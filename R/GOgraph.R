@@ -43,14 +43,12 @@ makeGOGraph <- function (x, what = "MF", lib = "hgu95av2",
     rE <- lapply(rE, function(x) x <- which(oldNodes %in% x))
     names(rE) <- oldNodes
 
-    rval = return(new("graphNEL", nodes = oldNodes, edgeL = lapply(rE,
-        function(x) list(edges = x)), edgemode = "directed"))
+    rval = new("graphNEL", nodes = oldNodes, edgeL = lapply(rE,
+        function(x) list(edges = x)), edgemode = "directed")
 
     if( removeRoot )
-        removeNode("GO:0003673", gG)
-    else
-        rval
-
+        rval = removeNode("GO:0003673", rval)
+    rval
 }
 
 

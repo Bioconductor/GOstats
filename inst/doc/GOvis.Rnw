@@ -121,6 +121,7 @@ satisfy two conditions first they were included on the chip being used
 and second they have a GO annotation for the ontology of interest.
 
 \subsection{An Example}
+\label{sec:example}
 
 To demonstrate some of the tools that are included in the
 \Rpackage{GOstats} package we consider expression data from 79 samples
@@ -193,7 +194,9 @@ than 100 units. Applying both of these transformations yielded
  lls = unlist(mget(gN, hgu95av2LOCUSID, ifnotfound=NA))
  syms = unlist(mget(gN, hgu95av2SYMBOL, ifnotfound=NA))
 
-@ Next restricting attention to just these \Sexpr{sum(selected)}
+@
+
+Next restricting attention to just these \Sexpr{sum(selected)}
 probes we use the \Rfunction{mt.maxT} function from the
 \Rpackage{multtest} package to compute adjusted $p$-values for F-test
 comparisons.  We found \Sexpr{sum(Fstats$adjp < pvCutOff)} of these to
@@ -210,55 +213,171 @@ data and note that others may want to use different conventions.
 
 \section{Visualization}
 
-We need to develop more and better tools for visualizing the data. We
-need to be able to associated the experimental data (often gene
-expression data) directly with the GO data. This can be done by laying
-out the induced GO graph and then controlling the nodes. They can be
-colored according to very many different criteria including $p$-value
-and the behavior of the genes of interest.
+Using the genes selected in Section~\ref{sec:example} we can
+construct the induced GO graph for any one of the three different
+Ontologies. In Figures~\ref{fig:mf}, \ref{fig:bp} and \ref{fig:cc} we
+present these three different graphs. Of course one would like to add
+some of the experimental data and information to these plots.
 
-Storch et al, plus some of the ALL plots go here.
+<<inducedGO, echo=FALSE, results=hide>>=
 
-Can we do a pieglyph and then use that to render at the different nodes?
+ gMF <- makeGOGraph(gN, "MF", "hgu95av2")
+ gBP = makeGOGraph(gN, "BP", "hgu95av2")
+ gCC = makeGOGraph(gN, "CC", "hgu95av2")
 
 
-\section*{Multiple Testing}
+ nMF = list()
+ lbs = rep("", length(nodes(gMF)))
+ names(lbs) = nodes(gMF)
+ nMF$label = lbs
 
-Using GO, or any other ontology, for data analytic purposes raises
-some substantial concerns about the interpretation of any resultant
-$p$-values. There are two major hurdles that present
-themselves. First, and probably least important, is the lack of
-independence. Since genes are annotated at a specific term and then by
-inheritance at all less specific terms we find that for less specific nodes
-the tests carried out often are based on largely the same genes as were
-used at the parent node.
+ nBP = list()
+ lbs = rep("", length(nodes(gBP)))
+ names(lbs) = nodes(gBP)
+ nBP$label = lbs
 
-%%FIXME: can we get an example - GO:
+ nCC = list()
+ lbs = rep("", length(nodes(gCC)))
+ names(lbs) = nodes(gCC)
+ nCC$label = lbs
 
-The second problem appears to be more substantial. It arises because
-we are not typically interested in the behavior of a single $p$-value
-(which is what $p$-value correction largely does) but rather with the
-existence of patterns in the $p$-values that are associated with
-structure in the GO graph. This is harder as we have no real guidance
-and it appears to be a rather unusual situation.
 
-For example in the ALL1/AF4 example we found a set of three nodes with
-increasing $p$-values as we went from the most specific term to the
-least specific. So that any $p$-value correction would remove the
-least specific term first. But the evidence was (something like) 7 of 111,
-8 of 121 and 22 of 800. Now given these numbers it is hard to believe that
-the evidence at the second node is of interest given the first
-node. Whereas, for the third node, even though it has a smaller
-$p$-value than the second node it does seem to indicate some form of
-new information.
 
-%%FIXME: perhaps we could do something like look to see if a node is
-%%interesting given its most significant antecedant? A rather odd form
-%%of linearization?
+@
 
-%%FIXME: find out what folks have done Gaven Sherlock has done
-%%something as I think have the FatiGO folks - the later seemed wrong
-%%to me but needs to be checked out
+\begin{figure}[htbp]
+\begin{center}
+
+<<GOMF, fig=TRUE, echo=FALSE>>=
+  plot(gMF, nodeAttrs=nMF)
+@
+\caption{The induced MF GO graph for the selected genes. \label{fig:mf}}
+\end{center}
+\end{figure}
+
+\begin{figure}[htbp]
+\begin{center}
+
+<<GOBP, fig=TRUE, echo=FALSE>>=
+  plot(gBP, nodeAttrs=nBP)
+@
+\caption{The induced BP GO graph for the selected genes. \label{fig:bp}}
+\end{center}
+\end{figure}
+
+\begin{figure}[htbp]
+\begin{center}
+
+<<GOCC, fig=TRUE, echo=FALSE>>=
+  plot(gCC, nodeAttrs=nCC)
+@
+\caption{The induced CC GO graph for the selected genes. \label{fig:cc}}
+\end{center}
+\end{figure}
+
+
+The nodes in these different graphs can be colored according to
+different criteria. In \cite{Storch} they considered using color for
+the nodes. The studied differences in gene expression
+between heart and liver in mice.  Their Figure 2 presents data that
+were assembled in roughly the following manner. Genes of interest were
+mapped to terms in the Biological Process arm of GO \cite{GO}.  They
+then colored the nodes in this tree red if the associated genes were
+expressed in heart, green if they were expressed in liver and yellow
+if they were expressed in both. The figure itself is quite helpful and
+clearly displays the data informatively.
+
+This is an interesting idea and we amplify it a bit here. In our
+example we have three groups and we might want to consider coloring
+the nodes differently. For each node in the induced graph there is one
+or more genes from our list of interesting genes annotated at that
+node (due to the way we constructed the graph). We could color the
+nodes according to the phenotype (ALL1/AF4, BCR/ABL, or NEG) that had
+the highest mean (if there is more than one gene then we might use the
+multiplicity of highest means). Or, possibly of more interest would be
+to categorize the genes (again we could use which phenotype had the
+highest mean) and render the nodes using pie charts.
+
+The computations are quite straightforward.
+First we find the maximum mean for each gene. We see that BCR/ABL has
+the most maxima, followed by the ALL1/AF4 samples and finally the NEGs.
+
+<<findhigestmeans>>=
+mns = apply(exprs(eS), 1, function(x) sapply(split(x, MB), mean))
+whismax = apply(mns, 2, function(x) match(max(x), x))
+maxNames = names(mns[,1])[whismax]
+names(maxNames) = names(whismax)
+table(maxNames)
+@
+
+We next need to associate each GO term with the set of these genes and
+classify them according to which phenotype has the highest mean.
+Since the CC ontology has the fewest nodes in the induced graph we
+will use it for the examples here -- the reader may want to adapt the
+code to deal with the other two ontologies.
+
+<<genesToGO>>=
+
+ CCnodes = nodes(gCC)
+ nodes2affy = mget(CCnodes, hgu95av2GO2ALLPROBES)
+
+ cts = sapply(nodes2affy, function(x) {
+       wh = names(whismax) %in% x
+       table(maxNames[wh])
+   })
+
+ all1cts = sapply(cts, function(x) x["ALL1/AF4"])
+ all1cts = ifelse(is.na(all1cts), 0, all1cts)
+
+ bcrcts = sapply(cts, function(x) x["BCR/ABL"])
+ bcrcts = ifelse(is.na(bcrcts), 0, bcrcts)
+
+ negcts = sapply(cts, function(x) x["NEG"])
+ negcts = ifelse(is.na(negcts), 0, negcts)
+
+ ctmat = cbind(all1cts, bcrcts, negcts)
+@
+
+Now that we have assembled the requisite counts we are now ready to
+layout and render the graph. The code in the following code chunk does
+this. We first do a layout to get the node positions and then write a
+function that will draw each node as a piechart and color the
+components the requested colors.
+
+
+<<layoutandrender>>=
+
+ pgLayout = agopen(gCC, "foo")
+
+plotPieChart <- function(curPlot, counts) {
+    renderNode <- function(x) {
+        force(x)
+        y <- x*100+1
+        function(node, ur) {
+            nodeCenter <- getNodeCenter(node)
+            pieGlyph(y, xpos=getX(nodeCenter),
+                     ypos=getY(nodeCenter),
+                     radius=getNodeRW(node),
+                     col=c("blue", "green", "red"))
+        }
+    }
+    drawing <- vector(mode="list", length=nrow(counts))
+    for (i in 1:length(drawing)) {
+        drawing[[i]] <- renderNode(counts[i,])
+    }
+
+    plot(curPlot, drawNode=drawing, main="Example Pie Chart Plot")
+    legend(300, 65, legend=c("ALL1/AF4", "BCR/ABL", "NEG"),
+          fill=c("blue", "green", "red"))
+}
+plotPieChart(pgLayout, ctmat)
+@
+
+We can see a number of interesting features in this plot. For example,
+long sequences of single colored nodes - as set of blue nodes on the
+right and another set of red nodes on the left. We might want to
+investigate these and see what cellular components they are related
+to.
 
 \section{GO induced Distances}
 
@@ -266,6 +385,9 @@ Another idea that has seen some exploration is the notion of defining
 distances between two genes in terms of the similarity of their GO
 annotations. We explore some of the suggestions and provide some
 guidance for those who would like to explore these ideas.
+
+
+
 
 One of the problems that seems to arise is how one might deal with
 genes that have multiple annotations. In that case a number of options
@@ -275,9 +397,6 @@ define distance as some combination of the annotation specific
 distances. For example, if gene 1 is annotated at 2 terms and gene 2 is
 annotated at three terms there are 6 distances to be computed and some
 functional of these 6 distances will be reported.
-
-%%FIXME: need to list how many multiply annotated genes for each of
-%%the different ontologies
 
 Discuss and describe the different distances here.
 
