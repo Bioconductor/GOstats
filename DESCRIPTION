@@ -6,7 +6,7 @@ Description: A set of tools for interacting with GO and microarray
   data. A variety of basic manipulation tools for graphs, hypothesis
   testing and other simple calculations.
 Depends: graph, GO, annotate, RBGL, xtable, Biobase, genefilter, multtest
-Suggests: hgu95av2 (>= 1.5.1)
+Suggests: hgu95av2 (>= 1.6.0)
 Maintainer: R. Gentleman <rgentlem@jimmy.harvard.edu>
 License: GPL2.0
 
