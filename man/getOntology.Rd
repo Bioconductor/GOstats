@@ -2,8 +2,9 @@
 \alias{getOntology}
 \title{ Get GO terms for a specified ontology }
 \description{
-Find the subset of GO terms, for each element of the supplied list of
-bindings from a manufacturers probe.
+Find the subset of GO terms for the specified ontology, for each element 
+of the supplied list of associations. The input list is typically from
+one of the chip-specific meta-data files or from GOLOCUSID2GO.
 }
 \usage{
 getOntology(inlist, ontology=c("MF", "BP", "CC"))
@@ -13,12 +14,14 @@ getOntology(inlist, ontology=c("MF", "BP", "CC"))
   \item{ontology}{The name of the ontology you want returned. }
 }
 \details{
-  A simple use of \code{\link{lapply}} and \code{\link{sapply}} to
-  extract the terms. Only GO identifiers are returned.
+  The input list should be a list of lists, each element of \code{inlist}
+  is itself a list containing the information that maps from a specified 
+  ID (usually LocusLink) to GO information. Each element of the inner list 
+  is a list with elements \code{GOID}, \code{Ontology} and \code{Evidence}. 
 }
 \value{
    A list of the same length as the input list. Each element of this
-   list will contain the GO term identifer for those terms that match
+   list will contain a vector of \code{GOID}s for those terms that match
    the requested ontology.
 }
 \author{R. Gentleman}
