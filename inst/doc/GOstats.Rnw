@@ -571,7 +571,7 @@ ggt3 = paste(ggt2, ifelse(numCh > 17, "...", ""), sep="")
 gg.counts <- gGhyp$goCounts[names(gg)]
 
 ggMat = matrix(c(nms3, ggt3, round(gg,3), gg.counts),
-    byrow=FALSE, nc=4, dimnames=list(rep("", length(gg)), c("GO ID",
+    byrow=FALSE, nc=4, dimnames=list(1:length(gg), c("GO ID",
    "Term", "p-value","No. of Genes")))
 xtable.matrix(ggMat,
   caption="GO terms, p-values and counts.", label="ta:GOggterms")
@@ -837,7 +837,8 @@ Table~\ref{ta:notconn}.
           c(length(bothBad), length(badN), length(badB)))
  affys = paste("\\verb+", affys, "+", sep="")
  outM = cbind(affys, syms, wh)
- dimnames(outM) = list(NULL, c("Affymetrix ID", "Symbol", "Which graph"))
+ dimnames(outM) = list(1:length(affys), c("Affymetrix ID", "Symbol",
+         "Which graph"))
  xtable(outM,
         caption="Genes not connected in the different graphs",
         label="ta:notconn")
@@ -882,7 +883,7 @@ the BCR/ABL graph.}
 
 <<analyseFinite, results=hide, echo=FALSE>>=
  ##these are pairwise distances that have changed a lot
- whOnes = xx>2.5 & is.finite(xx)
+ whOnes = xx>1.4 & is.finite(xx)
  vv = xx[whOnes]
  Ns = Ndists[whOnes]
  Bs = Bdists[whOnes]
@@ -1100,7 +1101,9 @@ that HMG20B and MPO have a negative correlation.
 \begin{figure}[htbp]
 \begin{center}
 <<pathPairs, fig=TRUE, echo=FALSE>>=
-pairs(t(exprs(Bsub)[MYCMPO.B$path,]))
+mat1 = t(exprs(Bsub)[MYCMPO.B$path,])
+dimnames(mat1)[[2]] = mget(dimnames(mat1)[[2]], hgu95av2SYMBOL)
+pairs(mat1)
 @
 \caption{Pairwise scatterplots of gene expression for those genes on
 the shortest path between MYC and MPO from patients with the BCR/ABL
