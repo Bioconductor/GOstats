@@ -227,6 +227,7 @@ for the specific set of child nodes.
        tmp <- rep(FALSE, length(nL))
        names(tmp) = nL
        tGfnA$fixedsize = tmp
+	names(nLterm) <- nL
        tGfnA$label = nLterm
        plot(tfG, nodeAttrs=tGfnA)
 
