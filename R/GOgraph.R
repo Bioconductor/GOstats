@@ -82,13 +82,12 @@ makeGOGraph <- function (x, Ontology = "MF", removeRoot=TRUE)
 ##then at step 2, the nodes are A,B,C,D; new nodes B,C,D
 ##we need to find edges for each of them
 ##we're going to build a graphNEL
-oneGOGraph <- function(x, dataenv) {
+GOGraph = function(x, dataenv) {
     require(GO) || stop("no GO library")
-    if( length(x) > 1 )
-        stop("wrong number of GO terms")
     if (!is.environment(dataenv))
         stop("second argument must be an environment")
-
+    ##this is the old oneGOGraph code - but it just works for
+    ##multiple inputs
     oldEdges <- vector("list", length=0)
     oldNodes <- vector("character", length=0)
     newN <- x
@@ -120,6 +119,15 @@ oneGOGraph <- function(x, dataenv) {
                function(x) list(edges=x)),edgemode="directed" ))
 }
 
+##to be deprecated
+oneGOGraph <- function(x, dataenv) {
+    require(GO) || stop("no GO library")
+    if( length(x) > 1 )
+        stop("wrong number of GO terms")
+    if (!is.environment(dataenv))
+        stop("second argument must be an environment")
+    GOGraph(x, dataenv)
+}
 ##given two GO graphs, g1 and g2 join them together into a single new
 ##GO graph
 combGOGraph <- function(g1, g2)
@@ -150,45 +158,51 @@ combGOGraph <- function(g1, g2)
       nG[sapply(iE, length) == 0]
   }
 
- ##similarity between GO terms as described in B. Ding/R. Gentleman
- ## the number of nodes in common divided by the total number of nodes
- ##in both graphs
- simDGGO <- function(term1, term2, dataenv) {
-     g1 <- oneGOGraph(term1, dataenv)
-     g2 <- oneGOGraph(term2, dataenv)
-     n1 <- nodes(g1)
-     n2 <- nodes(g2)
-     ##drop the GO root -- if there
-     m1 <- match("GO:0003673", n1)
-     if( !is.na(m1) ) n1 <- n1[-m1]
-     m2 <- match("GO:0003673", n2)
-     if( !is.na(m2) ) n2 <- n2[-m2]
-     length(intersect(n1,n2))/length(union(n1,n2))
+ ##similarity functions - based on graphs
+ simUI = function(g1, g2) {
+     if(!is(g1, "graph") || !is(g2, "graph") )
+         stop("only works for graphs")
+     n1 = nodes(g1); n2 = nodes(g2)
+    length(intersect(n1, n2))/length(union(n1, n2))
  }
 
- ##the similarity suggested by Cheng et al
- ##use the length of the longest path to the root in the intersection
- ##graph
- simCGO <- function(term1, term2, dataenv) {
-     require("RBGL", quietly=TRUE) || stop("need RBGL for this function")
-     if( is(term1, "graph") )
-         g1 <- term1
-     else
-         g1 <- oneGOGraph(term1, dataenv)
-     if( is(term2, "graph") )
-         g2 <- term2
-     else
-         g2 <- oneGOGraph(term2, dataenv)
-     ig <- intersection(g1, g2)
-     lfi <- GOLeaves(ig)
-     degs = degree(ig)
-     root = names(degs$outDegree)[degs$outDegree==0]
-     paths = sp.between(ig, lfi, root)
-     if( length(lfi) == 1 )
-         return(paths$length)
-     plens = sapply(paths, function(x) x$length)
-     max(plens)
- }
+ simLP = function(g1, g2) {
+    if(!is(g1, "graph") || !is(g2, "graph") )
+         stop("only works for graphs")
+    require("RBGL") || stop("need RBGL for this similarity")
+    ig <- intersection(g1, g2)
+    lfi <- GOLeaves(ig)
+    degs = degree(ig)
+    root = names(degs$outDegree)[degs$outDegree == 0]
+    paths = sp.between(ig, lfi, root)
+    plens = sapply(paths, function(x) x$length)
+    max(plens)
+}
+
+ ##a helper function to get the right GOIDs
+ .getWHEC = function(llid, wh, eCodes) {
+     x = GOLOCUSID2GO[[llid]]
+     if( !is.null(eCodes) )
+         x = dropECode(x, eCodes)
+     unique(unlist(getOntology(x, wh)))
+  }
+
+ simLL = function(ll1, ll2, Ontology="MF", measure = "LP",
+                      dropCodes=NULL) {
+    wh = match.arg(Ontology, c("MF", "BP", "CC"))
+    ll1GO = .getWHEC(ll1, wh, dropCodes)
+    ll2GO = .getWHEC(ll2, wh, dropCodes)
+    dataenv = get(paste("GO", wh, "PARENTS", sep=""),
+                    mode="environment")
+    g1 = GOGraph(ll1GO, dataenv)
+    g2 = GOGraph(ll2GO, dataenv)
+    sm = match.arg(measure, c("LP", "UI"))
+    sim = switch(sm,
+           LP = simLP(g1, g2),
+           UI = simUI(g1, g2))
+    return(list(sim=sim, measure=measure, g1 = g1, g2 =g2))
+  }
+
 
 ##three functions to get all the GO information for a set of GO terms
 ##FIXME: these need to be renovated - probably removed even..

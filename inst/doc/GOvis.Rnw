@@ -439,12 +439,12 @@ We can make use of the \Rfunction{imageMap} function from the
  dev.off()
 
  if( require(prada) ) {
-     con = openHtmlPage("example", "An Image Map")
+     con = openHTMLpage("example", "An Image Map")
 
      imageMap(con, "mygraph.jpg", CCbb, tooltips=getNodeNames(gCClo),
               url=rep("", length(nodes(gCC))))
 
-     closeHtmlPage(con)
+     closeHTMLpage(con)
  }
 
 
@@ -480,13 +480,13 @@ review of the area and for some suggestions. Code contributions that
 implement some of their methods would be most welcome.
 
 Two methods based on graph similarity have been implemented in
-\Rpackages{GOstats} they are \Rfunction{simDGGO} and
-\Rfunction{simCGO}. The first uses the number of nodes that the two
-graphs have in common divided by the total number of nodes in both
-graphs combined. Hence these similarities are bounded between 0 and 1
+\Rpackage{GOstats} they are \Rfunction{simUI} and
+\Rfunction{simLP}. The first uses the number of nodes that the two
+graphs have in common divided by the number of nodes in the union of
+the two node sets. Hence these similarities are bounded between 0 and 1
 with genes that are more similar having values near one.
 
-For \Rfunction{simCGO} the similarity measure is the depth of the
+For \Rfunction{simLP} the similarity measure is the depth of the
 longest shared path from the root node. Two genes that are both quite
 specific and similar should have long shared paths, while those that
 have less in common should have relatively short shared paths.
@@ -496,6 +496,27 @@ to fail to uncover similarity and others where they suggest a
 similarity that does not exist. Further investigation and comparison
 with other methods is certainly warranted.
 
+To compare different genes with respect to their GO annotation you may
+use \Rfunction{simLL} which first computes the induced GO graph for each of
+its two, user supplied, LocusLink IDs and then calls either
+\Rfunction{simLP} or \Rfunction{simUI}. Users can restrict the
+mappings from LocusLink IDs to GO IDs based on evidence codes.
+
+Some further work is needed to correctly address two outstanding
+issues. First, in some cases a LocusLink identifier is mapped to
+several GO terms and in the current implementation these are merely
+combined into one large graph. However, there may be some benefits in
+considering the comparison of each induced graph separately. For
+example, suppose that we have a gene, $G_1$ that performs a specific
+molecular function and we want to know which other genes are
+reasonably similar to it. We might not care if those other genes also
+do something else and so in this case we would probably use each
+mapping separately.
+
+The second issue that needs to be addressed at some time is to include
+functionality that would allow the user to construct a GO graph based
+only on \textit{is-a} relationships or only on \textit{partof}
+relationships.
 
 In the next code chunk we take the first 10 genes selected and
 construct a set of similarity measures between all pairs of genes with
@@ -510,7 +531,7 @@ respect to the BP ontology.
 
 
  GOs = mget(as.character(igenes), GOLOCUSID2GO, ifnotfound=NA)
- gBP = getOntology(GOs, "BP")
+ gBP = sapply(GOs, getOntology, "BP")
  ##how many terms
 
  sum(sapply(gBP, length))
@@ -522,25 +543,14 @@ respect to the BP ontology.
 
  ggs = lapply(igenes[hasBP], makeGOGraph, "BP")
 
-
- sim1 = function(g1, g2)
-    length(nodes(intersection(g1, g2)))/length(nodes(join(g1,g2)))
-
- sim2 = function(g1, g2) {
-    ig <- intersection(g1, g2)
-    lfi <- GOLeaves(ig)
-    degs = degree(ig)
-    root = names(degs$outDegree)[degs$outDegree == 0]
-    paths = sp.between(ig, lfi, root)
-    plens = sapply(paths, function(x) x$length)
-    max(plens)
-}
+## you could also do ggx = lapply(gBP, GOGraph, GOBPPARENTS)
+## and should get the same thing
 
  simatM1 = matrix(1, nr=sum(hasBP), nc=sum(hasBP))
  for(i in 1:sum(hasBP))
     for( j in 1:sum(hasBP) )
         if( i== j ) next else
-          simatM1[i,j] = sim1(ggs[[i]], ggs[[j]])
+          simatM1[i,j] = simUI(ggs[[i]], ggs[[j]])
 
  library(RBGL)
 
@@ -548,18 +558,18 @@ respect to the BP ontology.
  for(i in 1:sum(hasBP))
     for( j in 1:sum(hasBP) )
         if( i== j ) next else {
-          print(paste(i,j, sep=","))
-          simatM2[i,j] = sim2(ggs[[i]], ggs[[j]])
+          simatM2[i,j] = simLP(ggs[[i]], ggs[[j]])
       }
 
 @
 
-Now, since some of our genes have multiple BP mappings we must decide what
-to do with them.
+You can plot these two measures against each other and compare
+them. We hope that the two measures are somewhat positively
+correlated.
 
 
 
-\bibliography(GOstats}
+\bibliography{GOstats}
 
 \end{document}
 

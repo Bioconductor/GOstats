@@ -207,7 +207,7 @@ the graph that consists of those terms and any less specific terms
 for the specific set of child nodes.
 
 <<tfG,results=hide, echo=FALSE>>=
- tfG <- oneGOGraph("GO:0003700", GOMFPARENTS)
+ tfG <- GOGraph("GO:0003700", GOMFPARENTS)
  ##drop the GO node
  tfGs <- removeNode("GO:0003673", tfG)
 @
