@@ -131,7 +131,7 @@ table(unlist(affyEv, use.names=FALSE))
 <<dropOneEvidence>>=
 
 
-test1 = dropEcode(affyGO, c("IEA", "NR"))
+test1 = dropECode(affyGO, c("IEA", "NR"))
 
 table(unlist(getEvidence(test1), use.names=FALSE))
 
