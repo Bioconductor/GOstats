@@ -386,9 +386,6 @@ distances between two genes in terms of the similarity of their GO
 annotations. We explore some of the suggestions and provide some
 guidance for those who would like to explore these ideas.
 
-
-
-
 One of the problems that seems to arise is how one might deal with
 genes that have multiple annotations. In that case a number of options
 are open. One could define distance to the induced subgraph thereby
@@ -399,19 +396,6 @@ annotated at three terms there are 6 distances to be computed and some
 functional of these 6 distances will be reported.
 
 Discuss and describe the different distances here.
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 \end{document}
 

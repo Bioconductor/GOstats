@@ -426,14 +426,16 @@ view of the data.
  whGO = resT$index[resT$adjp<0.05]
  gNsel <- geneNames(esetSub)[whGO]
  gGO <- makeGOGraph(gNsel, "MF", "hgu95av2")
-##drop the GO root node
- gGO <- removeNode("GO:0003673", gGO)
 
  nA1 = list()
  lbs = rep("", length(nodes(gGO)))
  names(lbs) = nodes(gGO)
  nA1$label = lbs
 
+##fixme: why is this different
+##from just plotting
+## gGopen = agopen(gGO, "foo")
+## plot(gGopen, nodeAttrs=nA1)
 @
 
 \begin{figure}[htbp]
@@ -633,7 +635,7 @@ We focus our attention on these probes and carry out a permutation
 
 <<GO3, results=hide, echo=FALSE>>=
 
-resTGO <- mt.maxT(exprs(esetSub[whSel,]), classlabel=cl, B=100000)
+resTGO <- mt.maxT(exprs(esetSub[whSel,]), classlabel=cl, B=10000)
 ordGO <- order(resTGO$index) #$  the original gene order
 adjpGO <- resTGO$adjp[ordGO] #$  raw permutation $p$-values #names(resT)
 names(adjpGO) <- geneNames(esetSub[whSel,])
@@ -956,10 +958,6 @@ in each of the two graphs. In our examples we focus on MYC and the
 distances between it and MPO and GADD45A.
 
 <<graphsandpaths, echo=FALSE, results=hide>>=
-
- ##a little helper function to take the names off of the sp.between
- ##paths and
- #nm2sym
 
  ##get the Affy IDs for the genes that connect to MYC, and are
  ##interesting
