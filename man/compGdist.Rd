@@ -32,7 +32,9 @@ compGdist(g, whNodes, verbose = FALSE)
 \seealso{ \code{\link{compCorrGraph}} }
 \examples{
 
- ##none yet
+ example(compCorrGraph)
+ compGdist(corrG, nodes(corrG)[1:5])
+
 }
 \keyword{manip }
 

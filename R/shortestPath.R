@@ -42,6 +42,7 @@ shortestPath <- function(g, GOnode)
 }
 
 compGdist <- function(g, whNodes, verbose=FALSE) {
+    require("RBGL") || stop("need RBGL for compGdist")
     rval <- NULL
     nNodes = length(whNodes)
     for(i in 1:nNodes) {

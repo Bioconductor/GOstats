@@ -320,8 +320,8 @@ We can see that the problem can be quite substantial; there are
 \Sexpr{sum(tab) -tab[1]} LocusLink IDs that have more than one probe set
 identified with them. Making the correct inference requires that some
 adjustment be made for the many-to-one mapping from probes to
-LocusLink identifiers. These are sometimes called \textit{technical 
-replicates}, but investigation suggests that the are not necessarily probing 
+LocusLink identifiers. These are sometimes called \textit{technical
+replicates}, but investigation suggests that the are not necessarily probing
 the same thing, so some caution is warranted.
 
 For any particular microarray analysis you will need to obtain the
@@ -444,9 +444,9 @@ view of the data.
 \begin{center}
 
 <<GOg1, fig=TRUE, echo=FALSE>>=
-  if (require("Rgraphviz")) 
-    plot(gGO, nodeAttrs=nA1)  
-@ 
+  if (require("Rgraphviz"))
+    plot(gGO, nodeAttrs=nA1)
+@
 \caption{The induced GO graph for the selected genes. \label{fig:GG1}}
 \end{center}
 \end{figure}
@@ -710,11 +710,13 @@ level of expression and some variation in expression across samples.
 We then separate the data into two sets (BCR/ABL and NEG) and within
 each group we define the distance between two genes as one minus the
 Pearson correlation (other approaches such as that use by
-\cite{shortestpath} or some other robust correlation estimates) We
+\cite{shortestpath} or some other robust correlation estimates). We
 then used an edge weight of $d(u,v) = (1-C_{u,v})^k$ with $k=1$ and
-$\tau=0.6$ as the cutoff for correlations, if $C_{u,v}<\tau$ then no
-edge exists (Zhou et. al used $k=6$ in their analysis and some
-experimentation may be warranted).
+$\tau=0.6$ as the cutoff for correlations.
+We define $C_{u,v}$ to be the absolute value of the correlation
+between genes $u$ and $v$. If $C_{u,v}<\tau$ then no
+edge exists. Zhou et. al used $k=6$ in their analysis and some
+experimentation may be warranted.
 
 <<getTFs, hide=TRUE, echo=FALSE>>=
 TF2 <- get("GO:0003700", hgu95av2GO2ALLPROBES)
