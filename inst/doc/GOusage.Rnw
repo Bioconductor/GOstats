@@ -1,0 +1,148 @@
+%
+% NOTE -- ONLY EDIT THE .Rnw FILE!!!  The .tex file is
+% likely to be overwritten.
+%
+% \VignetteIndexEntry{Descriptive GO statistics}
+%\VignetteDepends{Biobase, genefilter, graph, GO, hgu95av2, xtable, multtest}
+%\VignetteSuggests{Rgraphviz}
+%\VignetteKeywords{EDA, graphs, ontology}
+%\VignettePackage{GOstats}
+\documentclass[12pt]{article}
+
+\usepackage{times}
+\usepackage{hyperref}
+
+\usepackage[authoryear,round]{natbib}
+\usepackage{times}
+\usepackage{comment}
+
+\textwidth=6.2in
+\textheight=8.5in
+%\parskip=.3cm
+\oddsidemargin=.1in
+\evensidemargin=.1in
+\headheight=-.3in
+
+\newcommand{\scscst}{\scriptscriptstyle}
+\newcommand{\scst}{\scriptstyle}
+
+\newcommand{\Rfunction}[1]{{\texttt{#1}}}
+\newcommand{\Robject}[1]{{\texttt{#1}}}
+\newcommand{\Rpackage}[1]{{\textit{#1}}}
+\newcommand{\Rclass}[1]{{\textit{#1}}}
+
+
+\bibliographystyle{plainnat}
+
+\title{Basic GO Statistics}
+\author{R. Gentleman}
+
+\begin{document}
+
+\maketitle
+
+\section*{Introduction}
+
+The basic characteristics of the GO \citep{GO} data are described in
+\cite{GentGO2004a} and the interested reader is referred there for
+more details. In this paper we assume that readers are familiar with
+the basic DAG structure of GO and with the mappings of genes to GO
+terms that are provide by GOA \citep{GOA}.
+In this vignette we consider some of the different properties of GO
+annotation. As a result we will produce some functionality that allows users
+to select different specific annotations of interest to them.
+
+<<Setup, echo=FALSE, results=hide>>=
+library("Biobase")
+library("annotate")
+library("GOstats")
+library("xtable")
+require("Rgraphviz", quietly=TRUE)
+library(hgu95av2)
+@
+
+\subsection{First Principles}
+
+Our mappings to GO from different microarray platforms are contained in
+platform specific documentation sets. For the HGu95Av2 chip the package is
+called \Robject{hgu95av2}.
+
+Some important GO terms are listed below.
+
+\begin{itemize}
+\item \texttt{GO:0003673} is the GO root.
+\item \texttt{GO:0003674} is the MF root.
+\item \texttt{GO:0005575} is the CC root.
+\item \texttt{GO:0008150} is the BP root.
+\item \texttt{GO:0000004} is biological process unknown
+\item \texttt{GO:0005554} is molecular function unknown
+\item \texttt{GO:0008372} is cellular component unknown
+\end{itemize}
+
+Finding terms that have specific values is easily accomplished using
+\Rfunction{grep}, but first we must convert the hash table
+(environment) containing the terms into a \Robject{character} vector
+since this is what \Rfunction{grep} expects.
+
+<<finding these>>=
+ goterms = unlist(as.list(GOTERM))
+ grep("molecular_function", goterms)
+@
+
+
+We first get all the MF terms for our Affymetrix data.  We do this by
+first turning the hash table into a list and then extracting from that
+list the set of GO terms that have an MF label (you might also want to
+only choose those with a particular evidence code).
+
+In R release 1.9.x you will need to turn the hash tables into lists to
+do any sort of applying to them, but in subsequent releases the
+function \Rfunction{eapply} can be used instead and it will be more
+efficient.
+
+<<getMF>>=
+affyGO = as.list(hgu95av2GO)
+
+affyMF = getOntology(affyGO)
+@
+
+How many of these probes have multiple GO
+terms associated with them? What do we do if we want to compare two
+genes that have multiple GO terms associated with them? Is it better
+to map from Affymetrix identifiers or from LocusLink identifiers?
+
+What about evidence codes? To find these we apply a similar function
+to the affyGO terms. Now we can see that the most common attribution
+is through the code \verb+IEA+, which corresponds to \textit{inferred
+from electronic analysis}, and the notes for this suggest that no
+curator has viewed the output. One may want to eliminate or downweight
+such associations. \verb+ISS+ is a similar annotation, but in this
+case BLAST or equivalent was used and a curator has viewed the results.
+
+<<getEvidence>>=
+
+
+affyEv = getEvidence(affyGO)
+
+table(unlist(affyEv, use.names=FALSE))
+
+@
+
+<<dropOneEvidence>>=
+
+
+test1 = dropEcode(affyGO, c("IEA", "NR"))
+
+table(unlist(getEvidence(test1), use.names=FALSE))
+
+
+
+
+@
+
+These functions make is somewhat straight forward to select subsets of
+the GO terms that are specific to different evidence codes.
+
+
+\end{document}
+
