@@ -191,6 +191,7 @@ combGOGraph <- function(g1, g2)
  }
 
 ##three functions to get all the GO information for a set of GO terms
+##FIXME: these need to be renovated - probably removed even..
  getGOCategory <- function(x) {
      if( !is.character(x) )
          stop("need a character argument")

@@ -73,6 +73,13 @@ library(hgu95av2)
 library(genefilter)
 @
 
+The results reported in this document are based on version
+\Sexpr{packageDescription("hgu95av2")[["Version"]]} of the
+\Rpackage{hgu95av2} data package and on
+\Sexpr{packageDescription("GO")[["Version"]]} of the \Rpackage{GO}
+package. If you have different versions your results will probably be
+different.
+
 \subsection{Graphs}
 
 The relationships between different GO terms, within a specific
@@ -402,7 +409,7 @@ We can make use of the \Rfunction{imageMap} function from the
 <<imageMap>>=
 
  getNodeBB = function(ingraph) {
-     xypos = getNodeLocs(ingraph)
+     xypos = getNodeXY(ingraph)
      hts = getNodeHeight(ingraph)
      wdsR = getNodeRW(ingraph)
      wdsL = getNodeLW(ingraph)
@@ -427,7 +434,7 @@ We can make use of the \Rfunction{imageMap} function from the
 ##to get the right user coords on the jpg file...
  jpeg("mygraph.jpg", quality=100, width=urx-llx, height=ury-lly)
   opar = par(plt=c(0,1,0,1), xpd=NA)
-  plotPieChart(gCClo, ctmat, xlim=c(0,urx-llx), ylim=c(0,ury-lly))
+  plotPieChart(gCClo, ctmat)
   par(opar)
  dev.off()
 
@@ -552,6 +559,7 @@ to do with them.
 
 
 
+\bibliography(GOstats}
 
 \end{document}
 

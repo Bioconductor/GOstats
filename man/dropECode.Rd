@@ -32,9 +32,11 @@ dropECode(inlist, code="IEA")
 \seealso{\code{\link{getEvidence}}, \code{\link{getOntology}} }
 
 \examples{
- if( require("hgu95av2") ) {
-     affyGO = as.list(hgu95av2GO)
-     ecd = dropECode(affyGO, c("IEA", "NR"))
+ bb=GOLOCUSID2GO$"4121"
+ getEvidence(bb)
+ cc = dropECode(bb)
+ getEvidence(cc)
+
 }
 
 

@@ -24,9 +24,8 @@ getEvidence(inlist)
 \seealso{\code{\link{getOntology}}, \code{\link{dropECode}} }
 
 \examples{
- if( require("hgu95av2") ) {
-     affyGO = as.list(hgu95av2GO)
-     affyEv = getEvidence(affyGO)
+ bb=GOLOCUSID2GO$"4121"
+ getEvidence(bb)
 }
 
 }

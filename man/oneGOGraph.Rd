@@ -29,9 +29,9 @@ oneGOGraph(x, dataenv)
 
  g1 <- oneGOGraph("GO:0003680", GOMFPARENTS)
  g2 <- oneGOGraph("GO:0003701", GOMFPARENTS)
- g3 <- combGOGraph(g1, g2)
+ g3 <- join(g1, g2)
 
-if( require(Rgraphviz) && interactive() )
+if( require("Rgraphviz") && interactive() )
   plot(g3)
 }
 \keyword{manip}

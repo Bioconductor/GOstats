@@ -26,9 +26,9 @@ getOntology(inlist, ontology=c("MF", "BP", "CC"))
 \seealso{\code{\link{getEvidence}}, \code{\link{dropECode}} }
 
 \examples{
- if( require("hgu95av2") ) {
-     affyGO = as.list(hgu95av2GO)
-     affyMF = getOntology(affyGO)
+ bb=GOLOCUSID2GO$"4121"
+ getOntology(bb)
+ sapply(bb, function(x) x$Ontology)
 }
 
 }

@@ -31,7 +31,7 @@ GOLeaves(inG)
 \examples{
  g1 <- oneGOGraph("GO:0003680", GOMFPARENTS)
  g2 <- oneGOGraph("GO:0003701", GOMFPARENTS)
- g3 <- combGOGraph(g1, g2)
+ g3 <- join(g1, g2)
  GOLeaves(g3)
 }
 \keyword{manip}
