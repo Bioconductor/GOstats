@@ -150,7 +150,7 @@ include ``chromosome'', ``nucleus'' and ``ribosome''.
 
 <<GOcharacteristics, echo=FALSE, results=tex>>=
  goTerms <- contents(GOTERM)
- goCats <- sapply(goTerms, Category)
+ goCats <- sapply(goTerms, Ontology)
  gCnums <- table(goCats)[c("BP","CC", "MF")]
  gCmat <- matrix(as.integer(gCnums), dimnames=list(c("BP","CC",
                                       "MF"), "Number of Terms"))

@@ -55,7 +55,7 @@ makeGOGraph <- function (x, Ontology = "MF", removeRoot=TRUE)
  ## desired mode
  hasGOannote <- function(x, which="MF") {
      if( is(x, "GOTerms") ) {
-         cat = Category(x)
+         cat = Ontoloy(x)
          if( !is.na(cat) && cat == which )
             return(TRUE) else return(FALSE)
      }
@@ -63,7 +63,7 @@ makeGOGraph <- function (x, Ontology = "MF", removeRoot=TRUE)
          gT = sapply(x, function(y) is(y, "GOTerms"))
          if( any(gT) ) {
              if( all(gT) ) {
-                 cats = sapply(x, Category)
+                 cats = sapply(x, Ontology)
                  return(cats == which)
              }
              else
@@ -72,7 +72,7 @@ makeGOGraph <- function (x, Ontology = "MF", removeRoot=TRUE)
      }
      if( !is.character(x) )
          stop("wrong argument")
-     tm <- getGOCategory(x)
+     tm <- getGOOntology(x)
      return(tm == which)
  }
 
@@ -206,13 +206,13 @@ combGOGraph <- function(g1, g2)
 
 ##three functions to get all the GO information for a set of GO terms
 ##FIXME: these need to be renovated - probably removed even..
- getGOCategory <- function(x) {
+ getGOOntology <- function(x) {
      if( !is.character(x) )
          stop("need a character argument")
      if(length(x) == 0 )
          return( character(0))
      wh <- mget(x, env=GOTERM, ifnotfound=NA)
-     return( sapply(wh, Category) )
+     return( sapply(wh, Ontology) )
  }
 
  getGOParents <- function(x) {
@@ -271,7 +271,7 @@ combGOGraph <- function(g1, g2)
      if(length(x) == 0 )
          return(list())
      terms <- mget(x, env=GOTERM, ifnotfound=NA)
-     ontology <- sapply(terms, Category)
-     terms = sapply(terms, Ontology)
+     ontology <- sapply(terms, Ontology)
+     terms = sapply(terms, Term)
      return(split(terms, ontology))
  }

@@ -46,7 +46,7 @@ GOHyperG <- function(x, lib="hgu95av2", what="MF") {
 
     ##determine which of the GO terms are in the category we are
     ##working on
-    goCat <- unlist(getGOCategory(names(goV)))
+    goCat <- unlist(getGOOntology(names(goV)))
     goodGO <- goCat == what
     ##not every thing in goV has a category
     mm <- match(names(goCat), names(goV))

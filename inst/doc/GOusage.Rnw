@@ -241,10 +241,9 @@ First we list some of the specific GO IDs that might be of interest
 
 We can find out how many terms are in each of the different ontologies
 by:
-%%FIXME: this will change with the new updates from Jianhua
 <<sizeofonts>>=
 
- zz = eapply(GOTERM, function(x) x@Category)
+ zz = eapply(GOTERM, function(x) x@Ontology)
  table(unlist(zz))
 
 @
@@ -286,8 +285,7 @@ it easier to do multiple searches.
 
 
 <<finding these>>=
-##FIXME: needs to change when the new GO package is ready
- goterms = unlist(eapply(GOTERM, function(x) x@Ontology))
+ goterms = unlist(eapply(GOTERM, function(x) x@Term))
  whmf = grep("molecular_function", goterms)
 @
 So we see that there are \Sexpr{length(whmf)} terms with the string
