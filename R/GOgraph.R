@@ -12,7 +12,11 @@ makeGOGraph <- function (x, what = "MF", lib = "hgu95av2",
     GOpkgname<- paste(lib, "GO", sep="")
     GOpkgenv <- get(GOpkgname, mode="environment")
     newNodes <- mget(x, env = GOpkgenv, ifnotfound=NA)
-    newNodes <- newNodes[!is.na(newNodes)]
+    if( length(newNodes) == 1)
+       bd = is.na(newNodes[[1]])
+    else
+       bd = is.na(newNodes)
+    newNodes <- newNodes[!bd]
 
     newNodes <- lapply(newNodes, function(x) x[sapply(x, hasGOannote,
         what)])
