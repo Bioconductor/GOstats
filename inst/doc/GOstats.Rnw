@@ -744,19 +744,19 @@ zz = unlist(dups)
 oTF3 = oTF2[!duplicated(LL2)]
 @
 
-Our interest in this particular example is on transcription
-factors. Hence we use the GO term \texttt{GO:0003700} which maps to
-the molecular function \texttt{transcription factor activity} to
-identify all genes with transcription factor activity. We used only
-genes for which this was a most specific annotation and obtained
+Our interest in this particular example is on transcription factors.
+Hence we use the GO term \texttt{GO:0003700} which maps to the
+molecular function \texttt{transcription factor activity} to identify
+all genes with transcription factor activity. We used only genes for
+which this was a most specific annotation and obtained
 \Sexpr{length(TF2)} mappings and \Sexpr{sum(!duplicated(LLs))} unique
 LocusLink ids. Of these \Sexpr{length(oTF2)} were among those probes
 selected for our analysis. Of these we found that there were
-\Sexpr{length(ww)} with duplicate entries. A visual inspection (not
-reported) suggested that the correlation between these duplicate
-probes was quite high and so only one of each was used in the
-subsequent analysis. This left us with \Sexpr{length(oTF3)} distinct
-transcription factors for our study.
+\Sexpr{length(ww)} with duplicate entries (\textit{technical
+  replicates}. A visual inspection (not reported) suggested that the
+correlation between these duplicate probes was quite high and so only
+one of each was used in the subsequent analysis. This left us with
+\Sexpr{length(oTF3)} distinct transcription factors for our study.
 
 We note that while \cite{shortestpath} divided the probes/genes
 according to the cellular component they were annotated at, we did not
@@ -890,10 +890,13 @@ the BCR/ABL graph.}
 
  dNames = idx2dimnames(Ndists, whOnes)
 
- rowSym <- unlist(mget(dNames$rowNames, hgu95av2SYMBOL, ifnotfound=NA))
+ rowSym <- unlist(mget(dNames$rowNames, hgu95av2SYMBOL, 
+             ifnotfound="Unknown"))
  colSym = unlist(mget(dNames$colNames, hgu95av2SYMBOL,
-          ifnotfound=NA))
+          ifnotfound="Unknown))
 
+ rowSym[is.na(rowSym)] = "Unknown"
+ colSym[is.na(colSym)] = "Unknown"
 
  fromTO = paste(rowSym, colSym, sep="->")
 
