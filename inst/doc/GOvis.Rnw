@@ -260,7 +260,7 @@ some of the experimental data and information to these plots.
 \begin{center}
 
 <<GOBP, fig=TRUE, echo=FALSE>>=
-  if (require("Rgraphivz"))
+  if (require("Rgraphviz"))
     plot(gBP, nodeAttrs=nBP)
 @
 \caption{The induced BP GO graph for the selected genes. \label{fig:bp}}

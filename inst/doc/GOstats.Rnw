@@ -1163,7 +1163,7 @@ that is the case here). We consider two specific paths -
 \begin{center}
 <<pathinNEG, fig=TRUE, echo=FALSE>>=
  nAN = nA; nAN$fillcolor = Ncols
- if (require("Rgraphivz"))
+ if (require("Rgraphviz"))
     plot(NsG, "neato", nodeAttrs=nAN)
 
 @
