@@ -5,7 +5,7 @@
 
     if(.Platform$OS.type == "windows" && require(Biobase) && interactive()
         && .Platform$GUI ==  "Rgui"){
-        addPDF2Vig("GOstats")
+        addVigs2WinMenu("GOstats")
     }
 
 
