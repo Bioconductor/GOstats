@@ -308,7 +308,7 @@ tab <- table(table(lls))
 cat("Multiplicity      ", sapply(names(tab),
      function(x) sprintf("%4s", x)),
     "\nNo. LocusLink IDs ", sapply(tab,
-     function(x) sprintf("%4d", x)))
+     function(x) sprintf("%4d", x)), "\n")
 
 #lls  <- lls[!is.na(lls)]   ## LocuslinkIDs
 #spLL <- split(lls, lls)    ## Unique Locuslink IDs
@@ -346,8 +346,8 @@ annotated specifically at \texttt{GO:0003700} and these correspond to
 We can also use the data in \Robject{hgu95aGO2ALLPROBES} to find all
 the probe sets that are annotated at the term \texttt{GO:0003700},
 this is the union of those specifically annotated at that term
-together with those annotated at any of the child nodes.  This is
-\Sexpr{length(alltfprobes)} probes.
+together with those annotated at any of the child nodes.  For the term
+\texttt{GO:0003700} there are \Sexpr{length(alltfprobes)} probes.
 
 \section{An Example}
 
@@ -399,14 +399,14 @@ numLT = unlist(gnames[resT$index[resT$adjp<0.05]])
 @
 
 To reduce the set of genes for consideration we applied two different
-sets of filters (gene filtering is considered in more detail in
-\cite{WileyEncy} and the interested reader is referred there). A
+sets of filters. Gene filtering is considered in more detail in
+\cite{WileyEncy} and the interested reader is referred there. A
 non-specific filter was used to remove genes that showed little or no
 change in expression level across experiments. The resulting data set
 had \Sexpr{sum(selected)} probes remaining. To select genes whose
 expression values were associated with the phenotypes of interest
 (BCR/ABL and NEG) we used the \Rfunction{mt.maxT} function from the
-\Rpackage{multtest} package which computes a permutation based t-test
+\Rpackage{multtest} package which computes a permutation based $t$-test
 for comparing two groups.
 
 After adjustment for multiple testing there were only
@@ -417,7 +417,7 @@ most-specific GO terms in the MF ontology that they are annotated at
 and compute the induced GO graph which is rendered in
 Figure~\ref{fig:GG1}. No labels have been added to the nodes in this
 plot since there is not sufficient room to provide informative
-ones. Notice that the most specific terms are at the top of the graph
+ones. The most specific terms are at the top of the graph
 and that arrows go from more specific nodes to less specific ones. The
 node in the bottom center is the MF node. Clearly some sort of
 interactivity (e.g. tooltips) would be beneficial. We will return to
@@ -708,15 +708,16 @@ technology is as follows. We use the output of the first filtering
 step described previously -- that is we select genes that show some
 level of expression and some variation in expression across samples.
 We then separate the data into two sets (BCR/ABL and NEG) and within
-each group we define the distance between two genes as one minus the
-Pearson correlation (other approaches such as that use by
-\cite{shortestpath} or some other robust correlation estimates). We
-then used an edge weight of $d(u,v) = (1-C_{u,v})^k$ with $k=1$ and
-$\tau=0.6$ as the cutoff for correlations.
-We define $C_{u,v}$ to be the absolute value of the correlation
-between genes $u$ and $v$. If $C_{u,v}<\tau$ then no
-edge exists. Zhou et. al used $k=6$ in their analysis and some
-experimentation may be warranted.
+each group we define the distance between two genes, $u$ and $v$, as
+one minus the absolute value of the Pearson correlation.  Other
+approaches that could be used are Spearman's correlation, that use by
+\cite{shortestpath} or some other robust correlation estimate. We let
+$C_{u,v}$ denote the absolute value of the \textit{correlation}
+between probes $u$ and $v$ and used an edge weight of $d(u,v) =
+(1-C_{u,v})^k$ with $k=1$ and $\tau=0.6$ as the cutoff for
+correlations. If $C_{u,v}<\tau$ then no edge exists in our group. Zhou
+et. al used $k=6$ in their analysis and some experimentation may be
+warranted.
 
 <<getTFs, hide=TRUE, echo=FALSE>>=
 TF2 <- get("GO:0003700", hgu95av2GO2ALLPROBES)
@@ -828,7 +829,6 @@ that are not connected in either graph, those that are not connected
 in one of the two graphs but not in the other. They are reported in
 Table~\ref{ta:notconn}.
 
-%%FIXME: is the symbol for 1106_s_at really TRA@
 <<reportNotConn, results=tex, echo=FALSE>>=
 
  affys = c(bothBad, badN, badB)
@@ -890,7 +890,7 @@ the BCR/ABL graph.}
 
  dNames = idx2dimnames(Ndists, whOnes)
 
- rowSym <- unlist(mget(dNames$rowNames, hgu95av2SYMBOL, 
+ rowSym <- unlist(mget(dNames$rowNames, hgu95av2SYMBOL,
              ifnotfound="Unknown"))
  colSym = unlist(mget(dNames$colNames, hgu95av2SYMBOL,
           ifnotfound="Unknown"))
@@ -898,7 +898,7 @@ the BCR/ABL graph.}
  rowSym[is.na(rowSym)] = "Unknown"
  colSym[is.na(colSym)] = "Unknown"
 
- fromTO = paste(rowSym, colSym, sep="->")
+ fromTO = paste(rowSym, colSym, sep="<->")
 
 @
 
@@ -924,7 +924,7 @@ reported below.
 @
 
 <<getthemappings, results=hide, echo=FALSE>>=
-##found 3 genes - MYC, GADD45A and MPO
+##using 3 genes - MYC, GADD45A and MPO
  nMYC = Ns[grep("^MYC", rowSym)]
  names(nMYC) = fromTO[grep("^MYC", rowSym)]
  bMYC = Bs[grep("^MYC", rowSym)]
@@ -943,21 +943,22 @@ reported below.
 @
 
 %%FIXME: watch out here as the facts may change as the data do
-And we can see that there are three genes that have substantially
-higher counts than the others, namely, MYC, MPO and GADD45A. This fact
-suggests that perhaps the expression patterns of these three different
-transcription factors are substantially different in the two
-phenotypes we are studying.
+And we can see that GADD45A has much higher counts than the rest.
+Additionally MYC, MPO and L0C57228 each have several. Very little is
+currently known about L0C57228 and so we concentrate our examination
+on the other three genes. The evidence here suggests that, perhaps,
+the expression patterns of these three different transcription factors
+are substantially different in the two phenotypes we are studying.
 
 For each of the three transcription factors we can compute the average
 distance, separately within each graph, to all the other selected
 genes. We find that the results are quite consistent and that in all
 cases the path length is much shorter in the BCR/ABL group than it is
-in the NEG group. For MYC the means were \Sexpr{round(mean(nMYC))} for
-NEG and \Sexpr{round(mean(bMYC))} for BCR/ABL, for MPO they were
-\Sexpr{round(mean(nMPO))} for NEG and \Sexpr{round(mean(bMPO))} for
-BCR/ABL and for GADD45A the means were \Sexpr{round(mean(nGADD))} for
-NEG and \Sexpr{round(mean(bGADD))} for BCR/ABL. It is rather
+in the NEG group. For MYC the means were \Sexpr{round(mean(nMYC),1)} for
+NEG and \Sexpr{round(mean(bMYC),1)} for BCR/ABL, for MPO they were
+\Sexpr{round(mean(nMPO),1)} for NEG and \Sexpr{round(mean(bMPO),1)} for
+BCR/ABL and for GADD45A the means were \Sexpr{round(mean(nGADD),1)} for
+NEG and \Sexpr{round(mean(bGADD),1)} for BCR/ABL. It is rather
 interesting to observe that amongst the pairwise distances that have
 changed the most are those between these three specific genes.
 
@@ -1001,7 +1002,7 @@ distances between it and MPO and GADD45A.
       nms = mget(x$path, hgu95av2SYMBOL)
    else
       nms = x$path
-   paste(nms, collapse="->")
+   paste(nms, collapse="<->")
  }
 @
 
@@ -1012,7 +1013,7 @@ results are:
 
 <<printPaths1, echo=FALSE>>=
 
-  cat("BCR/ABLE \n")
+  cat("BCR/ABL \n")
   p2ch(MYCMPO.B)
   cat("NEG \n")
   p2ch(MYCMPO.N)
@@ -1020,16 +1021,19 @@ results are:
 @
 
 If we then make use of the results in Figure~\ref{fig:pairs} we see
-that there are positive correlations between MYC and EIF4G1 and as
-well between EIF4G1 and HMG20B, but that for HMG20B and MPO the
+that there are positive correlations between MYC and KIAA0540 and as
+well between KIAA0540 and HMG20B, but that for HMG20B and MPO the
 correlation is negative. Positive correlations are suggestive of
 shared transcriptional activity while negative correlations are
-suggestive of transcriptional inhibition.
+suggestive of transcriptional inhibition. But the reader is cautioned
+that these are stable values averaged over many cells and are not in
+any sense a time-course so direct relationships are very difficult to
+establish.
 
 The results comparing MYC to GADD45A are:
 <<printPaths1, echo=FALSE>>=
 
-  cat("BCR/ABLE \n")
+  cat("BCR/ABL \n")
   p2ch(MYCGADD45A.B)
   cat("NEG \n")
   p2ch(MYCGADD45A.N)
@@ -1092,8 +1096,10 @@ want to ask whether the distances are also larger (that is that the
 correlations are smaller). To do this we need to obtain the edge
 weights from the respective graphs and compare them. We found that
 there appeared to be no difference (all averaged around a distance of
-about $0.65$) but the number of edges is quite small and one might
-expect to see systematic differences if a larger study were undertaken.
+about \Sexpr{round(mean(c(MYCMPO.Bwts,MYCMPO.Nwts,
+  MYCGADD45A.Bwts,MYCGADD45A.Nwts)),1)} but the number of edges is
+quite small and one might expect to see systematic differences if a
+larger study were undertaken.
 
 We can check our results, at least to some extent, by examining
 pairwise scatterplots of the gene expressions. In
@@ -1118,7 +1124,8 @@ Finally, we finish our examination of these data by considering some
 of the specific paths between the different transcription
 factors. Comparison of paths in different graphs is problematic since
 the same nodes need not be connected in the two different graphs (and
-that is the case here). We consider two specific paths -
+that is the case here). We consider two specific paths - the ones
+between MYC and MPO in each of the two phenotypes.
 
 <<subGraphs, results=hide, echo=FALSE>>=
  basecol = rep("lightyellow", length(sGnodes))
@@ -1178,7 +1185,7 @@ that is the case here). We consider two specific paths -
 
 @
 \caption{Shortest path between MYC and MPO in the NEG
-  samples. \label{fig:NEGsp}.}
+  samples. \label{fig:NEGsp}}
 \end{center}
 \end{figure}
 
@@ -1191,7 +1198,7 @@ that is the case here). We consider two specific paths -
     plot(BsG, "neato", nodeAttrs=nAB)
 @
 \caption{Shortest path between MYC and MPO in the BCR/ABL
-  samples. \label{fig:BCRsp}.}
+  samples. \label{fig:BCRsp}}
 \end{center}
 \end{figure}
 
