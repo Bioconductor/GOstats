@@ -6,7 +6,7 @@
 %\VignetteDepends{Biobase, genefilter, graph, GO, hgu95av2, xtable, multtest}
 %\VignetteSuggests{Rgraphviz}
 %\VignetteKeywords{EDA, graphs, ontology, visualization}
-%\VignettePackage{none}
+%\VignettePackage{GOstats}
 \documentclass[12pt]{article}
 
 \usepackage{times}
