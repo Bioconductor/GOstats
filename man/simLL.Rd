@@ -38,11 +38,10 @@ simLP(g1, g2)
   the size of the union of the node sets. Large values indicate more
   similarity. These similarities are between 0 and 1.
 
-  For code{\simLP} the length of the longest path in the intersection
+  For \code{simLP} the length of the longest path in the intersection
   graph of the two supplied graph. Again, large values indicate more
   similarity. Similarities are between 0 and the maximum leaf depth of
   the graph for the specified ontology.
-  
 }
 \value{
   A list with:
