@@ -432,12 +432,13 @@ We can make use of the \Rfunction{imageMap} function from the
 
 ##FIXME: work in progress here - we need to do a bit of mapping
 ##to get the right user coords on the jpg file...
+if (interactive()) {
  jpeg("mygraph.jpg", quality=100, width=urx-llx, height=ury-lly)
   opar = par(plt=c(0,1,0,1), xpd=NA)
   plotPieChart(gCClo, ctmat)
   par(opar)
  dev.off()
-
+}
  if( require(prada) ) {
      con = openHTMLpage("example", "An Image Map")
 
