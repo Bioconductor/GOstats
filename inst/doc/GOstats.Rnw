@@ -1,0 +1,1274 @@
+%
+% NOTE -- ONLY EDIT THE .Rnw FILE!!!  The .tex file is
+% likely to be overwritten.
+%
+% \VignetteIndexEntry{Using GOstats}
+%\VignetteDepends{genefilter, graph, GO, hgu95av2, xtable, multtest, RBGL}
+%\VignetteSuggests{Rgraphviz}
+%\VignetteKeywords{EDA, graphs, ontology, hypothesis testing}
+%\VignettePackage{none}
+\documentclass[11pt]{article}
+
+\usepackage{times}
+\usepackage{hyperref}
+
+\usepackage[authoryear,round]{natbib}
+\usepackage{times}
+\usepackage{comment}
+
+\textwidth=6.2in
+\textheight=8.5in
+%\parskip=.3cm
+\oddsidemargin=.1in
+\evensidemargin=.1in
+\headheight=-.3in
+
+\newcommand{\scscst}{\scriptscriptstyle}
+\newcommand{\scst}{\scriptstyle}
+
+\newcommand{\Rfunction}[1]{{\texttt{#1}}}
+\newcommand{\Robject}[1]{{\texttt{#1}}}
+\newcommand{\Rpackage}[1]{{\textit{#1}}}
+\newcommand{\Rclass}[1]{{\textit{#1}}}
+
+
+\bibliographystyle{plainnat}
+
+\title{Using GO for Statistical Analyses}
+\author{R. Gentleman}
+
+\begin{document}
+
+\maketitle
+
+\section{Introduction}
+
+While there are a number of different definitions of an ontology we
+will use the notion of a restricted vocabulary as the basis for the
+discussions here. Ontologies and related concepts are becoming
+increasingly important tools for organizing and navigating
+information. Initiatives in biology (our main focus) as well as the
+semantic web are providing a variety of resources and interesting
+problems related to ontologies.
+
+One of the major problems facing comprehensive searching and use of
+available biological information is the lack of a common set of terms
+and descriptions for basic biological functions, processes and
+entities. In fact, many genes have a variety of different names. For
+genes and gene products the Gene Ontology Consortium, or GO,
+(\url{www.geneontology.org}) is an initiative that is designed to
+address this problem. GO provides a restricted vocabulary as well as
+clear indications of the relationships between terms.  Readers are
+referred to the GO web site for more specific definitions.
+
+GO is clearly a valuable tool for data analysis, however its structure
+(as a DAG) and the complex nature of the relationships that it
+represents make appropriate use of this tool challenging. Most data
+analytic software is not readily able to handle these data and much of
+the organizational burden falls on the data analyst.  We have been
+developing tools, as part of the Bioconductor Project, that should
+greatly simplify the use of GO in a data analytic context. We consider
+some of these different methods in the remainder of this paper. First
+we outline some general properties and behaviors of GO. That
+discussion is followed by a description of our example and finally the
+different methods are applied to the data.
+
+In this paper we will use meta-data packages from the Bioconductor
+Project to carry out statistical analyses of gene expression data.
+But would like to note that the potential scope of these applications
+is much broader and many of the methods described here could be
+applied to other types of high-throughput data. To provide context we
+will make use of data from an investigation into acute lymphoblastic
+leukemia (ALL) reported in \citet{Chiaretti2004}.
+
+The outline of the paper is as follows. First we discuss and explain
+what GO is, how it is structured and how genes are annotated at
+specific terms within GO. Then we briefly describe the example data.
+Then we consider three specific analyses. The first uses GO to help
+understand sets of genes that have been selected according to specific
+criteria by the data analyst. The second use of GO is to reduce the
+set of probes to a manageable number before carrying out an analysis,
+while the third considers some variations on the graph theoretic
+themes introduced by \cite{shortestpath} and finally we discuss our
+findings and make some suggestions for further exploration.
+
+<<Setup, echo=FALSE, results=hide>>=
+library("Biobase")
+library("annotate")
+library("GOstats")
+library("xtable")
+library("multtest")
+require("Rgraphviz", quietly=TRUE)
+library(hgu95av2)
+library(genefilter)
+library(RBGL)
+@
+
+\section{The Gene Ontology}
+
+An ontology is a restricted structured vocabulary of terms that
+represent domain knowledge. In a practical sense an ontology specifies
+a vocabulary that can be used to exchange queries and assertions. A
+commitment to the use of the ontology is an agreement to use the
+shared vocabulary in a consistent way. There is no commitment to
+completeness, the commitment is to coherence and consistency.
+
+The Gene Ontology (GO) consortium produces three independent
+ontologies for gene products.  The three ontologies form the basis for
+the description of the molecular function, biological process and
+cellular component of gene products. The relationships between gene
+products and specific terms in the three ontologies, molecular
+function, biological process and cellular component, are all many to
+many. Gene products are physical things such as proteins or RNA. In
+the remainder of the paper the terms \textit{gene product} and
+\textit{gene} will be used interchangeably (except in situations where
+it is obvious that the remark pertains only to one or the other).
+
+The \textit{molecular function} of a gene product is defined to be
+biochemical activity or action of the gene product. This describes a
+capability that the gene product has and there is no reference to
+where or when this activity or usage actually occurs.  Examples of
+terms that fall into this ontology are: "enzyme," "transporter," or
+"ligand."
+
+The term \textit{biological process} should be interpreted as a
+biological objective to which the gene product contributes.  A
+biological process is accomplished via one or more ordered assemblies
+of molecular functions. There is generally some temporal aspect to the
+process and it will often involve the transformation of some physical
+thing. Examples of terms in this ontology include "cell growth and
+maintenance" or "signal transduction". The concept of a pathway is
+different from that of a biological process. A pathway is more complex
+and has dependencies and dynamics that are not part of the concept of
+a biological process.  It is not always easy to distinguish between
+molecular function and biological process. The GO consortium suggests
+that a process must have more than one distinct step.
+
+A \textit{cellular component} is a component of a cell that is part of
+some larger object or structure. Examples of cellular components
+include ``chromosome'', ``nucleus'' and ``ribosome''.
+
+<<GOcharacteristics, echo=FALSE, results=tex>>=
+ goTerms <- contents(GOTERM)
+ goCats <- sapply(goTerms, function(x) names(x))
+ gCnums <- table(goCats)[c("BP","CC", "MF")]
+ gCmat <- matrix(as.integer(gCnums), dimnames=list(c("BP","CC",
+                                      "MF"), "Number of Terms"))
+ xtable.matrix(gCmat, display=c("d","d"),
+  caption="Number of GO terms per ontology.", label="ta:GOprops")
+@
+
+Table~\ref{ta:GOprops} presents the number of different terms
+associated with each of the three ontologies. For example,
+we see that for version \Sexpr{package.description("GO")["Version"]}
+of the \Rpackage{GO} package there are \Sexpr{gCnums[1]} terms in the
+biological process (BP) ontology.
+
+\subsection{The Graph Structure of GO}
+
+The GO ontologies are structured as directed acyclic graphs (DAGs)
+that represent a network in which each term may be a \textit{child} of
+one or more \textit{parents}. We use the expressions \textit{GO node}
+and \textit{GO term} interchangeably.  Child terms are more
+specific than their parents. The term ``transmembrane receptor
+protein-tyrosine kinase'' is child of both ``transmembrane receptor''
+and ``protein tyrosine kinase''. For each of the three different
+ontologies there is a root node that has the ontology name associated
+with it and that node is the most general node for terms in the
+respective ontology. In the published hierarchy these three nodes all have a
+common parent node which is labeled as the ``gene ontology'' node, but
+this node is dropped from the examples presented here.
+
+The relationship between a child and a parent can be and be either a
+\textit{is a} relation or a \textit{has a} (\textit{part of})
+relation.  For example ``mitotic chromosome'' is a child of
+``chromosome'' and the relationship is an \textit{is a} relation. On
+the other hand, a ``telomere'' is a child of ``chromosome'' with the
+\textit{has a} relation. Child terms may have more than one parent
+term and may have a different class of relationship with its different
+parents.
+
+Each term in the ontology is associated with a unique identifier and
+the relationships between the GO terms (parent/child) as well as other
+relevant data are provided by GO. The \Rpackage{GO} package provides
+six sets of mappings, two for each ontology. For example the two
+cellular component mappings are provided by \Robject{GOCCPARENTS} and
+\Robject{GOCCCHILDREN} and the others are similarly named, with
+\texttt{CC} replaced by \texttt{BP} and \texttt{MF} respectively.
+For example the term
+\textit{transcription factor} is in the molecular function ontology
+and has the GO label \texttt{GO:0003700}. Figure~\ref{fig:tfG}
+shows the graph that is created by starting with this node and finding
+all of the less specific terms that are related to it.
+
+In general, given a set of most specific terms of interest we can find
+the graph that consists of those terms and any less specific terms
+(parents). We will refer to this graph as the \textit{induced GO graph}
+for the specific set of child nodes.
+
+<<tfG,results=hide, echo=FALSE>>=
+ tfG <- oneGOGraph("GO:0003700", GOMFPARENTS)
+ ##drop the GO node
+ tfGs <- removeNode("GO:0003673", tfG)
+@
+
+\begin{figure}[htbp]
+  \begin{center}
+<<tfGplot, fig=TRUE, echo=FALSE, results=hide>>=
+   nL <- nodes(tfG); nLterm = unlist(mget(nL, GOTERM))
+   names(nLterm) = nL
+   nLterm["GO:0003673"] <-  "Gene Ontology"
+   if(require(Rgraphviz) ) {
+       tGfnA <- list()
+       tmp <- rep("ellipse", length(nL))
+       names(tmp) <- nL
+       tGfnA$shape = tmp;
+       tmp <- rep(FALSE, length(nL))
+       names(tmp) = nL
+       tGfnA$fixedsize = tmp
+       tGfnA$label = nLterm
+       plot(tfG, nodeAttrs=tGfnA)
+
+   }
+@
+%$
+  \caption{Graph of GO relationships for the term: transcription factor
+  \label{fig:tfG}}
+\end{center}
+\end{figure}
+
+We can also obtain the children of a node, for example we can obtain
+those terms within the MF ontology that are more specific than
+\textit{transcription factor}.
+
+<<tfG.children, echo=FALSE>>=
+tfG.ch <- get("GO:0003700", GOMFCHILDREN)
+tfg.terms <- mget(tfG.ch, GOTERM)
+tfg.tch <- paste(names(tfg.terms), tfg.terms, sep=": ")
+for(i in tfg.tch) cat(i, "\n")
+@
+
+\citet{Lordetal} suggest that the reason that ontologies are of
+particular interest in computational biology is that they provide a
+mechanism for representing a communities domain knowledge in a form
+that is accessible by humans and is amenable to computation. We
+largely agree with that observation. GO (and potentially other
+ontologies) provide us with a data resource that is useful and in this
+paper we consider some of the different ways that this resource can be
+used.
+
+\subsection{Associating Genes With GO Terms}
+\label{sec:assocgenes}
+
+GO itself is strictly the ontology. The mapping of genes to GO terms
+is carried out separately. And as the ontology is being constantly
+updated so is this set of mappings. A set of mappings between
+manufacturer identifiers and GO terms is available in every
+Bioconductor meta-data package. These packages are available at
+\url{http://www.bioconductor.org/data/metaData.html}.
+Further data, regarding the
+relationships between GO terms, the specific term names etc. are
+provided in the \Rpackage{GO} package. The actual mappings are
+provided by GOA \citep{GOA} and are mappings between
+GO terms and LocusLink IDs which are modified to account for
+the multiplicity of mappings between the manufacturer IDs and
+LocusLink IDs.
+
+Mappings from GO terms to specific genes is provided in the hash table
+(R \Robject{environment}) named \Robject{GOGO2LL}, which maps from GO
+terms to LocusLink identifiers. A histogram of the logarithm of the
+number of LocusLink identifiers per GO term is given in
+Figure~\ref{fig:GO2LL}.
+
+\begin{figure}[htbp]
+\begin{center}
+<<GO2LL, fig=TRUE, echo=FALSE>>=
+ go2LL <- contents(GOGO2LL)
+ go2LLcounts <- sapply(go2LL, length)
+ hist(log(go2LLcounts), main="Log Counts of LocusLink IDs per GO ID",
+      xlab="")
+@
+\caption{LocusLink counts per GO term (log scale). \label{fig:GO2LL}.}
+\end{center}
+\end{figure}
+
+For any particular microarray there may be many probes that are mapped
+to the same LocusLink identifier. In some of the computations it will
+be important that this multiplicity be accounted for. If, for example,
+one asks whether a particular GO term is overrepresented in the probes
+that were selected by some particular procedure then any
+multiplicities should be dealt with in making that assessment. We
+report the set of multiplicities for the Affymetrix HGU95Av2 GeneChip
+below.
+
+%%borrowed from the Wiley paper
+<<duplicates, echo=FALSE>>=
+lls <- unlist(contents(hgu95av2LOCUSID))
+tab <- table(table(lls))
+cat("Multiplicity      ", sapply(names(tab),
+     function(x) sprintf("%4s", x)),
+    "\nNo. LocusLink IDs ", sapply(tab,
+     function(x) sprintf("%4d", x)))
+
+lls  <- lls[!is.na(lls)]   ## LocuslinkIDs
+spLL <- split(lls, lls)    ## Unique Locuslink IDs
+
+slen1 <- sapply(spLL, length)  ## multiplicities of all LLids
+@
+
+We can see that the problem can be quite substantial; there are
+\Sexpr{sum(slen1 > 1)} LocusLink IDs that have more than one probe set
+identified with them. Making the correct inference requires that some
+adjustment be made for the many-to-one mapping from probes to
+LocusLink identifiers.
+
+For any particular microarray analysis you will need to obtain the
+correct meta-data package from Bioconductor (or create your own
+equivalent set of mappings). Each Bioconductor meta-data package
+follows a specific naming convention. A short name for the chip is
+used as a prefix and a variety of suffixes are used.  So for the
+\Rpackage{hgu95av2} package the data objects that have GO mappings are
+named \Robject{hgu95av2GO}, \Robject{hgu95av2GO2PROBE} and
+\Robject{hgu95av2GO2ALLPROBES}.
+
+<<getGO, results=hide, echo=FALSE>>=
+tfprobes <-  get("GO:0003700", hgu95av2GO2PROBE)
+syms <- getSYMBOL(tfprobes, "hgu95av2")
+alltfprobes <- get("GO:0003700", hgu95av2GO2ALLPROBES)
+@
+
+There are \Sexpr{length(tfprobes)} Affymetrix probes that are
+annotated specifically at \texttt{GO:0003700} and these correspond to
+\Sexpr{sum(!duplicated(syms))} distinct genes.
+
+We can also use the data in \Robject{hgu95aGO2ALLPROBES} to find all
+the probe sets that are annotated at the term \texttt{GO:0003700},
+this is the union of those specifically annotated at that term
+together with those annotated at any of the child nodes.  This is
+\Sexpr{length(alltfprobes)} probes.
+
+\section{An Example}
+
+To demonstrate some of the tools that are included in the
+\Rpackage{GOstats} package we consider expression data from 79 samples
+from patients with acute lymphoblastic leukemia (ALL) that were
+investigated using HGU95AV2 Affymetrix GeneChip arrays
+\citep{Chiaretti2004}.  The data were normalized using quantile
+normalization and expression estimates were computed using
+RMA~\citep{Irizarry2003}. Of particular interest is the comparison of
+37 samples from patients with the BCR/ABL
+fusion gene resulting from a chromosomal translocation (9;22) with
+the 42 samples from the NEG group.
+
+<<Example, results=hide, echo=FALSE>>=
+## subset of interest: 37+42 samples
+data(ALL)
+eset <- ALL[, intersect(grep("^B", as.character(ALL$BT)),
+          which(as.character(ALL$mol) %in% c("BCR/ABL","NEG")))]
+
+
+## intensities above 100 in at least 25% of the samples
+f1 <- pOverA(.25, log2(100))
+f2 <- function(x)(IQR(x)>0.5)
+ff <- filterfun(f1, f2)
+selected <- genefilter(eset, ff)
+sum(selected)
+esetSub <- eset[selected,]
+
+##use multtest
+cl   <- as.numeric(esetSub$mol== "BCR/ABL")
+## permutation test, using the Welch statistic
+##FIXME: B should be bigger - but it is too painful during the
+##authoring phase
+resT <- mt.maxT(exprs(esetSub), classlabel=cl, B=1000)
+ord <- order(resT$index) #the original gene order
+rawp <- resT$rawp[ord] # raw permutation $p$-values #names(resT)
+names(rawp) <- geneNames(esetSub)
+
+##get the gene names
+ABL1 <- "1635_at"
+ABL1LL <- get(ABL1, hgu95av2LOCUSID)
+gnames <- mget(geneNames(esetSub), env = hgu95av2SYMBOL, ifnotfound=NA)
+top5 <- resT$index[1:5]
+unlist(gnames[top5]) #$ sorted according to adjusted p-values
+
+numLT = unlist(gnames[resT$index[resT$adjp<0.05]])
+
+@
+
+To reduce the set of genes for consideration we applied two different
+sets of filters (gene filtering is considered in more detail in
+\cite{WileyEncy} and the interested reader is referred there). A
+non-specific filter was used to remove genes that showed little or no
+change in expression level across experiments. The resulting data set
+had \Sexpr{sum(selected)} probes remaining. To select genes whose
+expression values were associated with the phenotypes of interest
+(BCR/ABL and NEG) we used the \Rfunction{mt.maxT} function from the
+\Rpackage{multtest} package which computes a permutation based t-test
+for comparing two groups.
+
+After adjustment for multiple testing there were only
+\Sexpr{sum(resT$adjp<0.05)} probes %$
+(which correspond to \Sexpr{length(unique(numLT))} genes) with an
+adjusted $p$-value below 0.05. Using those genes we obtain the set of
+most-specific GO terms in the MF ontology that they are annotated at
+and compute the induced GO graph which is rendered in
+Figure~\ref{fig:GG1}. No labels have been added to the nodes in this
+plot since there is not sufficient room to provide informative
+ones. Notice that the most specific terms are at the top of the graph
+and that arrows go from more specific nodes to less specific ones. The
+node in the bottom center is the MF node. Clearly some sort of
+interactivity (e.g. tooltips) would be beneficial. We will return to
+this plot in the next section and use it to provide a more detailed
+view of the data.
+
+<<inducedGO, echo=FALSE, results=hide>>=
+ whGO = resT$index[resT$adjp<0.05]
+ gNsel <- geneNames(esetSub)[whGO]
+ gGO <- makeGOGraph(gNsel, "MF", "hgu95av2")
+##drop the GO root node
+ gGO <- removeNode("GO:0003673", gGO)
+
+ nA1 = list()
+ lbs = rep("", length(nodes(gGO)))
+ names(lbs) = nodes(gGO)
+ nA1$label = lbs
+
+@
+
+\begin{figure}[htbp]
+\begin{center}
+
+<<GOg1, fig=TRUE, echo=FALSE>>=
+  plot(gGO, nodeAttrs=nA1)
+@
+\caption{The induced GO graph for the selected genes. \label{fig:GG1}}
+\end{center}
+\end{figure}
+
+\section{Statistical Analyses}
+
+\subsection{Finding Interesting GO terms}
+
+If genes have been partitioned into distinct sets, say by finding
+those with small $p$-values (as was done above) or by some form of
+clustering, then one of the questions that arises is whether genes
+that comprise a cluster have a common function, process or location in
+the cell.  A second, related application of this idea is to provide
+meaning to a list or set of genes that were selected according to some
+criteria.  For example, in our microarray experiment we selected genes
+that were differentially expressed between the BCR/ABL group and the
+NEG group. We might then wonder whether these genes have a common
+function, are involved in common processes, or perhaps are co-located
+in some region of the cell.
+
+The actual test employed is quite straight forward. Given a set of
+genes and one of the three ontologies we first find the set of all
+unique GO terms within the ontology that are associated with one or
+more of the genes of interest (i.e. the induced GO graph). Next, for
+each term we determine how many of the interesting genes are annotated
+at that node and how many genes that were assayed (i.e. have probes on
+the chip that represent that gene) are annotated at the node. Here we
+must work in terms of the unique LocusLink identifiers and not the
+manufacturers identifiers because of the multiple mapping issues
+raised in Section~\ref{sec:assocgenes}.
+
+We can ask if there are more interesting genes at the node than one
+might expect by chance. If that is true, then that term can be thought
+of as being overrepresented in the data. This question can be answered
+using a Hypergeometric distribution. Suppose that there are $N$ total
+genes annotated for the ontology of interest and that our list of
+interesting genes contains $m$ distinct genes. Then we can imagine an
+urn with $N$ balls in it and $N-m$ are black while $m$ are white. If
+we draw $k$ balls from the urn, where $k$ is the number of genes
+annotated at a node, we are asking whether the number of white balls
+in that drawn sample is unusually large. Suppose that there are $q$
+white balls (interesting genes) in the drawn sample, we then ask what
+is the probability that $X \geq q$ where $X$ is a Hypergeometric
+random variable with parameters as we have described. This probability
+constitutes a $p$-value since it is the probability of seeing
+something as extreme or more extreme than what was observed. This
+functionality is provided in the function \Rfunction{GOHyperG}
+available in the \Rpackage{GOstats} package.
+
+There are some issues that arise in the interpretation of these
+$p$-values. First, we note that often very many hypotheses will have
+been tested and that some form of $p$-value correction will be
+needed. However, there is no simple or straightforward way to do
+that. The different hypotheses are not independent by virtue of the
+way that GO is structured and even with this difficulty addressed it
+is further the case that we are most likely interested in patterns of
+$p$-values that correspond to structure in GO rather than single
+$p$-values that exceed some threshold. These and other issues are
+considered in more detail in \citet{GentGO2004B}.
+
+A second issue that arises is the fact that nodes with few genes
+annotated at them will typically have small $p$-values. This
+phenomenon occurs due to the way that we selected nodes for
+evaluation and the structure of GO. Recall that for each gene we have
+the most specific set of nodes that it is associated with and it is
+also annotated at all nodes that are less specific. Therefore most
+genes are annotated out quite far into the leaves of the GO graph and
+hence at nodes that have relatively few other genes annotated
+there. Calculation of the Hypergeometric $p$-values for those nodes
+results in very small $p$-values and often they are not too
+interesting. Nodes that are interesting are typically those with a
+reasonable number of genes (10 or more) and small $p$-values.
+
+<<HyperG, echo=FALSE, results=hide>>=
+
+nL <- rep("", length(nodes(gGO)))
+ names(nL) <- nodes(gGO)
+ nA <- list()
+
+ gNsLL <- unique(unlist(mget(gNsel, env=hgu95av2LOCUSID, ifnotfound=NA)))
+ gGhyp <- GOHyperG(gNsLL)
+
+ gGhyp.pv <- gGhyp$pv[nodes(gGO)]
+
+ gCols <- ifelse(gGhyp.pv < 0.1, "tomato", "lightblue")
+ names(gCols) = names(gGhyp.pv)
+ lbs = paste("  ",as.character(round(gGhyp.pv, 3)), " ")
+ names(lbs) = names(gGhyp.pv)
+ nA$label = lbs
+ nA$fillcolor = gCols
+@
+
+In Figure~\ref{fig:indGG}, we reproduce the plot from
+Figure~\ref{fig:GG1} except that we have now colored the nodes
+according to the $p$-value obtained from the Hypergeometric test
+described above.  The nodes in Figure~\ref{fig:indGG} are colored
+either red or blue depending on whether the unadjusted Hypergeometric
+$p$-value was less than $0.10$ or not (for those viewing this document
+in black and white the nodes should be dark and light grey,
+respectively). The GO terms for the terms colored red are printed
+below. The relevant biology suggests that these are quite reasonable.
+We note that while the smallest $p$-values are associated with nodes
+that have few genes annotated at them there are some nodes with a
+reasonable number of genes annotated at them (counts) and small
+$p$-values.
+
+<<GOterms, echo=FALSE, results=tex>>=
+gg = gGhyp.pv[gGhyp.pv < 0.1]
+gg = sort(gg)
+gg.terms <- unlist(mget(names(gg), GOTERM))
+
+##fix up the labels etc for printing
+nms = names(gg.terms)
+nms2 = gsub("^GO:", "", nms)
+nms3 = gsub(".MF$", "", nms2)
+ggt = unlist(gg.terms)
+numCh = nchar(ggt)
+ggt2 = substr(ggt, 1, 17)
+ggt3 = paste(ggt2, ifelse(numCh > 17, "...", ""), sep="")
+
+##get counts
+gg.counts <- gGhyp$goCounts[names(gg)]
+
+ggMat = matrix(c(nms3, ggt3, round(gg,3), gg.counts),
+    byrow=FALSE, nc=4, dimnames=list(rep("", length(gg)), c("GO ID",
+   "Term", "p-value","No. of Genes")))
+xtable.matrix(ggMat,
+  caption="GO terms, p-values and counts.", label="ta:GOggterms")
+
+@
+
+\begin{figure}[htbp]
+\begin{center}
+<<GOxx, fig=TRUE, echo=FALSE>>=
+  plot(gGO, nodeAttrs=nA)
+@
+\caption{The induced GO graph colored according to unadjusted Hypergeometric
+p-values \label{fig:indGG}}
+\end{center}
+\end{figure}
+
+%%FIXME: can we deal with underrepresented GO terms - or just
+%%overrepresented ones?
+
+\subsection{Selecting Genes according to GO term}
+
+GO can also be used as a method of data reduction. Here one might
+carry out an analysis focusing on a particular subset of genes, say
+those associated with the GO term \texttt{transcription
+factor}. Carrying out such an analysis is very straight forward.
+First one selects the GO term or terms that are of interest and then
+collects the set of genes that were assayed and that are annotated at
+that term. Generally one would consider all genes annotated at the
+term either directly or by inheritance. Given this set of genes the
+data are then reduced only to them and the usual machine learning or
+visualization procedures can be applied.
+
+It is often the case that these more directed approaches can be more
+successful (especially if determined \textit{a priori}) than the more
+omnibus approach of considering all assayed genes simultaneously.
+The $p$-value corrections are much less drastic and smaller, but
+important, effects can be detected more often.
+
+%%FROM Wiley
+Many of the effects due the BCR/ABL translocation are mediated by tyrosine
+kinase activity. It will therefore be of interest to examine genes that
+are known to have tyrosine kinase activity. We examine the set of GO terms and
+identify the term, \texttt{GO:0004713} from the \textit{molecular function}
+portion of the GO hierarchy as referring to \texttt{protein-tyrosine kinase
+activity}. We can then obtain all Affymetrix probes that are annotated at that
+node, either directly or by inheritance, using the following command.
+
+<<GOp1>>=
+tykin <- unique(lookUp("GO:0004713", "hgu95av2", "GO2ALLPROBES"))
+@
+
+<<GO2, echo=FALSE, results=hide >>=
+gN <- geneNames(esetSub)
+whSel <- match(tykin, gN)
+whSel <- whSel[!is.na(whSel)]
+@
+
+We see that \Sexpr{length(tykin)} probe sets are annotated
+at this particular term.
+Of these only \Sexpr{length(whSel)} were selected by the
+non-specific filtering step.
+We focus our attention on these probes and carry out a permutation
+ $t$-test analysis.
+
+<<GO3, results=hide, echo=FALSE>>=
+
+resTGO <- mt.maxT(exprs(esetSub[whSel,]), classlabel=cl, B=100000)
+ordGO <- order(resTGO$index) #$  the original gene order
+adjpGO <- resTGO$adjp[ordGO] #$  raw permutation $p$-values #names(resT)
+names(adjpGO) <- geneNames(esetSub[whSel,])
+otherp <- resT$adjp[ord]     #$
+names(otherp) <- geneNames(esetSub)
+op2 <- otherp[names(adjpGO)]
+ndiff <- sum(adjpGO < 0.1)
+@
+
+In this analysis of the GO--filtered data, \Sexpr{ndiff} probe sets
+have FWER--adjusted $p$--values less than 0.1. They are printed below,
+together with the adjusted $p$-values from an analysis that used all
+probes that passed our non-specific filter and hence involved
+\Sexpr{length(rawp)} genes.
+
+<<GO4, echo=FALSE>>=
+print("GO analysis")
+sort(adjpGO)[1:ndiff]
+print("All Genes")
+sort(op2)[1:ndiff]
+@
+
+Due to the reduced number of tests in the analysis focused on tyrosine kinases,
+we are left with more significant genes after correcting for multiple testing.
+For instance, the probe set \verb+36643_at+, which corresponds to
+the gene \Sexpr{ getSYMBOL("36643_at", "hgu95av2")}, was not significant in the
+unfocused analysis, but would be if instead the investigation was oriented
+towards studying tyrosine kinases \textit{a priori}.
+
+
+\subsection{Using Shortest Paths}
+
+\cite{shortestpath} consider some interesting applications of GO in
+conjunction with microarray expression data. In this section we
+consider a related idea and apply it to the ALL data. At their
+most basic level the ideas of \cite{shortestpath} consist of forming a
+graph between genes (which are the nodes) based on some relevant
+distance. This distance might be correlation distance or it could be
+any other relevant distance. Then all edges in the graph
+that correspond to distances that are larger than some
+threshold are removed.
+%%FIXME: need the Shamir reference
+Next, genes are grouped according to some specific
+categorization (they used GO biological process terms) and the
+shortest paths (using Dijkstra's algorithm) between all pairs of nodes
+are computed. Those shortest paths can then be examined to
+see whether they provide information of relevance.
+
+Among the points that they make is that it will often be reasonable
+(and possibly essential) to partition the genes being analysed
+according to their cellular location. They provide the two following
+examples in order to make their point. For gene expression data
+consider an analysis that explores the biological process of
+\textit{protein biosynthesis}. This process occurs in both the
+mitochondria and the cytoplasm and there is little reason to assume
+that there is any sort of relationship between the two. Other
+concepts, such as \textit{membrane transport} are very distinct
+processes in the three different compartments and are unlikely to be
+related at the transcriptional level, and hence should be modeled
+separately when considering microarray data.
+
+In the ALL experiment we are most interested in comparing patients
+that have the BCR/ABL defect to those that have no measured
+cytogenetic abnormalities. Our adaptation of the shortest path
+technology is as follows. We use the output of the first filtering
+step described previously -- that is we select genes that show some
+level of expression and some variation in expression across samples.
+We then separate the data into two sets (BCR/ABL and NEG) and within
+each group we define the distance between two genes as one minus the
+Pearson correlation (other approaches such as that use by
+\cite{shortestpath} or some other robust correlation estimates) We
+then used an edge weight of $d(u,v) = (1-C_{u,v})^k$ with $k=1$ and
+$\tau=0.6$ as the cutoff for correlations, if $C_{u,v}<\tau$ then no
+edge exists (Zhou et. al used $k=6$ in their analysis and some
+experimentation may be warranted).
+
+<<getTFs, hide=TRUE, echo=FALSE>>=
+TF2 <- get("GO:0003700", hgu95av2GO2ALLPROBES)
+LLs <- getLL(TF2, "hgu95av2")
+gN = geneNames(esetSub)
+
+hv <- match(gN, TF2, 0)
+
+oTF2 <- gN[hv]
+
+##check to see how many of these are duplicated and which ones
+LL2 = getLL(oTF2, "hgu95av2")
+
+ww = table(LL2)[table(LL2)>1]
+
+dups = list()
+for(i in 1:length(ww)) dups[[i]] = names(LL2)[LL2==names(ww)[i]]
+zz = unlist(dups)
+##these are all highly correlated with each other - so I will just
+##use the first one of each
+##note that the fourth pair looks odd - and might be worth
+##investigating
+
+##drop duplicates
+oTF3 = oTF2[!duplicated(LL2)]
+@
+
+Our interest in this particular example is on transcription
+factors. Hence we use the GO term \texttt{GO:0003700} which maps to
+the molecular function \texttt{transcription factor activity} to
+identify all genes with transcription factor activity. We used only
+genes for which this was a most specific annotation and obtained
+\Sexpr{length(TF2)} mappings and \Sexpr{sum(!duplicated(LLs))} unique
+LocusLink ids. Of these \Sexpr{length(oTF2)} were among those probes
+selected for our analysis. Of these we found that there were
+\Sexpr{length(ww)} with duplicate entries. A visual inspection (not
+reported) suggested that the correlation between these duplicate
+probes was quite high and so only one of each was used in the
+subsequent analysis. This left us with \Sexpr{length(oTF3)} distinct
+transcription factors for our study.
+
+We note that while \cite{shortestpath} divided the probes/genes
+according to the cellular component they were annotated at, we did not
+do the same. In our case we are attempting to understand
+transcriptional networks, not gene function. It does not seem likely
+that transcriptional regulation is heavily dependent on the cellular
+location of the gene products.
+
+<<splitData, results=hide, echo=FALSE>>=
+
+Bsub <- esetSub[, esetSub$mol=="BCR/ABL"]
+Nsub <- esetSub[, esetSub$mol=="NEG"]
+Bgraph <- compCorrGraph(Bsub)
+Ngraph <- compCorrGraph(Nsub)
+@
+
+For every pair of transcription factors we compute two quantities. The
+shortest path between each pair for each of the different
+conditions. For example in our ALL example we compute the shortest
+paths between all transcription factors using a graph based only on
+data from those with BCR/ABL and secondly the same set of values based
+only on data from those without any noticeable genomic defects. Then
+each pair the distances are compared (plotted) and those pairs for
+which the distance has changed the most identified and further explored.
+
+%%FIXME: this takes way to long to run every time so these are precomputed
+%%and stored - but probably some careful checking should be done
+<<computeDists, hide=TRUE, echo=FALSE>>=
+##Ndists <- compGdist(Ngraph, oTF3)
+##save(Ndists, file="Ndists.rda")
+##Bdists <- compGdist(Bgraph, oTF3)
+##save(Bdists, file="Bdists.rda")
+@
+
+
+<<loadDistdata, results=hide, echo=FALSE>>=
+data(Ndists)
+data(Bdists)
+@
+
+This approach is quite different in substance than that originally
+proposed in \cite{shortestpath}. Their interests were centered on
+providing annotation for genes whose biological annotation is still
+incomplete, or potentially in error. Whereas our investigation is
+aimed at study transcription regulatory networks.
+
+<<spanalysis, results=hide, echo=FALSE>>=
+ xx = abs(Ndists - Bdists)
+
+ ##given a matrix and a logical vector return two lists
+ ##the row names and the column names for each selected entry
+
+
+ nConnN = notConn(Ndists)
+ nConnB = notConn(Bdists)
+
+ bothBad = nConnN[nConnN %in% nConnB]
+
+ badN = nConnN[!(nConnN %in% nConnB)]
+
+ badB = nConnB[!(nConnB %in% nConnN)]
+
+
+@
+
+We first consider those transcription factors that are not connected
+to the others in their respective graphs. There are three sets, those
+that are not connected in either graph, those that are not connected
+in one of the two graphs but not in the other. They are reported in
+Table~\ref{ta:notconn}.
+
+%%FIXME: is the symbol for 1106_s_at really TRA@
+<<reportNotConn, results=tex, echo=FALSE>>=
+
+ affys = c(bothBad, badN, badB)
+ syms = unlist(mget(affys, hgu95av2SYMBOL, ifnotfound=NA))
+ wh = rep(c("Both", "NEG only", "BCR/ABL only"),
+          c(length(bothBad), length(badN), length(badB)))
+ affys = paste("\\verb+", affys, "+", sep="")
+ outM = cbind(affys, syms, wh)
+ dimnames(outM) = list(NULL, c("Affymetrix ID", "Symbol", "Which graph"))
+ xtable(outM,
+        caption="Genes not connected in the different graphs",
+        label="ta:notconn")
+
+@
+
+<<pairwise, results=hide, echo=FALSE>>=
+
+ ndx = (Ndists-Bdists)
+ ndx = ndx[is.finite(ndx)]
+
+ tt=t.test(ndx)
+
+@
+We now consider the finite pairwise distances. First a simple $t$-test
+can be carried out to see if there is any difference between the
+distances in on graph versus the other. We took each pairwise distance
+in the NEG graph and subtracted from it the same pairwise distance
+computed on the BCR/ABL graph. The $t$-test is for whether the mean is
+zero and the test statistic was \Sexpr{round(tt$estimate, 3)} with an extremely
+small $p$-value. So we see that distances in the NEG graph seem to be longer
+than those in the BCR/ABL. Further evidence of this difference comes
+from the observation that proportion of values that were larger
+in the NEG graph was \Sexpr{round(sum(ndx>0)/length(ndx), 3)}.
+%$ - ESS is confused
+
+
+<<histabsd, echo=FALSE, results=hide>>=
+pdf(file="fig_histabsdiff.pdf", width=4, height=4.3)
+hist(xx[is.finite(xx)], main="", xlab="")
+dev.off()
+@
+
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics[width=0.5\textwidth]{fig_histabsdiff.pdf}
+\caption{\label{fig:absdist}Histogram of the absolute value of the
+difference between the distance computed in the NEG graph and that on
+the BCR/ABL graph.}
+\end{center}
+\end{figure}
+
+<<analyseFinite, results=hide, echo=FALSE>>=
+ ##these are pairwise distances that have changed a lot
+ whOnes = xx>2.5 & is.finite(xx)
+ vv = xx[whOnes]
+ Ns = Ndists[whOnes]
+ Bs = Bdists[whOnes]
+
+ dNames = idx2dimnames(Ndists, whOnes)
+
+ rowSym <- unlist(mget(dNames$rowNames, hgu95av2SYMBOL, ifnotfound=NA))
+ colSym = unlist(mget(dNames$colNames, hgu95av2SYMBOL,
+          ifnotfound=NA))
+
+
+ fromTO = paste(rowSym, colSym, sep="->")
+
+@
+
+In Figure~\ref{fig:absdist} a histogram of the absolute
+value of the pairwise differences is plotted. We see a number of
+interesting features. For example the large number of differences that
+are small in absolute value as well as a rather long right hand
+tail. We will focus our attention on those differences that are large
+in absolute value. We chose a value of $2.5$ as our cut-off and found
+that there were \Sexpr{sum(whOnes)} differences that were larger than
+$2.5$. These corresponded to \Sexpr{length(unique(rowSym))} distinct
+genes.
+
+While all may be interesting and a particular investigator may want to
+expend considerable effort in study transcription factors that are of
+particular interest we will center our analysis on the set of genes
+that appear most frequently in this list. The multiplicities are
+reported below.
+
+<<multiplicities, echo=FALSE>>=
+ ssvs =sort(table(rowSym))
+ ssvs
+@
+
+<<getthemappings, results=hide, echo=FALSE>>=
+##found 3 genes - MYC, GADD45A and MPO
+ nMYC = Ns[grep("^MYC", rowSym)]
+ names(nMYC) = fromTO[grep("^MYC", rowSym)]
+ bMYC = Bs[grep("^MYC", rowSym)]
+ names(bMYC) = fromTO[grep("^MYC", rowSym)]
+
+ nGADD = Ns[grep("^GADD", rowSym)]
+ names(nGADD) = fromTO[grep("^GADD", rowSym)]
+ bGADD = Bs[grep("^GADD", rowSym)]
+ names(bGADD) = fromTO[grep("^GADD", rowSym)]
+
+ nMPO = Ns[grep("^MPO", rowSym)]
+ names(nMPO) = fromTO[grep("^MPO", rowSym)]
+ bMPO = Bs[grep("^MPO", rowSym)]
+ names(bMPO) = fromTO[grep("^MPO", rowSym)]
+
+@
+
+%%FIXME: watch out here as the facts may change as the data do
+And we can see that there are three genes that have substantially
+higher counts than the others, namely, MYC, MPO and GADD45A. This fact
+suggests that perhaps the expression patterns of these three different
+transcription factors are substantially different in the two
+phenotypes we are studying.
+
+For each of the three transcription factors we can compute the average
+distance, separately within each graph, to all the other selected
+genes. We find that the results are quite consistent and that in all
+cases the path length is much shorter in the BCR/ABL group than it is
+in the NEG group. For MYC the means were \Sexpr{round(mean(nMYC))} for
+NEG and \Sexpr{round(mean(bMYC))} for BCR/ABL, for MPO they were
+\Sexpr{round(mean(nMPO))} for NEG and \Sexpr{round(mean(bMPO))} for
+BCR/ABL and for GADD45A the means were \Sexpr{round(mean(nGADD))} for
+NEG and \Sexpr{round(mean(bGADD))} for BCR/ABL. It is rather
+interesting to observe that amongst the pairwise distances that have
+changed the most are those between these three specific genes.
+
+Specific paths between transcription factors can also be
+examined. Recall that we compute out distance between two
+transcription factors based on the shortest path length between them
+in each of the two graphs. In our examples we focus on MYC and the
+distances between it and MPO and GADD45A.
+
+<<graphsandpaths, echo=FALSE, results=hide>>=
+
+ ##a little helper function to take the names off of the sp.between
+ ##paths and
+ #nm2sym
+
+ ##get the Affy IDs for the genes that connect to MYC, and are
+ ##interesting
+ affyN.MYC = names(colSym)[rowSym=="MYC"]
+
+ affyMYC = names(rowSym)[rowSym=="MYC"][1]
+ affyMPO = names(rowSym)[rowSym=="MPO"][1]
+ affyGADD45A = names(rowSym)[rowSym=="GADD45A"][1]
+
+
+ ##compute the details of the paths between MYC and the other TFs
+
+ spB = sp.between(Bgraph, (names(rowSym)[rowSym=="MYC"])[1],
+                 affyN.MYC)
+
+ spN = sp.between(Ngraph, (names(rowSym)[rowSym=="MYC"])[1],
+                  affyN.MYC)
+
+
+ ##the MYC-MPO paths are then
+ MYCMPO.B = spB[[paste(affyMYC, affyMPO, sep=":")]]
+ MYCMPO.N = spN[[paste(affyMYC, affyMPO, sep=":")]]
+
+ MYCGADD45A.B = spB[[paste(affyMYC, affyGADD45A, sep=":")]]
+ MYCGADD45A.N = spN[[paste(affyMYC, affyGADD45A, sep=":")]]
+
+
+
+ p2ch = function(x, useSYMs=TRUE) {
+   if(useSYMs)
+      nms = mget(x$path, hgu95av2SYMBOL)
+   else
+      nms = x$path
+   paste(nms, collapse="->")
+ }
+@
+
+We print out the different shortest paths for genes connecting MYC to
+both MPO and GADD45A for each of the two phenotypes, respectively
+(first the paths for BCR/ABL, then for the NEG samples). The MYC to MPO
+results are:
+
+<<printPaths1, echo=FALSE>>=
+
+  cat("BCR/ABLE \n")
+  p2ch(MYCMPO.B)
+  cat("NEG \n")
+  p2ch(MYCMPO.N)
+
+@
+
+If we then make use of the results in Figure~\ref{fig:pairs} we see
+that there are positive correlations between MYC and EIF4G1 and as
+well between EIF4G1 and HMG20B, but that for HMG20B and MPO the
+correlation is negative. Positive correlations are suggestive of
+shared transcriptional activity while negative correlations are
+suggestive of transcriptional inhibition.
+
+The results comparing MYC to GADD45A are:
+<<printPaths1, echo=FALSE>>=
+
+  cat("BCR/ABLE \n")
+  p2ch(MYCGADD45A.B)
+  cat("NEG \n")
+  p2ch(MYCGADD45A.N)
+
+@
+
+We do not have space to present the other pairwise scatterplots here
+but readers that are making use of the compendium version of this
+paper can easily explore those different plots on their own.
+
+<<createGraphs, results=hide, echo=FALSE>>=
+
+ ##get the set of unique affy ids along the paths
+
+ spBAffy = unlist(sapply(spB, function(x) x$path))
+ names(spBAffy) = NULL
+ spNAffy = unlist(sapply(spN, function(x) x$path))
+ names(spNAffy) = NULL
+
+ sGnodes = unique(c(spBAffy, spNAffy))
+
+ Bnodes = unique(spBAffy)
+ Nnodes = unique(spNAffy)
+
+ BsG = subGraph(sGnodes, Bgraph)
+ NsG = subGraph(sGnodes, Ngraph)
+
+ oG = union(BsG, NsG)
+
+ ##get the edgeweights along a path
+ getEW = function(G, path) {
+   whones = match(path, nodes(G))
+   if(any(is.na(whones)))
+    stop("path/graph mismatch")
+
+   eL = G@edgeL
+   rval = rep(0, length(whones)-1)
+   for(i in 1:(length(whones)-1))
+     rval[i] = (eL[[whones[i]]]$weights)[as.character(whones[i+1])]
+   names(rval) = paste(path[1:(length(path)-1)], path[2:length(path)],
+        sep="->")
+   rval
+}
+
+ MYCMPO.Bwts = getEW(BsG, MYCMPO.B$path)
+ MYCMPO.Nwts = getEW(NsG, MYCMPO.N$path)
+ mean(MYCMPO.Bwts)
+ mean(MYCMPO.Nwts)
+
+ MYCGADD45A.Bwts = getEW(BsG, MYCGADD45A.B$path)
+ MYCGADD45A.Nwts = getEW(NsG, MYCGADD45A.N$path)
+ mean(MYCGADD45A.Bwts)
+ mean(MYCGADD45A.Nwts)
+
+@
+
+We notice that the path lengths for the NEG samples are longer
+(involve more genes) than those for the BCR/ABL samples. We might also
+want to ask whether the distances are also larger (that is that the
+correlations are smaller). To do this we need to obtain the edge
+weights from the respective graphs and compare them. We found that
+there appeared to be no difference (all averaged around a distance of
+about $0.65$) but the number of edges is quite small and one might
+expect to see systematic differences if a larger study were undertaken.
+
+We can check our results, at least to some extent, by examining
+pairwise scatterplots of the gene expressions. In
+Figure~\ref{fig:pairs} the genes on the path from MYC to MPO are
+plotted. We see quite strong correlations along the diagonal and note
+that HMG20B and MPO have a negative correlation.
+
+\begin{figure}[htbp]
+\begin{center}
+<<pathPairs, fig=TRUE, echo=FALSE>>=
+pairs(t(exprs(Bsub)[MYCMPO.B$path,]))
+@
+\caption{Pairwise scatterplots of gene expression for those genes on
+the shortest path between MYC and MPO from patients with the BCR/ABL
+translocation. \label{fig:pairs}.}
+\end{center}
+\end{figure}
+
+Finally, we finish our examination of these data by considering some
+of the specific paths between the different transcription
+factors. Comparison of paths in different graphs is problematic since
+the same nodes need not be connected in the two different graphs (and
+that is the case here). We consider two specific paths -
+
+<<subGraphs, results=hide, echo=FALSE>>=
+ basecol = rep("lightyellow", length(sGnodes))
+ names(basecol) = sGnodes
+
+ bc1 = basecol
+ bc1[Bnodes] = "lightblue"
+
+ nc1 = basecol
+ nc1[Nnodes] = "lightgreen"
+
+
+
+ nA = list()
+
+ nL <- rep("", length(nodes(BsG)))
+ names(nL) <- nodes(BsG)
+
+## gCols <- ifelse(gGhyp.pv < 0.1, "tomato", "lightblue")
+## names(gCols) = names(gGhyp.pv)
+## lbs = paste("  ",as.character(round(gGhyp.pv, 3)), " ")
+## names(lbs) = names(gGhyp.pv)
+ nA$label = nL
+## nA$fillcolor = gCols
+
+ if(interactive()) {
+   nA$fillcolor = bc1
+   plot(BsG, "neato", nodeAttrs=nA, main="BCR/ABL: MYC")
+   dev.set(dev.next())
+   nA$fillcolor = nc1
+   plot(NsG, "neato", nodeAttrs=nA, main="NEG: MYC")
+}
+
+ ##now we should be able to add some color - easily
+
+ colorPath = function(G, path, bkgd="lightyellow", end="tomato",
+   middle = "lightblue") {
+     ncols = rep(bkgd, length(nodes(G)))
+     names(ncols) = nodes(G)
+     ncols[path[1]] = end
+     pl = length(path)
+     ncols[path[pl]] = end
+     ncols[path[2:(pl-1)]] = middle
+     return(ncols)
+ }
+
+ Ncols = colorPath(NsG, MYCMPO.N$path)
+ Bcols = colorPath(BsG, MYCMPO.B$path)
+@
+
+\begin{figure}[htbp]
+\begin{center}
+<<pathinNEG, fig=TRUE, echo=FALSE>>=
+ nAN = nA; nAN$fillcolor = Ncols
+ plot(NsG, "neato", nodeAttrs=nAN)
+
+@
+\caption{Shortest path between MYC and MPO in the NEG
+  samples. \label{fig:NEGsp}.}
+\end{center}
+\end{figure}
+
+
+\begin{figure}[htbp]
+\begin{center}
+<<pathinBCR, fig=TRUE, echo=FALSE>>=
+ nAB = nA; nAB$fillcolor = Bcols
+ plot(BsG, "neato", nodeAttrs=nAB)
+@
+\caption{Shortest path between MYC and MPO in the BCR/ABL
+  samples. \label{fig:BCRsp}.}
+\end{center}
+\end{figure}
+
+We see, in Figures~\ref{fig:NEGsp} and \ref{fig:BCRsp}, the actual
+shortest paths between the genes MYC and MPO. The two end points have
+been colored red, genes along the path are colored blue. While the two
+graphs have the same set of nodes, their layout is quite
+different. This is because they have different sets of edges, with
+different weights. We will be developing layout tools that allow the
+user to fix the layout of the nodes and to subsequently add edges,
+recolor nodes etc.
+
+\section{Discussion}
+
+GO and the mappings from genes to specific terms in each of the three
+ontologies provide a number of important and unique data analytic
+opportunities. In this paper we have considered three separate
+applications of these resources to the problem of analysing gene
+expression data and in all cases the GO related data have provided new
+and important insights into the data.
+
+Using GO mappings to select certain terms for further study and
+reference has the possibility of providing meaning to sets of genes
+that have been selected according to different criteria. An equally
+important application is to use GOA mappings to reduce the set of
+genes under consideration. As the capacity of microarrays increase it
+is important that we begin developing tools and strategies that
+directly address specific questions of interest. $P$-value correction
+methods are at best a band-aid and do not represent an approach that
+has long term viability \citep{WileyEncy}.
+
+In our final example we adapt the method proposed by
+\cite{shortestpath} to a different problem, one where we consider only
+transcription factors and where we are interested in understanding
+their interrelationships. The results are promising and in our example
+reflect a fundamental difference between those with the BCR/ABL
+translocation and those patients with no observed genetic
+abnormalities. Ideally these, and other observations will lead to
+better understanding of transcriptional regulation and from that to
+better understanding modalities of efficacy for drug treatments.
+
+Perhaps more important than the statistical presentation is the fact
+that we have also provided software implementations for all tools
+described and discussed in this paper. They are available from the
+Bioconductor Project in the form of the \Rpackage{GOstats} package.
+\Rpackage{GOstats} makes substantial use of software infrastructure
+from the Bioconductor Project in carrying out this analysis. In
+particular the \Rpackage{graph}, \Rpackage{Rgraphviz} and
+\Rpackage{RBGL}, together with the different meta-data packages.
+
+Finally, this document itself represents an approach to reproducible
+research in the sense discussed by \cite{GentTL} and it can be
+reproduced on any users machine equipped with R and the appropriate
+set of R packages. We encourage the interested reader to avail
+themselves of the opportunity to explore the data and the methods in
+more detail on their own computer.
+
+\section*{Thanks}
+
+ I would like to thank Vincent Carey for many helpful discussions
+ about these, and very many other topics. I would like to thank
+ Drs. J. Ritz and S. Chiaretti of the DFCI for making their data
+ available and for helping me to understand how it relates to ALL.
+ I would like to thank J. Zhang and J. Gentry for a great deal of
+ assistance in preparing the data and writing software in support of
+ this research.
+
+\bibliography{GOstats}
+
+\end{document}
+
+ idx2dimnames = function(x, idx) {
+     if(length(idx) != length(x) )
+         stop("x and idx different lengths")
+     rowV = row(x)[idx]
+     colV = col(x)[idx]
+     return(list(rowNames = dimnames(x)[[1]][rowV],
+                 colNames = dimnames(x)[[2]][colV]))
+ }
+
+##take as input a distance matrix
+##if the number of infs is 1 less than the number of rows
+##then that nod is not connected
+ notConn = function(dists) {
+   allInf = (dists==Inf)
+   dns = idx2dimnames(dists, allInf)
+   tab1 = table(dns[[1]])
+   whAll = tab1[tab1 == (nrow(dists)-1)]
+   if( any(tab1 != (nrow(dists)-1) & tab1 != length(whAll)) )
+      warning("inf dists seem to be wrong")
+   return(names(whAll))
+}

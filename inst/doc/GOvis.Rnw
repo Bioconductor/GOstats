@@ -1,0 +1,298 @@
+%
+% NOTE -- ONLY EDIT THE .Rnw FILE!!!  The .tex file is
+% likely to be overwritten.
+%
+% \VignetteIndexEntry{Visualizing Data Using GOstats}
+%\VignetteDepends{Biobase, genefilter, graph, GO, hgu95av2, xtable, multtest}
+%\VignetteSuggests{Rgraphviz}
+%\VignetteKeywords{EDA, graphs, ontology, visualization}
+%\VignettePackage{none}
+\documentclass[12pt]{article}
+
+\usepackage{times}
+\usepackage{hyperref}
+
+\usepackage[authoryear,round]{natbib}
+\usepackage{times}
+\usepackage{comment}
+
+\textwidth=6.2in
+\textheight=8.5in
+%\parskip=.3cm
+\oddsidemargin=.1in
+\evensidemargin=.1in
+\headheight=-.3in
+
+\newcommand{\scscst}{\scriptscriptstyle}
+\newcommand{\scst}{\scriptstyle}
+
+\newcommand{\Rfunction}[1]{{\texttt{#1}}}
+\newcommand{\Robject}[1]{{\texttt{#1}}}
+\newcommand{\Rpackage}[1]{{\textit{#1}}}
+\newcommand{\Rclass}[1]{{\textit{#1}}}
+
+
+\bibliographystyle{plainnat}
+
+\title{Visualizing and Distances Using GO}
+\author{R. Gentleman}
+
+\begin{document}
+
+\maketitle
+
+\section*{Introduction}
+
+The basic characteristics of the GO \citep{GO} data are described in
+\cite{GentGO2004a} and the interested reader is referred there for
+more details. In this paper we assume that readers are familiar with
+the basic DAG structure of GO and with the mappings of genes to GO
+terms that are provide by GOA \citep{GOA}. We examine some of the
+different visualization problems and data analytic problems that can
+be addressed using these data. To make some of the concepts concrete
+and to provide extensive, but related examples we will make use of a
+microarray data set \citep{Chiaretti2004}.
+
+
+We begin with brief descriptions and reminders of some of the
+important concepts, as well as of our example data. Once that has been
+done we will then consider several different bioinformatic tasks that
+are of interest and show how these tasks can be carried out using
+software from the Bioconductor Project.
+%%FIXME: once we have centered on tasks we can come back and fill in
+%%details
+
+<<Setup, echo=FALSE, results=hide>>=
+library("Biobase")
+library("annotate")
+library("GOstats")
+library("xtable")
+library("multtest")
+require("Rgraphviz", quietly=TRUE)
+library(hgu95av2)
+library(genefilter)
+@
+
+\subsection{Graphs}
+
+The relationships between different GO terms, within a specific
+ontology are represented in the form of a directed acyclic graph.
+The leaves of this graph represent the most specific terms and their
+are edges from a specific term (child) to all less specific terms
+(each is a parent). The \textit{induced} GO graph is the graph that
+obtains from taking a set of GO terms and finding all parents of those
+terms, and so on until the root node has been obtained. Given any set
+of genes one may use the mappings provided by GOA \citep{GOA} to  find
+the most specific set of GO terms associated with those genes and
+hence, from those, to the induced GO graph. Thus we can speak of the
+induced GO graph either from the perspective of selected genes or from
+the perspective of selected terms.
+
+We note that there is a form of algebra possible on these induced GO
+graphs. If $G_1$ and $G_2$ are two different GO graphs from the same
+ontology then we can form their union, $G_1 \cup G_2$ which is the
+union of the nodes in the two graphs together with the union of the
+edge sets. We note that this is a bit different than the usual
+mathematical definition of the union of two graphs. Other set
+operations such as intersection and complement are also easy to define
+and implement and they will play a role in our subsequent discussions.
+
+\subsection{Some problems}
+
+One should be aware that our state of biological knowledge is
+constantly changing and that the terms, their relationships and the
+genes mapped to them are constantly changing and being updated. The
+meta-data used to prepare this report will likely be out of date in
+less than one year. Hence, one must try to ensure that the mappings
+being used are up to date (Bioconductor meta-data packages are built
+quarterly).
+
+Another practical issue that needs some attention is consideration of
+the incompleteness of the data. Not all genes (or all transcripts) are
+assayed and not all genes are well enough understood to accurately
+annotate them at the existing GO nodes; to say nothing of the issues
+regarding the evolving nature of GO discussed above. For each problem
+the data analyst will need to consider what, if any, biases these
+issues might raise.
+
+In all comparisons and gene list developments reported in the
+remainder of this paper we restrict attention to those genes which
+satisfy two conditions first they were included on the chip being used
+and second they have a GO annotation for the ontology of interest.
+
+\subsection{An Example}
+
+To demonstrate some of the tools that are included in the
+\Rpackage{GOstats} package we consider expression data from 79 samples
+from patients with acute lymphoblastic leukemia (ALL) that were
+investigated using HGU95AV2 Affymetrix GeneChip arrays
+\citep{Chiaretti2004}.  The data were normalized using quantile
+normalization and expression estimates were computed using
+RMA~\citep{Irizarry2003}. We will consider the subset of these
+patients that have B-cell ALL and within those we will further
+restrict our interest to comparing three groups. Those with BCR/ABL
+(this is a translocation between chromosomes 9 and 22), those with
+ALL1/AF4 (this is a translocation between chromosomes 4 and 11) and
+those with no detected cytogenetic abnormalities (labeled NEG).  There
+are 37 patients with BCR/ABL, 10 with ALL1/AF4 and 42 from the NEG
+group.
+
+We will examine genes that are differentially expressed between these
+different phenotypes and then make use of GO and other meta-data
+resources to help understand the genes that were selected. The actual
+method of determining differentially expressed genes is in some sense
+irrelevant to the subsequent analysis using GO and readers can easily
+substitute their own favorite methods. We refer readers to
+\cite{WileyEncy} for a general discussion of some of the issues
+involved in gene filtering.
+
+
+<<Example, results=hide, echo=FALSE>>=
+## subset of interest: 37+42 samples
+data(ALL)
+eset <- ALL[, intersect(grep("^B", as.character(ALL$BT)),
+          which(as.character(ALL$mol) %in% c("BCR/ABL","NEG", "ALL1/AF4")))]
+
+MB = factor(eset$mol.bio)
+
+## intensities above 100 in at least 7 of the samples
+f1 <- kOverA(7, log2(100))
+f2 = function(x) {gps = split(2^x, MB); mns=sapply(gps, mean);
+          if(max(mns) - min(mns) < 100) FALSE else TRUE}
+ff <- filterfun(f1, f2)
+selected <- genefilter(eset, ff)
+sum(selected)
+esetSub <- eset[selected,]
+
+@
+
+Our approach is fairly simplistic. First, we require that genes be
+expressed in a reasonable set of the samples. Since our smallest
+group, those with ALL1/AF4, has only 10 samples we will require that a
+gene be expressed in at least 7 samples to be deemed interesting. For
+our purposes we consider a gene to be expressed if its value is
+greater than 100. We also introduce a second selection criteria that
+is based on differences between the group means. We require that the
+difference between the smallest group mean and the largest be larger
+than 100 units. Applying both of these transformations yielded
+\Sexpr{sum(selected)} probes that were differentially expressed.
+
+<<mtFstats, results=hide, echo=FALSE>>=
+
+ pvCutOff = 0.05
+
+ Fstats = mt.maxT(exprs(esetSub), as.numeric(MB)-1, test="f")
+
+ eSet = esetSub[Fstats$index[Fstats$adjp<pvCutOff],]
+
+ gN = geneNames(eSet)
+ lls = unlist(mget(gN, hgu95av2LOCUSID, ifnotfound=NA))
+
+ eS = eSet[!duplicated(lls),]
+ gN = geneNames(eS)
+ lls = unlist(mget(gN, hgu95av2LOCUSID, ifnotfound=NA))
+ syms = unlist(mget(gN, hgu95av2SYMBOL, ifnotfound=NA))
+
+@ Next restricting attention to just these \Sexpr{sum(selected)}
+probes we use the \Rfunction{mt.maxT} function from the
+\Rpackage{multtest} package to compute adjusted $p$-values for F-test
+comparisons.  We found \Sexpr{sum(Fstats$adjp < pvCutOff)} of these to
+have adjusted $p$-values less than \Sexpr{round(pvCutOff, 2)}. We will
+deem these to be the differentially expressed genes and will now turn
+our attention to using GO to gain a better understanding of the
+associated genes.  Before going further though, we note that these
+\Sexpr{sum(Fstats$adjp < pvCutOff)} probes map to
+\Sexpr{sum(!duplicated(lls))} distinct LocusLink identifiers and since
+our GO mappings are based on LocusLink we further reduce our attention
+to these. We kept the first (in index order) of each of the duplicated
+probes for any analyses or computations that require gene expression
+data and note that others may want to use different conventions.
+
+\section{Visualization}
+
+We need to develop more and better tools for visualizing the data. We
+need to be able to associated the experimental data (often gene
+expression data) directly with the GO data. This can be done by laying
+out the induced GO graph and then controlling the nodes. They can be
+colored according to very many different criteria including $p$-value
+and the behavior of the genes of interest.
+
+Storch et al, plus some of the ALL plots go here.
+
+Can we do a pieglyph and then use that to render at the different nodes?
+
+
+\section*{Multiple Testing}
+
+Using GO, or any other ontology, for data analytic purposes raises
+some substantial concerns about the interpretation of any resultant
+$p$-values. There are two major hurdles that present
+themselves. First, and probably least important, is the lack of
+independence. Since genes are annotated at a specific term and then by
+inheritance at all less specific terms we find that for less specific nodes
+the tests carried out often are based on largely the same genes as were
+used at the parent node.
+
+%%FIXME: can we get an example - GO:
+
+The second problem appears to be more substantial. It arises because
+we are not typically interested in the behavior of a single $p$-value
+(which is what $p$-value correction largely does) but rather with the
+existence of patterns in the $p$-values that are associated with
+structure in the GO graph. This is harder as we have no real guidance
+and it appears to be a rather unusual situation.
+
+For example in the ALL1/AF4 example we found a set of three nodes with
+increasing $p$-values as we went from the most specific term to the
+least specific. So that any $p$-value correction would remove the
+least specific term first. But the evidence was (something like) 7 of 111,
+8 of 121 and 22 of 800. Now given these numbers it is hard to believe that
+the evidence at the second node is of interest given the first
+node. Whereas, for the third node, even though it has a smaller
+$p$-value than the second node it does seem to indicate some form of
+new information.
+
+%%FIXME: perhaps we could do something like look to see if a node is
+%%interesting given its most significant antecedant? A rather odd form
+%%of linearization?
+
+%%FIXME: find out what folks have done Gaven Sherlock has done
+%%something as I think have the FatiGO folks - the later seemed wrong
+%%to me but needs to be checked out
+
+\section{GO induced Distances}
+
+Another idea that has seen some exploration is the notion of defining
+distances between two genes in terms of the similarity of their GO
+annotations. We explore some of the suggestions and provide some
+guidance for those who would like to explore these ideas.
+
+One of the problems that seems to arise is how one might deal with
+genes that have multiple annotations. In that case a number of options
+are open. One could define distance to the induced subgraph thereby
+requiring that the two genes are similar on all functions. One could
+define distance as some combination of the annotation specific
+distances. For example, if gene 1 is annotated at 2 terms and gene 2 is
+annotated at three terms there are 6 distances to be computed and some
+functional of these 6 distances will be reported.
+
+%%FIXME: need to list how many multiply annotated genes for each of
+%%the different ontologies
+
+Discuss and describe the different distances here.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\end{document}
+
