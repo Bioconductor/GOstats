@@ -1,0 +1,23 @@
+
+plotPieChart <- function(curPlot, counts) {
+    renderNode <- function(x) {
+        force(x)
+        y <- x*100+1
+        function(node, ur, attrs=list()) {
+            nodeCenter <- getNodeCenter(node)
+            pieGlyph(y, xpos=getX(nodeCenter),
+                     ypos=getY(nodeCenter),
+                     radius=getNodeRW(node),
+                     col=c("black", "white", "darkgrey"))
+        }
+    }
+    drawing <- vector(mode="list", length=nrow(counts))
+    for (i in 1:length(drawing)) {
+        drawing[[i]] <- renderNode(counts[i,])
+    }
+
+    plot(curPlot, drawNode=drawing, main=" ")
+    legend(300, 75, legend=c("ALL1/AF4", "BCR/ABL", "NEG"),
+          fill=c("black", "white", "darkgrey"))
+}
+plotPieChart(pgLayout, ctmat)
