@@ -281,7 +281,7 @@ Mappings from GO terms to specific genes is provided in the hash table
 (R \Robject{environment}) named \Robject{GOLOCUSID}, which maps from GO
 terms to LocusLink identifiers. These are only the set of most
 specific mappings. To get all LocusLink IDs associated with a specific
-GO term use \Robject{GOALLOCUSID} instead. A histogram of the logarithm of the
+GO term use \Robject{GOALLLOCUSID} instead. A histogram of the logarithm of the
 number of LocusLink identifiers per GO term is given in
 Figure~\ref{fig:GO2LL}.
 
