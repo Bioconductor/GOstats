@@ -271,6 +271,11 @@ combGOGraph <- function(g1, g2)
      if(length(x) == 0 )
          return(list())
      terms <- mget(x, env=GOTERM, ifnotfound=NA)
+     ##cannot use is.na, because GOTerms objects are 0 length lists
+     isNA = sapply(terms, function(x) !(is(x, "GOTerms")))
+     if( any(isNA) )
+         terms = terms[!isNA]
+
      ontology <- sapply(terms, Ontology)
      terms = sapply(terms, Term)
      return(split(terms, ontology))
