@@ -249,7 +249,8 @@ some of the experimental data and information to these plots.
 \begin{center}
 
 <<GOMF, fig=TRUE, echo=FALSE>>=
-  plot(gMF, nodeAttrs=nMF)
+  if (require("Rgraphviz"))
+     plot(gMF, nodeAttrs=nMF)
 @
 \caption{The induced MF GO graph for the selected genes. \label{fig:mf}}
 \end{center}
@@ -259,7 +260,8 @@ some of the experimental data and information to these plots.
 \begin{center}
 
 <<GOBP, fig=TRUE, echo=FALSE>>=
-  plot(gBP, nodeAttrs=nBP)
+  if (require("Rgraphivz"))
+    plot(gBP, nodeAttrs=nBP)
 @
 \caption{The induced BP GO graph for the selected genes. \label{fig:bp}}
 \end{center}
@@ -269,7 +271,8 @@ some of the experimental data and information to these plots.
 \begin{center}
 
 <<GOCC, fig=TRUE, echo=FALSE>>=
-  plot(gCC, nodeAttrs=nCC)
+  if (require("Rgraphviz"))
+    plot(gCC, nodeAttrs=nCC)
 @
 \caption{The induced CC GO graph for the selected genes. \label{fig:cc}}
 \end{center}
@@ -347,6 +350,7 @@ components the requested colors.
 
 <<layoutandrender>>=
 
+if (require("Rgraphviz")) {
  pgLayout = agopen(gCC, "foo")
 
 plotPieChart <- function(curPlot, counts) {
@@ -371,6 +375,7 @@ plotPieChart <- function(curPlot, counts) {
           fill=c("blue", "green", "red"))
 }
 plotPieChart(pgLayout, ctmat)
+}
 @
 
 We can see a number of interesting features in this plot. For example,

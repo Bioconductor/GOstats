@@ -442,8 +442,9 @@ view of the data.
 \begin{center}
 
 <<GOg1, fig=TRUE, echo=FALSE>>=
-  plot(gGO, nodeAttrs=nA1)
-@
+  if (require("Rgraphviz")) 
+    plot(gGO, nodeAttrs=nA1)  
+@ 
 \caption{The induced GO graph for the selected genes. \label{fig:GG1}}
 \end{center}
 \end{figure}
@@ -578,7 +579,8 @@ xtable.matrix(ggMat,
 \begin{figure}[htbp]
 \begin{center}
 <<GOxx, fig=TRUE, echo=FALSE>>=
-  plot(gGO, nodeAttrs=nA)
+  if (require("Rgraphviz"))
+     plot(gGO, nodeAttrs=nA)
 @
 \caption{The induced GO graph colored according to unadjusted Hypergeometric
 p-values \label{fig:indGG}}
@@ -1132,7 +1134,7 @@ that is the case here). We consider two specific paths -
  nA$label = nL
 ## nA$fillcolor = gCols
 
- if(interactive()) {
+ if((interactive())&&(require("Rgraphviz"))) {
    nA$fillcolor = bc1
    plot(BsG, "neato", nodeAttrs=nA, main="BCR/ABL: MYC")
    dev.set(dev.next())
@@ -1161,7 +1163,8 @@ that is the case here). We consider two specific paths -
 \begin{center}
 <<pathinNEG, fig=TRUE, echo=FALSE>>=
  nAN = nA; nAN$fillcolor = Ncols
- plot(NsG, "neato", nodeAttrs=nAN)
+ if (require("Rgraphivz"))
+    plot(NsG, "neato", nodeAttrs=nAN)
 
 @
 \caption{Shortest path between MYC and MPO in the NEG
@@ -1174,7 +1177,8 @@ that is the case here). We consider two specific paths -
 \begin{center}
 <<pathinBCR, fig=TRUE, echo=FALSE>>=
  nAB = nA; nAB$fillcolor = Bcols
- plot(BsG, "neato", nodeAttrs=nAB)
+ if (require("Rgraphviz"))
+    plot(BsG, "neato", nodeAttrs=nAB)
 @
 \caption{Shortest path between MYC and MPO in the BCR/ABL
   samples. \label{fig:BCRsp}.}
