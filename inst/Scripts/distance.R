@@ -30,8 +30,8 @@ env1=NULL, env2=NULL, env3=NULL)
 
     for (j in geneslist1)
       {
-        geneslist1.gos <- unlist(multiget(j,get(env1)))
-        geneslist1.ontology <- geneslist1.gos[!is.na(multiget(geneslist1.gos,get(paste("GO",ontology,"ID2TERM",sep=""))))]
+        geneslist1.gos <- unlist(mget(j,get(env1)))
+        geneslist1.ontology <- geneslist1.gos[!is.na(mget(geneslist1.gos,get(paste("GO",ontology,"ID2TERM",sep=""))))]
 
     #  print(geneslist.ontology)
         if(length(geneslist1.ontology)==0)
@@ -44,8 +44,8 @@ env1=NULL, env2=NULL, env3=NULL)
 
     for (j in geneslist2)
       {
-        geneslist2.gos <- unlist(multiget(j,get(env1)))
-        geneslist2.ontology <- geneslist2.gos[!is.na(multiget(geneslist2.gos,get(paste("GO",ontology,"ID2TERM",sep=""))))]
+        geneslist2.gos <- unlist(mget(j,get(env1)))
+        geneslist2.ontology <- geneslist2.gos[!is.na(mget(geneslist2.gos,get(paste("GO",ontology,"ID2TERM",sep=""))))]
 
     #  print(geneslist.ontology)
         if(length(geneslist2.ontology)==0)
