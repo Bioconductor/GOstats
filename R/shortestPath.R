@@ -62,10 +62,12 @@ compCorrGraph <- function(eSet, k=1, tau=0.6) {
     if( tau < 0 || tau > 1 ) stop("bad tau value")
     cB <- abs(cor(t(exprs(eSet))))
     cB[cB < tau] <- 0
-    whE = cB[cB>0]
+    whE = cB>0
+    ##FIXME: any two genes whose exprssion values are perfectly
+    ##correlated will get dropped - seems pretty unlikely
     cB[whE] <- ((1-cB)[whE])^k
+    ##set diag to zero, since we do not want self-edges
     diag(cB) = 0
-    ##FIXME: cB=1?
     require("SparseM", quietly=TRUE) || stop("need SparseM package")
     v1<-as.matrix.csr(cB, nr=dim(cB)[1], nc=dim(cB)[2])
     rv <- sparseM2Graph(v1, geneNames(eSet))

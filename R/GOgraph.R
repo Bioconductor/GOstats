@@ -23,7 +23,7 @@ makeGOGraph <- function (x, what = "MF", lib = "hgu95av2",
     oldEdges <- vector("list", length = 0)
     oldNodes <- vector("character", length = 0)
     for (i in 1:length(newNodes)) {
-        newN <- sapply(newNodes[[i]], function(x) x$GOID)
+        newN <- unique(sapply(newNodes[[i]], function(x) x$GOID))
         done <- FALSE
         while (!done) {
             newN <- newN[!(newN %in% oldNodes)]
