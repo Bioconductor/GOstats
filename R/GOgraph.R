@@ -1,3 +1,5 @@
+ combGOGraph = function(g1, g2) .Defunct("join", package = "GOstats")
+
 ##given a set of LOCUSLINK IDs obtain the GO graph that has all
 ##GO ids that those genes are annotated at, and
 makeGOGraph <- function (x, Ontology = "MF", removeRoot=TRUE)
@@ -128,28 +130,6 @@ oneGOGraph <- function(x, dataenv) {
         stop("second argument must be an environment")
     GOGraph(x, dataenv)
 }
-##given two GO graphs, g1 and g2 join them together into a single new
-##GO graph
-combGOGraph <- function(g1, g2)
-{
-    .Deprecated("join", "graph")
-    if( !is(g1, "graphNEL") || !is(g2, "graphNEL") )
-        stop("both arguments must be GO graphs")
-
-    newn <- union(nodes(g1), nodes(g2))
-    e1 <- edges(g1)
-    e2 <- edges(g2)
-    nnodes <- length(newn)
-    rval <- vector("list", length=nnodes)
-    names(rval) <- newn
-    for( node in newn ) {
-        el1 <- e1[[node]]
-        el2 <- e2[[node]]
-        rval[[node]] <- list(edges=match(union(el1, el2), newn))
-    }
-    return(new("graphNEL", nodes = newn, edgeL=rval, edgemode="directed"))
-}
-
  ##GOleaves: the leaves of the GO graph are those nodes that have no
  ##inedges
   GOLeaves <- function(inG) {
