@@ -69,8 +69,8 @@ library("GOstats")
 library("xtable")
 library("multtest")
 require("Rgraphviz", quietly=TRUE)
-library(hgu95av2)
-library(genefilter)
+library("hgu95av2")
+library("genefilter")
 @
 
 The results reported in this document are based on version

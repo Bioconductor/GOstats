@@ -63,6 +63,7 @@ GOHyperG <- function(x, lib="hgu95av2", what="MF") {
     })
     bad <- sapply(goVcts, function(x) (length(x) == 1 && is.na(x)))
     goVcts = goVcts[!bad]
+    goV = goV[!bad] ##we are going to output this...
 
     ##find out how many map which is m+n in phyper-speak
     cLLs <- unique(unlist(goVcts))
@@ -85,12 +86,13 @@ GOHyperG <- function(x, lib="hgu95av2", what="MF") {
     useCts <- sapply(goVcts, function(x) sum(whGood %in% x))
 
     ##need the -1 because we are asking for evidence as extreme or
-    ##more extremen than what we say - and we are using the upper tail
+    ##more extreme than what we say - and we are using the upper tail
     pvs <- phyper(useCts-1, nInt, nLL-nInt, goCounts, lower.tail=FALSE)
 
     ord <- order(pvs)
-    return(list(pvalues=pvs[ord], goCounts=goCounts[ord],
-                intCounts=useCts[ord], numLL=nLL, numInt = nInt))
+    return(list(pvalues=pvs[ord], goCounts=goCounts[ord], chip=lib,
+                go2Affy=goV, intCounts=useCts[ord], numLL=nLL,
+                numInt = nInt, intLLs=x))
 }
 
     ##

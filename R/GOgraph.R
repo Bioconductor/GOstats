@@ -15,8 +15,11 @@ makeGOGraph <- function (x, Ontology = "MF", removeRoot=TRUE)
        bd = is.na(newNodes)
     newNodes <- newNodes[!bd]
 
-    newNodes <- lapply(newNodes, function(x) x[sapply(x, function(x)
-                                                      x$Ontology == Ontology)])
+    newNodes <- lapply(newNodes, function(x) x[sapply(x,
+                         function(x) {if (is.na(x$Ontology) )
+                                          return(FALSE)
+                                      else
+                                          x$Ontology == Ontology})])
     oldEdges <- vector("list", length = 0)
     oldNodes <- vector("character", length = 0)
     for (i in 1:length(newNodes)) {

@@ -54,6 +54,11 @@ GOHyperG(x, lib="hgu95av2", what="MF")
     some term in the specified GO category.}
   \item{numInt}{The number of unique LLIDs from those supplied that are
     mapped to some term in the specified GO category.}
+  \item{chip}{A string identifying the chip used.}
+  \item{intLLs}{The input vector \code{x}.}
+  \item{go2Affy}{A list with one element for each GO node, containing
+    the Affymetrix identifiers associated with that node, for the whole
+    chip (not just the interesting genes).}
 }
 \author{R. Gentleman}
 
