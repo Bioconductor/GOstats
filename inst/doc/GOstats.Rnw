@@ -893,7 +893,7 @@ the BCR/ABL graph.}
  rowSym <- unlist(mget(dNames$rowNames, hgu95av2SYMBOL, 
              ifnotfound="Unknown"))
  colSym = unlist(mget(dNames$colNames, hgu95av2SYMBOL,
-          ifnotfound="Unknown))
+          ifnotfound="Unknown"))
 
  rowSym[is.na(rowSym)] = "Unknown"
  colSym[is.na(colSym)] = "Unknown"
