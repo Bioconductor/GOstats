@@ -1,17 +1,12 @@
-##given a set of gene/probe identifiers obtain the GO graph that has all
+##given a set of LOCUSLINK IDs obtain the GO graph that has all
 ##GO ids that those genes are annotated at, and
-makeGOGraph <- function (x, what = "MF", lib = "hgu95av2",
-                         removeRoot=TRUE)
+makeGOGraph <- function (x, Ontology = "MF", removeRoot=TRUE)
 {
     require(GO) || stop("no GO library")
-    require(lib, character.only=TRUE, quietly=TRUE) ||
-                     stop("data library not available")
-    match.arg(what, c("MF", "BP", "CC"))
-    wh <- paste("GO", what, "PARENTS", sep = "")
-    dataenv <- get(wh, mode = "environment")
-    GOpkgname<- paste(lib, "GO", sep="")
-    GOpkgenv <- get(GOpkgname, mode="environment")
-    newNodes <- mget(x, env = GOpkgenv, ifnotfound=NA)
+    match.arg(Ontology, c("MF", "BP", "CC"))
+    wh <- paste("GO", Ontology, "PARENTS", sep = "")
+    dataenv = get(wh, mode="environment")
+    newNodes <- mget(x, env = GOLOCUSID2GO, ifnotfound=NA)
     if( length(newNodes) == 1)
        bd = is.na(newNodes[[1]])
     else
@@ -19,7 +14,7 @@ makeGOGraph <- function (x, what = "MF", lib = "hgu95av2",
     newNodes <- newNodes[!bd]
 
     newNodes <- lapply(newNodes, function(x) x[sapply(x, function(x)
-                                                      x$Ontology == what)])
+                                                      x$Ontology == Ontology)])
     oldEdges <- vector("list", length = 0)
     oldNodes <- vector("character", length = 0)
     for (i in 1:length(newNodes)) {
@@ -91,7 +86,7 @@ oneGOGraph <- function(x, dataenv) {
     require(GO) || stop("no GO library")
     if( length(x) > 1 )
         stop("wrong number of GO terms")
-    if( !is.environment(dataenv) )
+    if (!is.environment(dataenv))
         stop("second argument must be an environment")
 
     oldEdges <- vector("list", length=0)
@@ -129,6 +124,7 @@ oneGOGraph <- function(x, dataenv) {
 ##GO graph
 combGOGraph <- function(g1, g2)
 {
+    .Deprecated("join", "graph")
     if( !is(g1, "graphNEL") || !is(g2, "graphNEL") )
         stop("both arguments must be GO graphs")
 

@@ -215,7 +215,7 @@ for the specific set of child nodes.
 \begin{figure}[htbp]
   \begin{center}
 <<tfGplot, fig=TRUE, echo=FALSE, results=hide>>=
-   nL <- nodes(tfG) 
+   nL <- nodes(tfG)
    nLterm = unlist(getGOTerm(nL), use.names=FALSE)
    names(nLterm) = nL
    nLterm = gsub("_", " ", nLterm)
@@ -432,7 +432,9 @@ view of the data.
 <<inducedGO, echo=FALSE, results=hide>>=
  whGO = resT$index[resT$adjp<0.05]
  gNsel <- geneNames(esetSub)[whGO]
- gGO <- makeGOGraph(gNsel, "MF", "hgu95av2")
+ gNll = unlist(mget(gNsel, hgu95av2LOCUSID))
+ gNll = as.character(gNll)
+ gGO <- makeGOGraph(gNll, "MF")
 
  nA1 = list()
  lbs = rep("", length(nodes(gGO)))

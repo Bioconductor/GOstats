@@ -182,7 +182,8 @@ than 100 units. Applying both of these transformations yielded
 
  pvCutOff = 0.05
 
- Fstats = mt.maxT(exprs(esetSub), as.numeric(MB)-1, test="f")
+ Fstats = mt.maxT(exprs(esetSub), as.numeric(MB)-1,
+                   B=1000, test="f")
 
  eSet = esetSub[Fstats$index[Fstats$adjp<pvCutOff],]
 
@@ -192,6 +193,7 @@ than 100 units. Applying both of these transformations yielded
  eS = eSet[!duplicated(lls),]
  gN = geneNames(eS)
  lls = unlist(mget(gN, hgu95av2LOCUSID, ifnotfound=NA))
+ lls = as.character(lls)
  syms = unlist(mget(gN, hgu95av2SYMBOL, ifnotfound=NA))
 
 @
@@ -221,9 +223,9 @@ some of the experimental data and information to these plots.
 
 <<inducedGO, echo=FALSE, results=hide>>=
 
- gMF <- makeGOGraph(gN, "MF", "hgu95av2")
- gBP = makeGOGraph(gN, "BP", "hgu95av2")
- gCC = makeGOGraph(gN, "CC", "hgu95av2")
+ gMF <- makeGOGraph(lls, "MF")
+ gBP = makeGOGraph(lls, "BP")
+ gCC = makeGOGraph(lls, "CC")
 
 
  nMF = list()
@@ -241,7 +243,11 @@ some of the experimental data and information to these plots.
  names(lbs) = nodes(gCC)
  nCC$label = lbs
 
-
+if( require("Rgraphviz") ) {
+  gMFlo = agopen(gMF, "gMF")
+  gBPlo = agopen(gBP, "gBP")
+  gCClo = agopen(gCC, "gCC")
+}
 
 @
 
@@ -250,7 +256,7 @@ some of the experimental data and information to these plots.
 
 <<GOMF, fig=TRUE, echo=FALSE>>=
   if (require("Rgraphviz"))
-     plot(gMF, nodeAttrs=nMF)
+     plot(gMFlo, nodeAttrs=nMF, main="Molecular Function")
 @
 \caption{The induced MF GO graph for the selected genes. \label{fig:mf}}
 \end{center}
@@ -261,7 +267,7 @@ some of the experimental data and information to these plots.
 
 <<GOBP, fig=TRUE, echo=FALSE>>=
   if (require("Rgraphviz"))
-    plot(gBP, nodeAttrs=nBP)
+    plot(gBPlo, nodeAttrs=nBP, main="Biological Process")
 @
 \caption{The induced BP GO graph for the selected genes. \label{fig:bp}}
 \end{center}
@@ -272,12 +278,11 @@ some of the experimental data and information to these plots.
 
 <<GOCC, fig=TRUE, echo=FALSE>>=
   if (require("Rgraphviz"))
-    plot(gCC, nodeAttrs=nCC)
+    plot(gCClo, nodeAttrs=nCC, main="Cellular Component")
 @
 \caption{The induced CC GO graph for the selected genes. \label{fig:cc}}
 \end{center}
 \end{figure}
-
 
 The nodes in these different graphs can be colored according to
 different criteria. In \cite{Storch} they considered using color for
@@ -331,12 +336,16 @@ code to deal with the other two ontologies.
 
  all1cts = sapply(cts, function(x) x["ALL1/AF4"])
  all1cts = ifelse(is.na(all1cts), 0, all1cts)
+ ##put nice names on
+ names(all1cts) = names(cts)
 
  bcrcts = sapply(cts, function(x) x["BCR/ABL"])
  bcrcts = ifelse(is.na(bcrcts), 0, bcrcts)
+ names(bcrcts) = names(cts)
 
  negcts = sapply(cts, function(x) x["NEG"])
  negcts = ifelse(is.na(negcts), 0, negcts)
+ names(negcts) = names(cts)
 
  ctmat = cbind(all1cts, bcrcts, negcts)
 @
@@ -350,10 +359,9 @@ components the requested colors.
 
 <<layoutandrender>>=
 
-if (require("Rgraphviz")) {
- pgLayout = agopen(gCC, "foo")
-
-plotPieChart <- function(curPlot, counts) {
+if( require(Rgraphviz) ) {
+opar = par(xpd = NA)
+plotPieChart <- function(curPlot, counts, main) {
     renderNode <- function(x) {
         force(x)
         y <- x*100+1
@@ -369,12 +377,16 @@ plotPieChart <- function(curPlot, counts) {
     for (i in 1:length(drawing)) {
         drawing[[i]] <- renderNode(counts[i,])
     }
+    if( missing(main) )
+       main="Example Pie Chart Plot"
 
-    plot(curPlot, drawNode=drawing, main="Example Pie Chart Plot")
+    plot(curPlot, drawNode=drawing, main=main)
+
     legend(300, 65, legend=c("ALL1/AF4", "BCR/ABL", "NEG"),
           fill=c("blue", "green", "red"))
 }
-plotPieChart(pgLayout, ctmat)
+plotPieChart(gCClo, ctmat)
+par(opar)
 }
 @
 
@@ -384,6 +396,52 @@ right and another set of red nodes on the left. We might want to
 investigate these and see what cellular components they are related
 to.
 
+We can make use of the \Rfunction{imageMap} function from the
+\Rpackage{prada} package to provide tool tips for our graph.
+
+<<imageMap>>=
+
+ getNodeBB = function(ingraph) {
+     xypos = getNodeLocs(ingraph)
+     hts = getNodeHeight(ingraph)
+     wdsR = getNodeRW(ingraph)
+     wdsL = getNodeLW(ingraph)
+     llx = xypos$x - wdsL
+     lly = xypos$y - (hts/2)
+     urx = xypos$x + wdsR
+     ury = xypos$y + (hts/2)
+     cbind(llx, lly, urx, ury)
+ }
+
+ CCbb = getNodeBB(gCClo)
+
+ ##now we need to adjust the graphBB to the plot region
+ bbG = boundBox(gCClo)
+ llx = getX(botLeft(bbG))
+ lly = getY(botLeft(bbG))
+ urx = getX(upRight(bbG))
+ ury = getY(upRight(bbG))
+
+
+##FIXME: work in progress here - we need to do a bit of mapping
+##to get the right user coords on the jpg file...
+ jpeg("mygraph.jpg", quality=100, width=urx-llx, height=ury-lly)
+  opar = par(plt=c(0,1,0,1), xpd=NA)
+  plotPieChart(gCClo, ctmat, xlim=c(0,urx-llx), ylim=c(0,ury-lly))
+  par(opar)
+ dev.off()
+
+ if( require(prada) ) {
+     con = openHtmlPage("example", "An Image Map")
+
+     imageMap(con, "mygraph.jpg", CCbb, tooltips=getNodeNames(gCClo),
+              url=rep("", length(nodes(gCC))))
+
+     closeHtmlPage(con)
+ }
+
+
+@
 \section{GO induced Distances}
 
 Another idea that has seen some exploration is the notion of defining
@@ -393,23 +451,107 @@ guidance for those who would like to explore these ideas.
 
 It seems reasonable to treat the three ontologies separately. Even
 within an ontology a single gene might be annotated at several GO
-terms. A
+terms. Some mechanisms for dealing with this issue would be helpful.
+For each gene we could define the graph to be that which is induced by
+all GO terms to which the gene is mapped, within the ontology of
+interest. Then use the between graph distances as already described.
+One could define distance as some combination of the annotation
+specific distances. For example, if gene 1 is annotated at 2 terms and
+gene 2 is annotated at three terms there are 6 distances to be
+computed and some functional of these 6 distances will be reported.
+
+
+
+There are two basic strategies that have been widely used to define
+distances, or similarities, between genes based on GO annotation. One,
+is to make use of the graph structure that is associated with each
+pair of genes. If the two graphs are very similar then the two genes
+are presumed to also be quite similar. The second general strategy is
+to use the information content in GO as a basis for assigning
+similarity. Readers should consult \cite{Lordetal} for a general
+review of the area and for some suggestions. Code contributions that
+implement some of their methods would be most welcome.
+
+Two methods based on graph similarity have been implemented in
+\Rpackages{GOstats} they are \Rfunction{simDGGO} and
+\Rfunction{simCGO}. The first uses the number of nodes that the two
+graphs have in common divided by the total number of nodes in both
+graphs combined. Hence these similarities are bounded between 0 and 1
+with genes that are more similar having values near one.
+
+For \Rfunction{simCGO} the similarity measure is the depth of the
+longest shared path from the root node. Two genes that are both quite
+specific and similar should have long shared paths, while those that
+have less in common should have relatively short shared paths.
+
+Of course neither is perfect and there are many cases where they seem
+to fail to uncover similarity and others where they suggest a
+similarity that does not exist. Further investigation and comparison
+with other methods is certainly warranted.
+
+
+In the next code chunk we take the first 10 genes selected and
+construct a set of similarity measures between all pairs of genes with
+respect to the BP ontology.
 
 <<multip>>=
 
+ igenes = unlist(mget(gN[1:10], hgu95av2LOCUSID))
 
+ igenes = igenes[!is.na(igenes)]
+ igenes = as.character(igenes)
+
+
+ GOs = mget(as.character(igenes), GOLOCUSID2GO, ifnotfound=NA)
+ gBP = getOntology(GOs, "BP")
+ ##how many terms
+
+ sum(sapply(gBP, length))
+
+ ##drop those with no BP annotations
+ hasBP = sapply(gBP, function(x) length(x) > 0)
+
+ gBP = gBP[hasBP]
+
+ ggs = lapply(igenes[hasBP], makeGOGraph, "BP")
+
+
+ sim1 = function(g1, g2)
+    length(nodes(intersection(g1, g2)))/length(nodes(join(g1,g2)))
+
+ sim2 = function(g1, g2) {
+    ig <- intersection(g1, g2)
+    lfi <- GOLeaves(ig)
+    degs = degree(ig)
+    root = names(degs$outDegree)[degs$outDegree == 0]
+    paths = sp.between(ig, lfi, root)
+    plens = sapply(paths, function(x) x$length)
+    max(plens)
+}
+
+ simatM1 = matrix(1, nr=sum(hasBP), nc=sum(hasBP))
+ for(i in 1:sum(hasBP))
+    for( j in 1:sum(hasBP) )
+        if( i== j ) next else
+          simatM1[i,j] = sim1(ggs[[i]], ggs[[j]])
+
+ library(RBGL)
+
+ simatM2 = matrix(1, nr=sum(hasBP), nc=sum(hasBP))
+ for(i in 1:sum(hasBP))
+    for( j in 1:sum(hasBP) )
+        if( i== j ) next else {
+          print(paste(i,j, sep=","))
+          simatM2[i,j] = sim2(ggs[[i]], ggs[[j]])
+      }
 
 @
-One of the problems that seems to arise is how one might deal with
-genes that have multiple annotations. In that case a number of options
-are open. One could define distance to the induced subgraph thereby
-requiring that the two genes are similar on all functions. One could
-define distance as some combination of the annotation specific
-distances. For example, if gene 1 is annotated at 2 terms and gene 2 is
-annotated at three terms there are 6 distances to be computed and some
-functional of these 6 distances will be reported.
 
-Discuss and describe the different distances here.
+Now, since some of our genes have multiple BP mappings we must decide what
+to do with them.
+
+
+
 
 \end{document}
 
