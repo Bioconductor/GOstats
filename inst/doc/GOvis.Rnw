@@ -391,6 +391,15 @@ distances between two genes in terms of the similarity of their GO
 annotations. We explore some of the suggestions and provide some
 guidance for those who would like to explore these ideas.
 
+It seems reasonable to treat the three ontologies separately. Even
+within an ontology a single gene might be annotated at several GO
+terms. A
+
+<<multip>>=
+
+
+
+@
 One of the problems that seems to arise is how one might deal with
 genes that have multiple annotations. In that case a number of options
 are open. One could define distance to the induced subgraph thereby

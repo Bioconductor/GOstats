@@ -150,7 +150,7 @@ include ``chromosome'', ``nucleus'' and ``ribosome''.
 
 <<GOcharacteristics, echo=FALSE, results=tex>>=
  goTerms <- contents(GOTERM)
- goCats <- sapply(goTerms, function(x) names(x))
+ goCats <- sapply(goTerms, Category)
  gCnums <- table(goCats)[c("BP","CC", "MF")]
  gCmat <- matrix(as.integer(gCnums), dimnames=list(c("BP","CC",
                                       "MF"), "Number of Terms"))
@@ -215,7 +215,7 @@ for the specific set of child nodes.
 \begin{figure}[htbp]
   \begin{center}
 <<tfGplot, fig=TRUE, echo=FALSE, results=hide>>=
-   nL <- nodes(tfG); nLterm = unlist(mget(nL, GOTERM))
+   nL <- nodes(tfG); nLterm = getGOTerm(nL)[["MF"]]
    names(nLterm) = nL
    nLterm["GO:0003673"] <-  "Gene Ontology"
    if(require(Rgraphviz) ) {
@@ -243,7 +243,8 @@ those terms within the MF ontology that are more specific than
 
 <<tfG.children, echo=FALSE>>=
 tfG.ch <- get("GO:0003700", GOMFCHILDREN)
-tfg.terms <- mget(tfG.ch, GOTERM)
+tfg.terms <- getGOTerm(tfG.ch)[["MF"]]
+
 tfg.tch <- paste(names(tfg.terms), tfg.terms, sep=": ")
 for(i in tfg.tch) cat(i, "\n")
 @
@@ -275,15 +276,17 @@ the multiplicity of mappings between the manufacturer IDs and
 LocusLink IDs.
 
 Mappings from GO terms to specific genes is provided in the hash table
-(R \Robject{environment}) named \Robject{GOGO2LL}, which maps from GO
-terms to LocusLink identifiers. A histogram of the logarithm of the
+(R \Robject{environment}) named \Robject{GOLOCUSID}, which maps from GO
+terms to LocusLink identifiers. These are only the set of most
+specific mappings. To get all LocusLink IDs associated with a specific
+GO term use \Robject{GOALLOCUSID} instead. A histogram of the logarithm of the
 number of LocusLink identifiers per GO term is given in
 Figure~\ref{fig:GO2LL}.
 
 \begin{figure}[htbp]
 \begin{center}
 <<GO2LL, fig=TRUE, echo=FALSE>>=
- go2LL <- contents(GOGO2LL)
+ go2LL <- contents(GOLOCUSID)
  go2LLcounts <- sapply(go2LL, length)
  hist(log(go2LLcounts), main="Log Counts of LocusLink IDs per GO ID",
       xlab="")
@@ -434,10 +437,9 @@ view of the data.
  names(lbs) = nodes(gGO)
  nA1$label = lbs
 
-##fixme: why is this different
-##from just plotting
-## gGopen = agopen(gGO, "foo")
-## plot(gGopen, nodeAttrs=nA1)
+if (require("Rgraphviz"))
+ gGopen = agopen(gGO, "foo")
+
 @
 
 \begin{figure}[htbp]
@@ -445,7 +447,7 @@ view of the data.
 
 <<GOg1, fig=TRUE, echo=FALSE>>=
   if (require("Rgraphviz"))
-    plot(gGO, nodeAttrs=nA1)
+    plot(gGopen, nodeAttrs=nA1)
 @
 \caption{The induced GO graph for the selected genes. \label{fig:GG1}}
 \end{center}
@@ -526,7 +528,8 @@ nL <- rep("", length(nodes(gGO)))
  names(nL) <- nodes(gGO)
  nA <- list()
 
- gNsLL <- unique(unlist(mget(gNsel, env=hgu95av2LOCUSID, ifnotfound=NA)))
+ gNsLL <- unique(unlist(mget(gNsel,
+              env=hgu95av2LOCUSID, ifnotfound=NA)))
  gGhyp <- GOHyperG(gNsLL)
 
  gGhyp.pv <- gGhyp$pv[nodes(gGO)]
@@ -556,12 +559,8 @@ $p$-values.
 <<GOterms, echo=FALSE, results=tex>>=
 gg = gGhyp.pv[gGhyp.pv < 0.1]
 gg = sort(gg)
-gg.terms <- unlist(mget(names(gg), GOTERM))
+gg.terms <- getGOTerm(names(gg))[["MF"]]
 
-##fix up the labels etc for printing
-nms = names(gg.terms)
-nms2 = gsub("^GO:", "", nms)
-nms3 = gsub(".MF$", "", nms2)
 ggt = unlist(gg.terms)
 numCh = nchar(ggt)
 ggt2 = substr(ggt, 1, 17)
@@ -570,7 +569,7 @@ ggt3 = paste(ggt2, ifelse(numCh > 17, "...", ""), sep="")
 ##get counts
 gg.counts <- gGhyp$goCounts[names(gg)]
 
-ggMat = matrix(c(nms3, ggt3, round(gg,3), gg.counts),
+ggMat = matrix(c(names(gg.terms), ggt3, round(gg,3), gg.counts),
     byrow=FALSE, nc=4, dimnames=list(1:length(gg), c("GO ID",
    "Term", "p-value","No. of Genes")))
 xtable.matrix(ggMat,
@@ -582,7 +581,7 @@ xtable.matrix(ggMat,
 \begin{center}
 <<GOxx, fig=TRUE, echo=FALSE>>=
   if (require("Rgraphviz"))
-     plot(gGO, nodeAttrs=nA)
+     plot(gGopen, nodeAttrs=nA)
 @
 \caption{The induced GO graph colored according to unadjusted Hypergeometric
 p-values \label{fig:indGG}}
@@ -861,7 +860,7 @@ computed on the BCR/ABL graph. The $t$-test is for whether the mean is
 zero and the test statistic was \Sexpr{round(tt$estimate, 3)} with an extremely
 small $p$-value. So we see that distances in the NEG graph seem to be longer
 than those in the BCR/ABL. Further evidence of this difference comes
-from the observation that proportion of values that were larger
+from the observation that the proportion of values that were larger
 in the NEG graph was \Sexpr{round(sum(ndx>0)/length(ndx), 3)}.
 %$ - ESS is confused
 
@@ -1096,8 +1095,8 @@ want to ask whether the distances are also larger (that is that the
 correlations are smaller). To do this we need to obtain the edge
 weights from the respective graphs and compare them. We found that
 there appeared to be no difference (all averaged around a distance of
-about \Sexpr{round(mean(c(MYCMPO.Bwts,MYCMPO.Nwts,
-  MYCGADD45A.Bwts,MYCGADD45A.Nwts)),1)} but the number of edges is
+about
+\Sexpr{round(mean(c(MYCMPO.Bwts,MYCMPO.Nwts, MYCGADD45A.Bwts,MYCGADD45A.Nwts)),1)} but the number of edges is
 quite small and one might expect to see systematic differences if a
 larger study were undertaken.
 

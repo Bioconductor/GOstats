@@ -18,8 +18,8 @@ makeGOGraph <- function (x, what = "MF", lib = "hgu95av2",
        bd = is.na(newNodes)
     newNodes <- newNodes[!bd]
 
-    newNodes <- lapply(newNodes, function(x) x[sapply(x, hasGOannote,
-        what)])
+    newNodes <- lapply(newNodes, function(x) x[sapply(x, function(x)
+                                                      x$Ontology == what)])
     oldEdges <- vector("list", length = 0)
     oldNodes <- vector("character", length = 0)
     for (i in 1:length(newNodes)) {
@@ -56,19 +56,29 @@ makeGOGraph <- function (x, what = "MF", lib = "hgu95av2",
 }
 
 
- ## helper function, determines if there is a go annotation for the
+ ## helper function, determines if there is a GO annotation for the
  ## desired mode
  hasGOannote <- function(x, which="MF") {
-     if( !is.null(x$Ontology) ) {
-         if( !is.na(x$Ontology) && x$Ontology == which )
+     if( is(x, "GOTerms") ) {
+         cat = Category(x)
+         if( !is.na(cat) && cat == which )
             return(TRUE) else return(FALSE)
+     }
+     if( is.list(x) ) {
+         gT = sapply(x, function(y) is(y, "GOTerms"))
+         if( any(gT) ) {
+             if( all(gT) ) {
+                 cats = sapply(x, Category)
+                 return(cats == which)
+             }
+             else
+                 stop("mixed arguments not allowed")
+         }
      }
      if( !is.character(x) )
          stop("wrong argument")
-     tm <- get(x, env=GOTERM)
-     if( names(tm)[1] == which)
-         return(TRUE)
-     return(FALSE)
+     tm <- getGOCategory(x)
+     return(tm == which)
  }
 
 
@@ -144,8 +154,10 @@ combGOGraph <- function(g1, g2)
       nG[sapply(iE, length) == 0]
   }
 
- ##distance between GO terms as described in B. Ding/R. Gentleman
- distDGGO <- function(term1, term2, dataenv) {
+ ##similarity between GO terms as described in B. Ding/R. Gentleman
+ ## the number of nodes in common divided by the total number of nodes
+ ##in both graphs
+ simDGGO <- function(term1, term2, dataenv) {
      g1 <- oneGOGraph(term1, dataenv)
      g2 <- oneGOGraph(term2, dataenv)
      n1 <- nodes(g1)
@@ -158,8 +170,11 @@ combGOGraph <- function(g1, g2)
      length(intersect(n1,n2))/length(union(n1,n2))
  }
 
- ##the distance suggested by Cheng et al
- distCGO <- function(term1, term2, dataenv) {
+ ##the similarity suggested by Cheng et al
+ ##use the length of the longest path to the root in the intersection
+ ##graph
+ simCGO <- function(term1, term2, dataenv) {
+     require("RBGL", quietly=TRUE) || stop("need RBGL for this function")
      if( is(term1, "graph") )
          g1 <- term1
      else
@@ -169,8 +184,14 @@ combGOGraph <- function(g1, g2)
      else
          g2 <- oneGOGraph(term2, dataenv)
      ig <- intersection(g1, g2)
-     lfi <- GOleaves(ig)
-     ##need a pathlength
+     lfi <- GOLeaves(ig)
+     degs = degree(ig)
+     root = names(degs$outDegree)[degs$outDegree==0]
+     paths = sp.between(ig, lfi, root)
+     if( length(lfi) == 1 )
+         return(paths$length)
+     plens = sapply(paths, function(x) x$length)
+     max(plens)
  }
 
 ##three functions to get all the GO information for a set of GO terms
@@ -180,7 +201,7 @@ combGOGraph <- function(g1, g2)
      if(length(x) == 0 )
          return( character(0))
      wh <- mget(x, env=GOTERM, ifnotfound=NA)
-     return( sapply(wh, function(x) names(x)) )
+     return( sapply(wh, Category) )
  }
 
  getGOParents <- function(x) {
@@ -220,8 +241,6 @@ combGOGraph <- function(g1, g2)
      lenx <- length(x)
      rval <- vector("list", length=lenx)
      names(rval) <- x
-     rval <- vector("list", length=lenx)
-     names(rval) <- x
      for(i in 1:lenx) {
          if( (length(hasMF[[i]]) > 1 ) || !is.na(hasMF[[i]]) )
              rval[[i]] <- list(Ontology="MF", Children=hasMF[[i]])
@@ -241,6 +260,7 @@ combGOGraph <- function(g1, g2)
      if(length(x) == 0 )
          return(list())
      terms <- mget(x, env=GOTERM, ifnotfound=NA)
-     ontology <- sapply(terms, function(x) names(x))
+     ontology <- sapply(terms, Category)
+     terms = sapply(terms, Ontology)
      return(split(terms, ontology))
  }

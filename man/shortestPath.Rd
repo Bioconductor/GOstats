@@ -52,13 +52,12 @@ library(GO)
 library(RBGL)
 
 tst <- unique(unlist(mget(c("GO:0005778", "GO:0005779",
-                            "GO:0030060"), GOGO2LL)))
+                            "GO:0030060"), GOLOCUSID)))
 set.seed(123)
 v1 <- randomGraph(tst, 1:10, .3)
 
 
 a1 <- shortestPath(v1, "GO:0005779")
-
 
 }
 \keyword{ manip }
