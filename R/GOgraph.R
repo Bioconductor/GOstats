@@ -60,7 +60,7 @@ makeGOGraph <- function (x, Ontology = "MF", removeRoot=TRUE)
  ## desired mode
  hasGOannote <- function(x, which="MF") {
      if( is(x, "GOTerms") ) {
-         cat = Ontoloy(x)
+         cat = Ontology(x)
          if( !is.na(cat) && cat == which )
             return(TRUE) else return(FALSE)
      }
