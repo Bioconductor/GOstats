@@ -160,7 +160,7 @@ include ``chromosome'', ``nucleus'' and ``ribosome''.
 
 Table~\ref{ta:GOprops} presents the number of different terms
 associated with each of the three ontologies. For example,
-we see that for version \Sexpr{package.description("GO")["Version"]}
+we see that for version \Sexpr{packageDescription("GO")["Version"]}
 of the \Rpackage{GO} package there are \Sexpr{gCnums[1]} terms in the
 biological process (BP) ontology.
 
