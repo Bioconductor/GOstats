@@ -13,7 +13,7 @@ oneGOGraph(x, dataenv)
 GOGraph(x, dataenv)
 }
 \arguments{
-  \item{x}{A character vector of GO indetifiers. }
+  \item{x}{A character vector of GO identifiers. }
   \item{dataenv}{ An environment for finding the parents of that term. }
 }
 \details{

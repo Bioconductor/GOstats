@@ -215,7 +215,7 @@ for the specific set of child nodes.
 \begin{figure}[htbp]
   \begin{center}
 <<tfGplot, fig=TRUE, echo=FALSE, results=hide>>=
-   nL <- nodes(tfG)
+   nL <- nodes(tfGs)
    nLterm = unlist(getGOTerm(nL), use.names=FALSE)
    names(nLterm) = nL
    nLterm = gsub("_", " ", nLterm)
@@ -227,9 +227,9 @@ for the specific set of child nodes.
        tmp <- rep(FALSE, length(nL))
        names(tmp) = nL
        tGfnA$fixedsize = tmp
-	names(nLterm) <- nL
+        names(nLterm) <- nL
        tGfnA$label = nLterm
-       plot(tfG, nodeAttrs=tGfnA)
+       plot(tfGs, nodeAttrs=tGfnA)
 
    }
 @
