@@ -208,18 +208,18 @@ for the specific set of child nodes.
 
 <<tfG,results=hide, echo=FALSE>>=
  tfG <- GOGraph("GO:0003700", GOMFPARENTS)
- ##drop the GO node
- tfGs <- removeNode("GO:0003673", tfG)
+ ## drop the GO node
+ tfG <- removeNode("top", tfG)
 @
 
 \begin{figure}[htbp]
   \begin{center}
 <<tfGplot, fig=TRUE, echo=FALSE, results=hide>>=
-   nL <- nodes(tfGs)
+   nL <- nodes(tfG)
    nLterm = unlist(getGOTerm(nL), use.names=FALSE)
    names(nLterm) = nL
    nLterm = gsub("_", " ", nLterm)
-   if(require(Rgraphviz) ) {
+   if(require("Rgraphviz") ) {
        tGfnA <- list()
        tmp <- rep("ellipse", length(nL))
        names(tmp) <- nL
@@ -229,7 +229,7 @@ for the specific set of child nodes.
        tGfnA$fixedsize = tmp
         names(nLterm) <- nL
        tGfnA$label = nLterm
-       plot(tfGs, nodeAttrs=tGfnA)
+       plot(tfG, nodeAttrs=tGfnA)
 
    }
 @

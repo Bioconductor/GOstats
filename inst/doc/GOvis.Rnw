@@ -2,8 +2,8 @@
 % NOTE -- ONLY EDIT THE .Rnw FILE!!!  The .tex file is
 % likely to be overwritten.
 %
-% \VignetteIndexEntry{Visualizing Data Using GOstats}
-%\VignetteDepends{Biobase, genefilter, graph, GO, hgu95av2, xtable, multtest}
+%\VignetteIndexEntry{Visualizing Data Using GOstats}
+%\VignetteDepends{Biobase,genefilter,graph,GO,hgu95av2,xtable,multtest}
 %\VignetteSuggests{Rgraphviz}
 %\VignetteKeywords{EDA, graphs, ontology, visualization}
 %\VignettePackage{GOstats}
@@ -403,8 +403,12 @@ right and another set of red nodes on the left. We might want to
 investigate these and see what cellular components they are related
 to.
 
-We can make use of the \Rfunction{imageMap} function from the
-\Rpackage{prada} package to provide tool tips for our graph.
+## FIXME (wh 20.1.2005): there is an imageMap function for Ragraph objects
+## in the package Rgraphviz! - use that. Then the function getNodeBB etc. 
+## can go.
+
+We can make use of the \Rfunction{imageMap} function to provide tool 
+tips for our graph.
 
 <<imageMap>>=
 
@@ -433,21 +437,25 @@ We can make use of the \Rfunction{imageMap} function from the
 ##FIXME: work in progress here - we need to do a bit of mapping
 ##to get the right user coords on the jpg file...
 if (interactive()) {
- jpeg("mygraph.jpg", quality=100, width=urx-llx, height=ury-lly)
+  jpeg("mygraph.jpg", quality=100, width=urx-llx, height=ury-lly)
   opar = par(plt=c(0,1,0,1), xpd=NA)
   plotPieChart(gCClo, ctmat)
   par(opar)
  dev.off()
 }
- if( require(prada) ) {
-     con = openHTMLpage("example", "An Image Map")
 
-     imageMap(con, "mygraph.jpg", CCbb, tooltips=getNodeNames(gCClo),
-              url=rep("", length(nodes(gCC))))
+## FIXME (wh 20.1.2005): better to use imageMap function for Ragraph objects
+## in the package Rgraphviz instead.
+if(require("geneplotter")) {
+  con = openHtmlPage("example", "An Image Map")
 
-     closeHTMLpage(con)
- }
+  imageMap(CCbb, con, tags=list(
+       TITLE = getNodeNames(gCClo),
+       HREF  = rep("", length(nodes(gCC)))),
+     imgname="mygraph.jpg")
 
+  closeHtmlPage(con)
+}
 
 @
 \section{GO induced Distances}
@@ -553,7 +561,7 @@ respect to the BP ontology.
         if( i== j ) next else
           simatM1[i,j] = simUI(ggs[[i]], ggs[[j]])
 
- library(RBGL)
+ library("RBGL")
 
  simatM2 = matrix(1, nr=sum(hasBP), nc=sum(hasBP))
  for(i in 1:sum(hasBP))
