@@ -215,9 +215,10 @@ for the specific set of child nodes.
 \begin{figure}[htbp]
   \begin{center}
 <<tfGplot, fig=TRUE, echo=FALSE, results=hide>>=
-   nL <- nodes(tfG); nLterm = getGOTerm(nL)[["MF"]]
+   nL <- nodes(tfG) 
+   nLterm = unlist(getGOTerm(nL), use.names=FALSE)
    names(nLterm) = nL
-   nLterm["GO:0003673"] <-  "Gene Ontology"
+   nLterm = gsub("_", " ", nLterm)
    if(require(Rgraphviz) ) {
        tGfnA <- list()
        tmp <- rep("ellipse", length(nL))
