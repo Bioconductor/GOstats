@@ -150,7 +150,7 @@ parents and children. They are provided as hash tables (the
 \texttt{BP}, \texttt{MF}, or \texttt{CC}.
 \begin{itemize}
 \item \texttt{GOXXPARENTS}: the parents of the term
-\item \texttt{GOXXANCESTORS}: the parents, and all their parents and
+\item \texttt{GOXXANCESTOR}: the parents, and all their parents and
       so on.
 \item \texttt{GOXXCHILDREN}: the children of the term
 \item \texttt{GOXXOFFSPRING}: the children, their children and so on
@@ -210,7 +210,7 @@ We see that there are \Sexpr{length(ll1)} different mappings.
 We can get only those mappings for the \texttt{BP} ontology by using
 \Rfunction{getOntology}.
 We can get the evidence codes using \Rfunction{getEvidence} and we can
-drop those codes we do not wish to use by using \Rfunction{dropEcode}.
+drop those codes we do not wish to use by using \Rfunction{dropECode}.
 
 <<getmappings>>=
 
