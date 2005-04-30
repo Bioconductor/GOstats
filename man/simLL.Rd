@@ -49,6 +49,10 @@ simLP(g1, g2)
   \item{measure}{Which measure was used.}
   \item{g1}{The graph induced by \code{ll1}.}
   \item{g2}{The graph induced by \code{ll2}.}
+
+  If one of the supplied Gene IDs does not have any GO terms associated
+with it, in the selected ontology and with the selected evidence codes
+then \code{NA} is returned.
 }
 
 \author{R. Gentleman }
