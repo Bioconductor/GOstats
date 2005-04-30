@@ -403,9 +403,9 @@ right and another set of red nodes on the left. We might want to
 investigate these and see what cellular components they are related
 to.
 
-## FIXME (wh 20.1.2005): there is an imageMap function for Ragraph objects
-## in the package Rgraphviz! - use that. Then the function getNodeBB etc. 
-## can go.
+%% FIXME (wh 20.1.2005): there is an imageMap function for Ragraph objects
+%% in the package Rgraphviz! - use that. Then the function getNodeBB etc. 
+%% can go.
 
 We can make use of the \Rfunction{imageMap} function to provide tool 
 tips for our graph.
