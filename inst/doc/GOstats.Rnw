@@ -99,9 +99,9 @@ library("GOstats")
 library("xtable")
 library("multtest")
 require("Rgraphviz", quietly=TRUE)
-library(hgu95av2)
-library(genefilter)
-library(RBGL)
+library("hgu95av2")
+library("genefilter")
+library("RBGL")
 @
 
 \section{The Gene Ontology}
@@ -208,8 +208,8 @@ for the specific set of child nodes.
 
 <<tfG,results=hide, echo=FALSE>>=
  tfG <- GOGraph("GO:0003700", GOMFPARENTS)
- ## drop the GO node
- tfG <- removeNode("top", tfG)
+ ## drop the top-level GO node
+ tfG <- removeNode("all", tfG)
 @
 
 \begin{figure}[htbp]
@@ -279,10 +279,10 @@ LocusLink IDs.
 
 Mappings from GO terms to specific genes is provided in the hash table
 (R \Robject{environment}) named \Robject{GOLOCUSID}, which maps from GO
-terms to LocusLink identifiers. These are only the set of most
-specific mappings. To get all LocusLink IDs associated with a specific
+terms to EntrezGene identifiers. These are only the set of most
+specific mappings. To get all EntrezGene IDs associated with a specific
 GO term use \Robject{GOALLLOCUSID} instead. A histogram of the logarithm of the
-number of LocusLink identifiers per GO term is given in
+number of EntrezGene identifiers per GO term is given in
 Figure~\ref{fig:GO2LL}.
 
 \begin{figure}[htbp]
@@ -290,15 +290,15 @@ Figure~\ref{fig:GO2LL}.
 <<GO2LL, fig=TRUE, echo=FALSE>>=
  go2LL <- contents(GOLOCUSID)
  go2LLcounts <- sapply(go2LL, length)
- hist(log(go2LLcounts), main="Log Counts of LocusLink IDs per GO ID",
+ hist(log(go2LLcounts), main="Log Counts of EntrezGene IDs per GO ID",
       xlab="")
 @
-\caption{LocusLink counts per GO term (log scale). \label{fig:GO2LL}.}
+\caption{EntrezGene counts per GO term (log scale). \label{fig:GO2LL}.}
 \end{center}
 \end{figure}
 
 For any particular microarray there may be many probes that are mapped
-to the same LocusLink identifier. In some of the computations it will
+to the same EntrezGene identifier. In some of the computations it will
 be important that this multiplicity be accounted for. If, for example,
 one asks whether a particular GO term is overrepresented in the probes
 that were selected by some particular procedure then any
@@ -312,7 +312,7 @@ lls <- unlist(as.list(hgu95av2LOCUSID))
 tab <- table(table(lls))
 cat("Multiplicity      ", sapply(names(tab),
      function(x) sprintf("%4s", x)),
-    "\nNo. LocusLink IDs ", sapply(tab,
+    "\nNo. EntrezGene IDs ", sapply(tab,
      function(x) sprintf("%4d", x)), "\n")
 
 #lls  <- lls[!is.na(lls)]   ## LocuslinkIDs
@@ -322,10 +322,10 @@ cat("Multiplicity      ", sapply(names(tab),
 @
 
 We can see that the problem can be quite substantial; there are
-\Sexpr{sum(tab) -tab[1]} LocusLink IDs that have more than one probe set
+\Sexpr{sum(tab) -tab[1]} EntrezGene IDs that have more than one probe set
 identified with them. Making the correct inference requires that some
 adjustment be made for the many-to-one mapping from probes to
-LocusLink identifiers. These are sometimes called \textit{technical
+EntrezGene identifiers. These are sometimes called \textit{technical
 replicates}, but investigation suggests that the are not necessarily probing
 the same thing, so some caution is warranted.
 
@@ -480,7 +480,7 @@ more of the genes of interest (i.e. the induced GO graph). Next, for
 each term we determine how many of the interesting genes are annotated
 at that node and how many genes that were assayed (i.e. have probes on
 the chip that represent that gene) are annotated at the node. Here we
-must work in terms of the unique LocusLink identifiers and not the
+must work in terms of the unique EntrezGene identifiers and not the
 manufacturers identifiers because of the multiple mapping issues
 raised in Section~\ref{sec:assocgenes}.
 
@@ -754,7 +754,7 @@ molecular function \texttt{transcription factor activity} to identify
 all genes with transcription factor activity. We used only genes for
 which this was a most specific annotation and obtained
 \Sexpr{length(TF2)} mappings and \Sexpr{sum(!duplicated(LLs))} unique
-LocusLink ids. Of these \Sexpr{length(oTF2)} were among those probes
+EntrezGene ids. Of these \Sexpr{length(oTF2)} were among those probes
 selected for our analysis. Of these we found that there were
 \Sexpr{length(ww)} with duplicate entries (\textit{technical
   replicates}. A visual inspection (not reported) suggested that the

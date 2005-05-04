@@ -389,7 +389,7 @@ plotPieChart <- function(curPlot, counts, main) {
 
     plot(curPlot, drawNode=drawing, main=main)
 
-    legend(300, 65, legend=c("ALL1/AF4", "BCR/ABL", "NEG"),
+    legend(x="bottomleft", legend=c("ALL1/AF4", "BCR/ABL", "NEG"),
           fill=c("blue", "green", "red"))
 }
 plotPieChart(gCClo, ctmat)
