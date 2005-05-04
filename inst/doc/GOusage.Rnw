@@ -175,12 +175,9 @@ and \texttt{OFFSPRING} hash tables to get more information.
 
 The mappings of genes to GO terms is contained in the
 \Robject{GOLOCUSID2GO} hash table. This contains mappings from a
-LocusLink ID to the most specific applicable GO terms. The hash table,
-\Robject{GOLOCUSID2ALLGO} contains the mappings from a LocusLink ID to
-all GO terms it is associated with (all parents of the most
-specific terms). Each entry in the \Robject{GOLOCUSID2GO} hash table
-is a list of lists. The actual entries are named lists, with three
-names:
+LocusLink ID to the most specific applicable GO terms.  Each entry in
+the \Robject{GOLOCUSID2GO} hash table is a list of lists. The actual
+entries are named lists, with three names:
 \begin{itemize}
 \item \texttt{GOID}: the GO identifier
 \item \texttt{Evidence}: the evidence code for the assignment

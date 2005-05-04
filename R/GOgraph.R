@@ -50,8 +50,14 @@ makeGOGraph <- function (x, Ontology = "MF", removeRoot=TRUE)
     rval = new("graphNEL", nodes = oldNodes, edgeL = lapply(rE,
         function(x) list(edges = x)), edgemode = "directed")
 
-    if( removeRoot && is.element("GO:0003673", nodes(rval)) )
-        rval = removeNode("GO:0003673", rval)
+    if (removeRoot) {
+        ## For compatibility with old GO packages, check for "GO:0003673" if
+        ## "all" is not found.
+        if (is.element("all", nodes(rval)))
+          rval = removeNode("all", rval)
+        else if (is.element("GO:0003673", nodes(rval)))
+          rval = removeNode("GO:0003673", rval)
+    }
     rval
 }
 
