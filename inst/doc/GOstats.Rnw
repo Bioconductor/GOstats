@@ -207,9 +207,13 @@ the graph that consists of those terms and any less specific terms
 for the specific set of child nodes.
 
 <<tfG,results=hide, echo=FALSE>>=
- tfG <- GOGraph("GO:0003700", GOMFPARENTS)
- ## drop the top-level GO node
- tfG <- removeNode("all", tfG)
+tfG <- GOGraph("GO:0003700", GOMFPARENTS)
+## drop the top-level GO node
+## Add compatibility checks for old and new versions of the GO package
+rootNames <- c("all", "top")
+root <- rootNames[rootNames %in% nodes(tfG)]
+if (length(root) > 0)
+  tfG <- removeNode(root, tfG)
 @
 
 \begin{figure}[htbp]
