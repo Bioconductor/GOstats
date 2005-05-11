@@ -22,7 +22,7 @@ notConn(dists)
  A vector of the names of the items that are not connected.
 }
 \author{R. Gentleman }
-\seealso{\code{\link{connComp}}}
+\seealso{\code{\link[graph]{connComp}}}
 \examples{
  data(Ndists)
  notConn(Ndists)

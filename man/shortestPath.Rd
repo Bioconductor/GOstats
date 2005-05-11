@@ -45,7 +45,7 @@ shortestPath(g, GOnode)
 
 \author{R. Gentleman }
 
-\seealso{\code{\link{sp.between}}}
+\seealso{\code{\link[RBGL]{sp.between}}}
 
 \examples{
 library(GO)
