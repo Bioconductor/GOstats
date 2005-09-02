@@ -55,9 +55,13 @@ tst <- unique(unlist(mget(c("GO:0005778", "GO:0005779",
                             "GO:0030060"), GOLOCUSID)))
 set.seed(123)
 v1 <- randomGraph(tst, 1:10, .3)
+## Since v1 is random, it might be disconnected and we need a
+## connected graph to guarantee the existence of a path.
+c1 <- connComp(v1)
+largestComp <- c1[[which.max(sapply(c1, length))]]
+v2 <- subGraph(largestComp, v1)
 
-
-a1 <- shortestPath(v1, "GO:0005779")
+a1 <- shortestPath(v2, "GO:0005779")
 
 }
 \keyword{ manip }
