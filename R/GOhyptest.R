@@ -17,7 +17,12 @@ GOHyperG <- function(x, lib="hgu95av2", what="MF") {
     match.arg(what, c("MF", "BP", "CC"))
 
     ##get the unique LocusLink IDs - GO is mapped to LL not to probe
-    cLLs <- unlist(as.list(getDataEnv("LOCUSID", lib)))
+    ##except for YEAST where it maps to common names
+
+    if( lib == "YEAST")
+        cLLs <- unique(as.list(YEASTCOMMON2SYSTEMATIC), keep.names=FALSE)
+    else
+        cLLs <- unlist(as.list(getDataEnv("LOCUSID", lib)))
 
     ##which ones do we have - don't worry about duplicates just yet
     ourLLs <- cLLs[match(x, cLLs)]
@@ -35,16 +40,29 @@ GOHyperG <- function(x, lib="hgu95av2", what="MF") {
     #aa <- sapply(a2GOsz, length)
     #a2GO <- unique(unlist(sapply(a2GO, names)))
 
-    whWeHave <- sapply(goV, function(y) {
-        if( is.na(y) || length(y) == 0 )
-            return(FALSE)
-        lls = unique(unlist(mget(y, getDataEnv("LOCUSID", lib),
-                        ifnotfound=NA)))
-        any(x %in% lls) })
+    if( lib == "YEAST" )
+        whWeHave <- sapply(goV, function(y) {
+            if( is.na(y) || length(y) == 0 )
+                return(FALSE)
+            any(x %in% y)} )
+    else
+        whWeHave <- sapply(goV, function(y) {
+            if( is.na(y) || length(y) == 0 )
+                return(FALSE)
+            lls = unique(unlist(mget(y, getDataEnv("LOCUSID", lib),
+            ifnotfound=NA)))
+            any(x %in% lls) })
 
     goV <- goV[whWeHave]
 
-    ##determine which of the GO terms are in the category we are
+    ##fix the all node problem
+
+    dropAll = match("all", names(goV), 0)
+    if( dropAll > 0 )
+        goV = goV[-dropAll]
+
+
+    ##Determine which of the GO terms are in the category we are
     ##working on
     goCat <- unlist(getGOOntology(names(goV)))
     goodGO <- goCat == what
@@ -55,12 +73,16 @@ GOHyperG <- function(x, lib="hgu95av2", what="MF") {
 
 
     ##this is the slow part
-    goVcts = sapply(goV, function(x) {
-        if(length(x) == 0 || is.na(x) ) return(NA)
-        lls <- unique(unlist(mget(x, getDataEnv("LOCUSID", lib))))
-        lls<-lls[!is.na(lls)]
-        lls
-    })
+    if( lib == "YEAST")
+        goVcts = goV
+    else
+        goVcts = sapply(goV, function(x) {
+            if(length(x) == 0 || is.na(x) ) return(NA)
+            lls <- unique(unlist(mget(x, getDataEnv("LOCUSID", lib))))
+            lls<-lls[!is.na(lls)]
+            lls
+        })
+
     bad <- sapply(goVcts, function(x) (length(x) == 1 && is.na(x)))
     goVcts = goVcts[!bad]
     goV = goV[!bad] ##we are going to output this...
@@ -70,7 +92,6 @@ GOHyperG <- function(x, lib="hgu95av2", what="MF") {
     nLL <- length(cLLs)
 
     goCounts <- sapply(goVcts, length)
-
 
     ourLLs <- unique(ourLLs[!is.na(ourLLs)])
     ours <-ourLLs[!duplicated(ourLLs)]
