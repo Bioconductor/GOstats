@@ -1,5 +1,6 @@
 \name{GOHyperG}
 \alias{GOHyperG}
+\alias{GOKEGGHyperG}
 \title{ Hypergeometric Tests for GO  }
 \description{
  Given a set of unique LocusLink Identifiers, a microarray chip and the
@@ -9,13 +10,19 @@
  graph.
 }
 \usage{
-GOHyperG(x, lib="hgu95av2", what="MF")
+GOHyperG(x, lib="hgu95av2", what="MF", universe=NULL)
+GOKEGGHyperG(x, lib="hgu95av2", what="MF", universe=NULL)
 }
 \arguments{
   \item{x}{A vector of unique LocusLink identifiers. }
   \item{lib}{The name of the annotation library for the chip that was used. }
   \item{what}{One of "MF", "BP", or "CC" indicating which of the GO
-    categories the computations should be made for.}
+    categories the computations should be made for.  In GOKEGGHyperG,
+    waht could also be "KEGG"}
+  \item{universe}{A vector of unique LocusLink identifiers of NULL
+    (default). This is the population (the urn) of the Hypergeometric
+    test.  Set it to be NULL if the population is all the LocusLink ids
+    in the annotation library}
 }
 \details{
   Typical usage will be to have a microarray experiment from which a set
