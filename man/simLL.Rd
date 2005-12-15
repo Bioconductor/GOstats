@@ -59,7 +59,8 @@ then \code{NA} is returned.
 
 \seealso{\code{\link{makeGOGraph}} }
 \examples{
-  aa = simLL("9184", "3547", "BP")
+  aa = simLL("111", "112")
+  bb = simLL("9184", "3547", "BP")
 }
 \keyword{manip}
 

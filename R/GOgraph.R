@@ -185,7 +185,7 @@ oneGOGraph <- function(x, dataenv) {
                     mode="environment")
     g1 = GOGraph(ll1GO, dataenv)
     g2 = GOGraph(ll2GO, dataenv)
-    if( length(g1) == 0 || length(g2) == 0 )
+    if( length(nodes(g1)) == 0 || length(nodes(g2)) == 0 )
       return(NA)
     sm = match.arg(measure, c("LP", "UI"))
     sim = switch(sm,
