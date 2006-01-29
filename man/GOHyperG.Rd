@@ -49,6 +49,12 @@ GOKEGGHyperG(x, lib="hgu95av2", what="MF", universe=NULL)
   annotated there, how many of the supplied LLIDs were annotated there
   and compute a $p$-value. This is the equivalent of using Fisher's
   exact test.
+
+  For S. cerevisiae if the \code{lib} argument is set to \code{YEAST}
+  then comparisons and statistics are computed using common names
+  and are with respect to all genes annotated in the S. cerevisiae genome
+  not with respect to any microarray chip. This will \bold{not} be the
+  right thing to do if you are working with a yeast microarray.
   
 }
 \value{
