@@ -21,6 +21,8 @@ GOHyperG <- function(x, lib="hgu95av2", what="MF", universe=NULL) {
 
     if( lib == "YEAST")
       cLLs <- unique(unlist(as.list(YEASTGO2ALLPROBES)))
+    else if (lib == "Universe")
+      cLLs <- universe
     else
       cLLs <- unique(unlist(as.list(getDataEnv("LOCUSID", lib))))
 
