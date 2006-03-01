@@ -54,7 +54,7 @@ library(RBGL)
 tst <- unique(unlist(mget(c("GO:0005778", "GO:0005779",
                             "GO:0030060"), GOLOCUSID)))
 set.seed(123)
-v1 <- randomGraph(tst, 1:10, .3)
+v1 <- randomGraph(tst, 1:10, .3, weights=FALSE)
 ## Since v1 is random, it might be disconnected and we need a
 ## connected graph to guarantee the existence of a path.
 c1 <- connComp(v1)
