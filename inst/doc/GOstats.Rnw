@@ -1070,19 +1070,12 @@ paper can easily explore those different plots on their own.
 
  oG = union(BsG, NsG)
 
- ##get the edgeweights along a path
- getEW = function(G, path) {
-   whones = match(path, nodes(G))
-   if(any(is.na(whones)))
-    stop("path/graph mismatch")
-
-   eL = G@edgeL
-   rval = rep(0, length(whones)-1)
-   for(i in 1:(length(whones)-1))
-     rval[i] = (eL[[whones[i]]]$weights)[as.character(whones[i+1])]
-   names(rval) = paste(path[1:(length(path)-1)], path[2:length(path)],
-        sep="->")
-   rval
+## get the edge weights along a path
+getEW <- function(G, path) {
+    len <- length(path)
+    fr <- path[1:(len - 1)]
+    to <- path[2:len]
+    unlist(edgeData(G, from=fr, to=to, attr="weight"))
 }
 
  MYCMPO.Bwts = getEW(BsG, MYCMPO.B$path)
