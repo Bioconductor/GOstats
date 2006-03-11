@@ -9,7 +9,8 @@ GOHyperG <- function(x, lib="hgu95av2", what="MF", universe=NULL) {
 
     ##first some checking
 
-    require(lib, character.only=TRUE) || stop("need data package", lib)
+    if( lib != "Universe" )
+        require(lib, character.only=TRUE) || stop("need data package", lib)
 
     if( any(duplicated(x)) )
         stop("input IDs must be unique")
@@ -169,8 +170,6 @@ GOKEGGHyperG <- function (x, lib = "hgu95av2", what = "MF", universe=NULL)
     getDataEnv <- function(name, lib) {
         get(paste(lib, name, sep = ""), mode = "environment")
     }
-
-
 
     require(lib, character.only = TRUE) || stop("need data package", lib)
 

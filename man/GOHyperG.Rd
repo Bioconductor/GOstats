@@ -15,7 +15,8 @@ GOKEGGHyperG(x, lib="hgu95av2", what="MF", universe=NULL)
 }
 \arguments{
   \item{x}{A vector of unique LocusLink identifiers. }
-  \item{lib}{The name of the annotation library for the chip that was used. }
+  \item{lib}{The name of the annotation library for the chip that was used,
+    or "YEAST" or "Universe", see details for more information. }
   \item{what}{One of "MF", "BP", or "CC" indicating which of the GO
     categories the computations should be made for.  In GOKEGGHyperG,
     waht could also be "KEGG"}
@@ -50,11 +51,15 @@ GOKEGGHyperG(x, lib="hgu95av2", what="MF", universe=NULL)
   and compute a $p$-value. This is the equivalent of using Fisher's
   exact test.
 
-  For S. cerevisiae if the \code{lib} argument is set to \code{YEAST}
+  For S. cerevisiae if the \code{lib} argument is set to \code{"YEAST"}
   then comparisons and statistics are computed using common names
   and are with respect to all genes annotated in the S. cerevisiae genome
   not with respect to any microarray chip. This will \bold{not} be the
   right thing to do if you are working with a yeast microarray.
+
+  If you want to supply your own universe then specify 
+  \code{lab="Universe"} and supply the universe via the \code{universe}
+  argument.
   
 }
 \value{
