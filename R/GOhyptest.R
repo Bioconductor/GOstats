@@ -72,7 +72,7 @@ GOHyperG <- function(x, lib="hgu95av2", what="MF", universe=NULL) {
                           function(y){
                               lls = unique(unlist(mget(y, getDataEnv("LOCUSID", lib),
                                 ifnotfound=NA)))
-                              if(all(lls %in% cLLs)) return(y)
+                              if(any(lls %in% cLLs)) return(y)
                           })
             goV <- goV[which(sapply(goV, function(y) !is.null(y) ))]
         }
