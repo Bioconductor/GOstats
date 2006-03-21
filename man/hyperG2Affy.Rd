@@ -43,3 +43,4 @@ hyperG2Affy(probids, "hgu95av2")
 }
 \keyword{ manip }% __ONLY ONE__ keyword per line
 \keyword{htest}
+

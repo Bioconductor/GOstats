@@ -55,3 +55,4 @@ hyperGtable(probids, "hgu95av2", save = TRUE, output = FALSE)
 }
 \keyword{ manip }% __ONLY ONE__ keyword per line
 \keyword{htest}
+
