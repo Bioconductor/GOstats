@@ -69,9 +69,12 @@ GOHyperG <- function(x, lib="hgu95av2", what="MF", universe=NULL) {
         }else{
             goV <- lapply(goV,
                           function(y){
-                              lls = unique(unlist(mget(y, getDataEnv("LOCUSID", lib),
-                                ifnotfound=NA)))
-                              if(any(lls %in% cLLs)) return(y)
+                              if (is.na(y) || length(y) == 0)
+                                return(NULL)
+                              lls = unique(unlist(mget(y, getDataEnv("LOCUSID", lib), ifnotfound=NA)))
+                              if(any(ourLLs %in% lls))
+                                return(y)
+                              NULL
                           })
             goV <- goV[which(sapply(goV, function(y) !is.null(y) ))]
         }
@@ -124,6 +127,8 @@ GOHyperG <- function(x, lib="hgu95av2", what="MF", universe=NULL) {
         goVcts = sapply(goV, function(y) {
             if(length(y) == 0 || is.na(y) ) return(NA)
             lls <- unique(unlist(mget(y, getDataEnv("LOCUSID", lib))))
+            lls <- intersect(lls, cLLs)
+            if (length(lls) == 0) return(NA)
             lls<-lls[!is.na(lls)]
             lls
         })
