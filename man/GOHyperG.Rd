@@ -90,9 +90,11 @@ GOKEGGHyperG(x, lib="hgu95av2", what="MF", universe=NULL)
     category.}
   \item{chip}{A string identifying the chip annotation data package used.}
   \item{intLLs}{The input vector \code{x}.}
-  \item{go2Affy}{A list with one element for each GO term, containing
+  \item{go2Affy}{A list with one element for each GO term tested, containing
     the Affymetrix identifiers associated with that node, for the whole
-    chip (not just the interesting genes).}
+    chip (not just the interesting genes).  This is the same as
+    extracting the tested GO ids from the annotation package's
+    GO2ALLPROBES environment.}
 }
 \author{R. Gentleman}
 
