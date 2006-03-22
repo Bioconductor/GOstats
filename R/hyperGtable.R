@@ -13,17 +13,22 @@
 ##
 ##
 ##  Moved hyperGtable and hyperG2Affy to GOstats 2-23-06
+##
+##  Added universe argument 3-22-06
 ###########################################
 
 hyperGtable <- function(probids, lib, type="MF", pvalue=0.05,
                         min.count=10, save = FALSE, output = TRUE,
-                        filename = NULL){
+                        filename = NULL, universe = NULL){
   require(lib, quietly = TRUE, character.only = TRUE) || stop(paste("The ", lib, " package is required"))
   lls <- getLL(probids, lib)
   lls <- unique(lls)
   lls <- lls[!is.na(lls)]
-  tmp <- GOHyperG(lls, lib, type)
+  tmp <- GOHyperG(lls, lib, type, universe)
   index <- tmp$pvalues < pvalue & tmp$goCounts > min.count
+  if(sum(index) == 0)
+    stop(paste("There are no significant GO terms using a p-value of ",pvalue,
+               " and a minimum count of ",  min.count,".\n", sep = ""), call. = FALSE)
   wh <- mget(names(tmp$pvalues[index]), GOTERM)
   tmp.terms <- sapply(wh, Term)
   out <- data.frame(names(tmp$pvalues[index]), tmp.terms, round(tmp$pvalues[index], 3), 
@@ -42,13 +47,16 @@ hyperGtable <- function(probids, lib, type="MF", pvalue=0.05,
 }
 
 hyperG2Affy <- function(probids, lib, type="MF", pvalue=0.05,
-                        min.count=10){
+                        min.count=10, universe = NULL){
   require(lib, quietly = TRUE, character.only = TRUE) || stop(paste("The ", lib, " package is required"))
   lls <- getLL(probids, lib)
   lls <- unique(lls)
   lls <- lls[!is.na(lls)]
-  tmp <- GOHyperG(lls, lib, type)
+  tmp <- GOHyperG(lls, lib, type, universe)
   index <- tmp$pvalues < pvalue & tmp$goCounts > min.count
+  if(sum(index) == 0)
+    stop(paste("There are no significant GO terms using a p-value of ",pvalue,
+               " and a minimum count of ",  min.count,".\n", sep = ""), call. = FALSE)
   wh <- mget(names(tmp$pvalues[index]), GOTERM)
   tmp.terms <- sapply(wh, Term)
   index2 <- match(names(tmp.terms), names(tmp$go2Affy))

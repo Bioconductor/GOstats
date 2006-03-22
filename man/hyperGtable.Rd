@@ -7,7 +7,7 @@
 }
 \usage{
 hyperGtable(probids, lib, type = "MF", pvalue = 0.05, min.count = 10,
-save = FALSE, output = TRUE, filename = NULL)
+save = FALSE, output = TRUE, filename = NULL, universe = NULL)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -26,6 +26,12 @@ save = FALSE, output = TRUE, filename = NULL)
     \code{data.frame} as a text file.}
   \item{filename}{ If output is set to \code{TRUE}, give the file name
     for the output file.}
+  \item{universe}{A character vector of unique Entrez Gene identifiers
+    or \code{NULL}.  This is the population (the urn) of the
+    Hypergeometric test.  When \code{NULL} (default), the population is
+    all Entrez Gene ids in the annotation package that have a GO term
+    annotation in the specified GO category (see \code{GOHyperG} for
+    more details).}
 }
 \details{
  This function will take a vector of Affymetrix IDs and output a

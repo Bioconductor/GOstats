@@ -7,7 +7,8 @@
   based on the output from hyperGtable.
 }
 \usage{
-hyperG2Affy(probids, lib, type = "MF", pvalue = 0.05, min.count = 10)
+hyperG2Affy(probids, lib, type = "MF", pvalue = 0.05, min.count = 10,
+universe = NULL)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -21,6 +22,12 @@ hyperG2Affy(probids, lib, type = "MF", pvalue = 0.05, min.count = 10)
     very low p-values that result from the situation where there are
     very few genes with a given GO term on the chip, but one or two are
     found in the set of significant genes.}
+   \item{universe}{A character vector of unique Entrez Gene identifiers
+    or \code{NULL}.  This is the population (the urn) of the
+    Hypergeometric test.  When \code{NULL} (default), the population is
+    all Entrez Gene ids in the annotation package that have a GO term
+    annotation in the specified GO category (see \code{GOHyperG} for
+    more details).}
 }
 \details{
  The function \code{hyperGtable} will output a table listing a set of
