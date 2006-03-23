@@ -2,10 +2,10 @@ export(combGOGraph, compCorrGraph, compGdist,
        dropECode, enumPairs, getEvidence,
        getGOChildren, getGOOntology, getGOParents,
        getGOTerm, getOntology, .getWHEC,
-       GOGraph, GOHyperG, GOLeaves,
+       GOGraph, GOLeaves,
        hasGOannote, idx2dimnames, isTriad,
        makeGOGraph, notConn, oneGOGraph,
        reduce2Degreek, shortestPath, simLL,
        simLP, simUI, triadCensus,
-       GOKEGGHyperG, hyperGtable, hyperG2Affy)
+       hyperGtable, hyperG2Affy)
 
