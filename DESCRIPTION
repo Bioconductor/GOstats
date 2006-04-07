@@ -7,8 +7,8 @@ Description: A set of tools for interacting with GO and microarray
         data. A variety of basic manipulation tools for graphs,
         hypothesis testing and other simple calculations.
 biocViews: Statistics, Annotation, GO, MultipleComparisons
-Depends: graph, GO, annotate, RBGL, xtable, Biobase, genefilter,
-        multtest, Category
+Depends: graph (>= 1.9.25), GO, annotate, RBGL, xtable, Biobase, genefilter,
+        multtest, Category (>= 1.3.7)
 Suggests: hgu95av2 (>= 1.6.0)
 Maintainer: R. Gentleman <rgentlem@fhcrc.org>
 License: GPL2.0
