@@ -292,8 +292,7 @@ Figure~\ref{fig:GO2LL}.
 \begin{figure}[htbp]
 \begin{center}
 <<GO2LL, fig=TRUE, echo=FALSE>>=
- go2LL <- contents(GOLOCUSID)
- go2LLcounts <- sapply(go2LL, length)
+ go2LLcounts <- unlist(eapply(GOLOCUSID, length))
  hist(log(go2LLcounts), main="Log Counts of EntrezGene IDs per GO ID",
       xlab="")
 @
@@ -323,6 +322,8 @@ cat("Multiplicity      ", sapply(names(tab),
 #spLL <- split(lls, lls)    ## Unique Locuslink IDs
 
 #slen1 <- sapply(spLL, length)  ## multiplicities of all LLids
+## Cleanup
+remove(lls)
 @
 
 We can see that the problem can be quite substantial; there are
@@ -344,11 +345,16 @@ named \Robject{hgu95av2GO}, \Robject{hgu95av2GO2PROBE} and
 
 <<getGO, results=hide, echo=FALSE>>=
 tfprobes <-  get("GO:0003700", hgu95av2GO2PROBE)
+tfprobesLen <- length(tfprobes)
 syms <- getSYMBOL(tfprobes, "hgu95av2")
 alltfprobes <- get("GO:0003700", hgu95av2GO2ALLPROBES)
+alltfprobesLen <- length(alltfprobes)
+
+## Cleanup
+remove(tfprobes, alltfprobes)
 @
 
-There are \Sexpr{length(tfprobes)} Affymetrix probes that are
+There are \Sexpr{tfprobesLen} Affymetrix probes that are
 annotated specifically at \texttt{GO:0003700} and these correspond to
 \Sexpr{sum(!duplicated(syms))} distinct genes.
 
@@ -356,7 +362,7 @@ We can also use the data in \Robject{hgu95aGO2ALLPROBES} to find all
 the probe sets that are annotated at the term \texttt{GO:0003700},
 this is the union of those specifically annotated at that term
 together with those annotated at any of the child nodes.  For the term
-\texttt{GO:0003700} there are \Sexpr{length(alltfprobes)} probes.
+\texttt{GO:0003700} there are \Sexpr{alltfprobesLen} probes.
 
 \section{An Example}
 
@@ -434,19 +440,20 @@ this plot in the next section and use it to provide a more detailed
 view of the data.
 
 <<inducedGO, echo=FALSE, results=hide>>=
- whGO = resT$index[resT$adjp<0.05]
+ whGO = resT$index[resT$adjp<0.01]
  gNsel <- geneNames(esetSub)[whGO]
  gNll = unlist(mget(gNsel, hgu95av2LOCUSID))
  gNll = as.character(gNll)
  gGO <- makeGOGraph(gNll, "MF")
 
- nA1 = list()
- lbs = rep("", length(nodes(gGO)))
- names(lbs) = nodes(gGO)
- nA1$label = lbs
+nattr <- makeNodeAttrs(gGO,
+                       label=nodes(gGO),
+                       shape="ellipse",
+                       fillcolor="#f2f2f2",
+                       fixedsize=FALSE)
 
-if (require("Rgraphviz"))
- gGopen = agopen(gGO, "foo")
+## if (require("Rgraphviz"))
+##  gGopen = agopen(gGO, "foo")
 
 @
 
@@ -454,8 +461,10 @@ if (require("Rgraphviz"))
 \begin{center}
 
 <<GOg1, fig=TRUE, echo=FALSE>>=
-  if (require("Rgraphviz"))
-    plot(gGopen, nodeAttrs=nA1)
+if (require("Rgraphviz"))
+  plot(gGO, nodeAttrs=nattr)
+  
+##    plot(gGopen, nodeAttrs=nA1)
 @
 \caption{The induced GO graph for the selected genes. \label{fig:GG1}}
 \end{center}
@@ -533,21 +542,26 @@ reasonable number of genes (10 or more) and small $p$-values.
 <<HyperG, echo=FALSE, results=hide>>=
 
 nL <- rep("", length(nodes(gGO)))
- names(nL) <- nodes(gGO)
- nA <- list()
+names(nL) <- nodes(gGO)
+nA <- list()
 
- gNsLL <- unique(unlist(mget(gNsel,
-              env=hgu95av2LOCUSID, ifnotfound=NA)))
- gGhyp <- GOHyperG(gNsLL)
+gNsLL <- unique(unlist(mget(gNsel,
+                            env=hgu95av2LOCUSID, ifnotfound=NA)))
+gGhyp <- GOHyperG(gNsLL)
 
- gGhyp.pv <- gGhyp$pv[nodes(gGO)]
+gGhyp.pv <- gGhyp$pv[nodes(gGO)]
 
- gCols <- ifelse(gGhyp.pv < 0.1, "tomato", "lightblue")
- names(gCols) = names(gGhyp.pv)
- lbs = paste("  ",as.character(round(gGhyp.pv, 3)), " ")
- names(lbs) = names(gGhyp.pv)
- nA$label = lbs
- nA$fillcolor = gCols
+gCols <- ifelse(gGhyp.pv < 0.1, "tomato", "lightblue")
+names(gCols) = names(gGhyp.pv)
+lbs = paste("  ",as.character(round(gGhyp.pv, 3)), " ")
+names(lbs) = names(gGhyp.pv)
+
+nattr <- makeNodeAttrs(gGO,
+                       label=nodes(gGO),
+                       shape="ellipse",
+                       fillcolor=gCols,
+                       fixedsize=FALSE)
+
 @
 
 In Figure~\ref{fig:indGG}, we reproduce the plot from
@@ -588,8 +602,9 @@ xtable.matrix(ggMat,
 \begin{figure}[htbp]
 \begin{center}
 <<GOxx, fig=TRUE, echo=FALSE>>=
-  if (require("Rgraphviz"))
-     plot(gGopen, nodeAttrs=nA)
+if (require("Rgraphviz"))
+  plot(gGO, nodeAttrs=nattr)
+##     plot(gGopen, nodeAttrs=nA)
 @
 \caption{The induced GO graph colored according to unadjusted Hypergeometric
 p-values \label{fig:indGG}}

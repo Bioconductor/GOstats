@@ -1,6 +1,6 @@
 Package: GOstats
 Title: Tools for manipulating GO and microarrays.
-Version: 1.5.8
+Version: 1.5.9
 Date: 23 March 2006
 Author: R. Gentleman
 Description: A set of tools for interacting with GO and microarray
