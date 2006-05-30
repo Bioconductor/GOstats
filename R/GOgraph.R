@@ -4,7 +4,6 @@
 ##GO ids that those genes are annotated at, and
 makeGOGraph <- function (x, Ontology = "MF", removeRoot=TRUE)
 {
-    require(GO) || stop("no GO library")
     match.arg(Ontology, c("MF", "BP", "CC"))
     wh <- paste("GO", Ontology, "PARENTS", sep = "")
     dataenv = get(wh, mode="environment")
@@ -94,7 +93,6 @@ makeGOGraph <- function (x, Ontology = "MF", removeRoot=TRUE)
 ##we need to find edges for each of them
 ##we're going to build a graphNEL
 GOGraph = function(x, dataenv) {
-    require(GO) || stop("no GO library")
     if (!is.environment(dataenv))
         stop("second argument must be an environment")
     ##this is the old oneGOGraph code - but it just works for
@@ -132,7 +130,6 @@ GOGraph = function(x, dataenv) {
 
 ##to be deprecated
 oneGOGraph <- function(x, dataenv) {
-    require(GO) || stop("no GO library")
     if( length(x) > 1 )
         stop("wrong number of GO terms")
     if (!is.environment(dataenv))
@@ -158,7 +155,6 @@ oneGOGraph <- function(x, dataenv) {
  simLP = function(g1, g2) {
     if(!is(g1, "graph") || !is(g2, "graph") )
          stop("only works for graphs")
-    require("RBGL") || stop("need RBGL for this similarity")
     ig <- intersection(g1, g2)
     lfi <- GOLeaves(ig)
     degs = degree(ig)

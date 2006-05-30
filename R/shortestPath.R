@@ -12,9 +12,6 @@ shortestPath <- function(g, GOnode)
     if( !is.character(GOnode) || length(GOnode) > 1 )
         stop("bad GO node description")
 
-    require("GO", character.only=TRUE) ||
-                      stop("GO library not available")
-
     ##obtain the LLIDs at the GO term
 
     LLs <- unique(get(GOnode, GOLOCUSID))
@@ -42,7 +39,6 @@ shortestPath <- function(g, GOnode)
 }
 
 compGdist <- function(g, whNodes, verbose=FALSE) {
-    require("RBGL") || stop("need RBGL for compGdist")
     rval <- NULL
     nNodes = length(whNodes)
     for(i in 1:nNodes) {
