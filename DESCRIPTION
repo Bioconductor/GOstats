@@ -1,6 +1,6 @@
 Package: GOstats
 Title: Tools for manipulating GO and microarrays.
-Version: 1.7.1
+Version: 1.7.2
 Date: 23 March 2006
 Author: R. Gentleman
 Description: A set of tools for interacting with GO and microarray
@@ -11,5 +11,5 @@ Depends: graph (>= 1.9.25), GO, annotate, RBGL, xtable, Biobase, genefilter,
         multtest, Category (>= 1.3.7)
 Suggests: hgu95av2 (>= 1.6.0)
 Maintainer: R. Gentleman <rgentlem@fhcrc.org>
-License: GPL2.0
+License: Artistic
 
