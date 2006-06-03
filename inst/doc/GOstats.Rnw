@@ -618,13 +618,13 @@ Figure~\ref{fig:GG1} except that we have now colored the nodes
 according to the $p$-value obtained from the Hypergeometric test
 described above.  The nodes in Figure~\ref{fig:indGG} are colored
 either red or blue depending on whether the unadjusted Hypergeometric
-$p$-value was less than $0.10$ or not (for those viewing this document
-in black and white the nodes should be dark and light grey,
-respectively). The GO terms for the terms colored red are printed
-below. The relevant biology suggests that these are quite reasonable.
-We note that while the smallest $p$-values are associated with nodes
-that have few genes annotated at them there are some nodes with a
-reasonable number of genes annotated at them (counts) and small
+$p$-value was less than \Sexpr{hyperG_pval} or not (for those viewing
+this document in black and white the nodes should be dark and light
+grey, respectively). The GO terms for the terms colored red are
+printed below. The relevant biology suggests that these are quite
+reasonable.  We note that while the smallest $p$-values are associated
+with nodes that have few genes annotated at them there are some nodes
+with a reasonable number of genes annotated at them (counts) and small
 $p$-values.
 
 <<GOterms, echo=FALSE, results=tex>>=
@@ -653,8 +653,9 @@ xtable.matrix(ggMat,
 <<GOxx, fig=TRUE, echo=FALSE>>=
 plot(gGO, nodeAttrs=nattr)
 @ 
-\caption{The induced GO graph colored according to unadjusted Hypergeometric
-p-values \label{fig:indGG}}
+\caption{The induced GO graph colored according to unadjusted
+Hypergeometric p-values.  Nodes colored red have a p-value less than
+\Sexpr{hyperG_pval}. \label{fig:indGG}}
 \end{center}
 \end{figure}
 
