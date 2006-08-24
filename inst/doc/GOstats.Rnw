@@ -597,7 +597,7 @@ reasonable number of genes (10 or more) and small $p$-values.
 deGenes_entrez <- mget(deGenes, env=hgu95av2LOCUSID, ifnotfound=NA)
 stopifnot(!any(duplicated(deGenes_entrez)))
 stopifnot(!any(is.na(deGenes_entrez)))
-gGhyp <- GOHyperG(deGenes_entrez)
+gGhyp <- GOHyperG(deGenes_entrez, lib="hgu95av2")
 gGhyp.pv <- gGhyp$pv[nodes(gGO)]
 hyperG_pval <- 0.01
 

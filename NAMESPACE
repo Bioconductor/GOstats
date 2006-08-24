@@ -1,3 +1,6 @@
+import("methods")
+import("Category")
+
 export(combGOGraph, compCorrGraph, compGdist,
        dropECode, enumPairs, getEvidence,
        getGOChildren, getGOOntology, getGOParents,
@@ -9,3 +12,7 @@ export(combGOGraph, compCorrGraph, compGdist,
        simLP, simUI, triadCensus,
        hyperGtable, hyperG2Affy)
 
+exportClasses("GeneGoCondHyperGeoTestResult",
+              "GeneGoCondHyperGeoTestParams")
+
+exportMethods("condHyperGeoTest")

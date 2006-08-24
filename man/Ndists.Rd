@@ -15,7 +15,7 @@
   These are both distance matrices.
 }
 \source{
- They are based on the ALL data, \code{\link{ALL}}.
+ They are based on the ALL data, \code{\link[ALL]{ALL}}.
 }
 \examples{
 data(Ndists)
