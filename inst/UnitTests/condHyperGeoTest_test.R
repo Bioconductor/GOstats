@@ -1,18 +1,23 @@
-require("hgu95av2") || stop("hgu95av2 is needed for unit tests")
-
 makeSimpleGeneGoHyperGeoTestParams <- function() {
     set.seed(344)
     probeIds <- ls(hgu95av2LOCUSID)
     randProbeIds <- sample(probeIds, 500)
-    entrezUniverse <- mget(randProbeIds, hgu95av2LOCUSID, ifnotfound=NA)
+##     entrezUniverse <- unlist(mget(randProbeIds, hgu95av2LOCUSID,
+##                                   ifnotfound=NA))
+    ## This is "wrong", should unlist, but the code
+    ## should catch/correct it.  The right way is above.
+    entrezUniverse <- mget(randProbeIds, hgu95av2LOCUSID,
+                           ifnotfound=NA)
+
     entrezUniverse <- entrezUniverse[!is.na(entrezUniverse)]
     selectedEntrezIds <- sample(entrezUniverse, 30)
-    params <- new("GeneGoCondHyperGeoTestParams",
+    params <- new("GeneGoHyperGeoTestParams",
                   geneIds=selectedEntrezIds, 
                   universeGeneIds=entrezUniverse,
                   annotation="hgu95av2", 
                   ontology="BP",
-                  pvalue.cutoff=0.05)
+                  pvalue.cutoff=0.05,
+                  conditional=TRUE)
     params
 }
     
@@ -20,10 +25,27 @@ makeSimpleGeneGoHyperGeoTestParams <- function() {
 test_condHyperGeoTest_regression <- function() {
     p <- makeSimpleGeneGoHyperGeoTestParams()
     res <- condHyperGeoTest(p)
-    checkEquals(18, sum(res@pvalues < res@pvalue.cutoff))
-    first5 <- c("GO:0043170", "GO:0044265", "GO:0009057",
-                "GO:0044248", "GO:0019320")
-    checkEquals(first5, names(res@pvalues[1:5]))
-    checkEquals(166, numNodes(res@goDag))
-    checkEquals(253, numEdges(res@goDag))
+    checkEquals(9, sum(pvalues(res) < res@pvalue.cutoff))
+    first5 <- c("GO:0009057", "GO:0019320", "GO:0006096",
+                "GO:0006006", "GO:0046164")
+    checkEquals(first5, names(pvalues(res)[1:5]))
+    checkEquals(166, length(universeCounts(res)))
+    checkEquals(253, numEdges(goDag(res)))
+}
+
+
+test_nonCondHyperGeoTest_regression <- function() {
+    p <- makeSimpleGeneGoHyperGeoTestParams()
+    p@conditional <- FALSE
+    res <- condHyperGeoTest(p)
+    checkEquals(18, sum(pvalues(res) < res@pvalue.cutoff))
+    
+    res2 <- geneCategoryHyperGeoTest(p)
+    checkEquals(pvalues(res), pvalues(res2))
+    checkEquals(geneCounts(res), geneCounts(res2))
+    checkEquals(universeCounts(res), universeCounts(res2))
+    checkEquals(universeMappedCount(res), universeMappedCount(res2))
+    checkEquals(geneMappedCount(res), geneMappedCount(res2))
+    checkEquals(annotation(res), annotation(res2))
+    checkEquals(testName(res), testName(res2))
 }

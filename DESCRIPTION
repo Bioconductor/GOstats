@@ -1,6 +1,6 @@
 Package: GOstats
 Title: Tools for manipulating GO and microarrays.
-Version: 1.7.4
+Version: 1.7.5
 Date: 23-08-2006
 Author: R. Gentleman with contributions from S. Falcon
 Description: A set of tools for interacting with GO and microarray
@@ -17,6 +17,7 @@ Collate:
     AllClasses.R
     AllGenerics.R
     condHyperGeoTest-methods.R
+    GeneGoHyperGeoTestResult-accessors.R
     GOgraph.R
     GOhyptest.R
     GOterms.R

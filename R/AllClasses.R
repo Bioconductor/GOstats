@@ -1,11 +1,11 @@
-setClass("GeneGoCondHyperGeoTestParams",
-         representation(pvalue.cutoff="numeric"),
-         contains="GeneGoHyperGeoTestParams",
-         prototype=prototype(pvalue.cutoff=0.01))
-
-
-setClass("GeneGoCondHyperGeoTestResult", 
-         contains="GeneCategoryHyperGeoTestResult",
+setClass("GeneGoHyperGeoTestResult",
+         contains="GeneCategoryHyperGeoTestResultBase",
          representation=representation(
-           ontology="character",
-           goDag="graphNEL"))
+           goDag="graph",
+           pvalue.order="integer"),
+         prototype=prototype(
+           testName="GO",
+           pvalue.cutoff=0.01,
+           goDag=new("graphNEL")))
+
+

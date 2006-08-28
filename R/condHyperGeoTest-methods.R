@@ -3,27 +3,40 @@ removeLengthZero <- function(x) {
     x[wanted]
 }
 
+
+setMethod("getGoGraph", signature(p="GeneGoHyperGeoTestParams",
+                                  goIds="character"),
+          function(p, goIds) {
+              ## FIXME: ':::'
+              goEnv <- Category:::getDataEnv(paste(p@ontology,
+                                                   "CHILDREN", sep=""),
+                                             "GO")
+              gobpkids <- eapply(goEnv, function(x) {
+                  intersect(x, goIds)
+              })
+              gobpkids <- l2e(gobpkids)
+              GOGraph(goIds, gobpkids)
+          })
+
+
 setMethod("condHyperGeoTest",
-          signature(p="GeneCategoryHyperGeoTestParams"), 
+          signature(p="GeneGoHyperGeoTestParams"), 
           function(p) {
-              origGeneIds <- p@geneIds
               p@universeGeneIds <- universeBuilder(p)
               selected <- intersect(p@geneIds, p@universeGeneIds)
               p@geneIds <- selected
               cat2Entrez <- categoryToEntrezBuilder(p)
               ## build the GO graph for the relevant GO nodes
               goIds <- names(cat2Entrez)
-              cat("found", length(goIds), "GO ids to test\n")
-              ## first, reduce GOBPCHILDREN to our current set
-              ## FIXME: need a method here
-              gobpkids <- eapply(GOBPCHILDREN, function(x) {
-                  intersect(x, goIds)
-              })
-              gobpkids <- l2e(gobpkids)
-              goDag <- GOGraph(goIds, gobpkids)
+              goDag <- getGoGraph(p, goIds)
               nodeDataDefaults(goDag, "pvalue") <- 1
+             nodeDataDefaults(goDag, "geneIds") <- numeric(0)
+             ## store the Entrez Gene IDs as attrs on the GO DAG.
+             nodeData(goDag, n=names(cat2Entrez),
+                      attr="geneIds") <- cat2Entrez
               ## now iterate leaves first doing tests and conditioning
               ## on all significant children.
+              ## FIXME: consider replacing with RBGL tsort?
               needsProc <- goDag
               complete <- character(0)
               SIGNIF <- p@pvalue.cutoff
@@ -31,8 +44,12 @@ setMethod("condHyperGeoTest",
                   numKids <- sapply(edges(needsProc), length)
                   noKids <- names(numKids[numKids == 0])
                   curCat2Entrez <- cat2Entrez[noKids]
-                  curCatKids <- edges(goDag)[names(curCat2Entrez)]
-                  curCatKids <- removeLengthZero(curCatKids)
+                  if (p@conditional) {
+                      curCatKids <- edges(goDag)[names(curCat2Entrez)]
+                      curCatKids <- removeLengthZero(curCatKids)
+                  } else {
+                      curCatKids <- character(0)
+                  }
                   if (length(curCatKids)) {
                       ## they should be all complete (sanity check)
                       stopifnot(all(unlist(curCatKids) %in% complete))
@@ -83,17 +100,37 @@ setMethod("condHyperGeoTest",
                   needsProc <- subGraph(hasKids, needsProc)
               }
               pvals <- unlist(nodeData(goDag, attr="pvalue"))
-              ord <- order(pvals)
-              new("GeneGoCondHyperGeoTestResult",
-                  pvalues=pvals[ord],
-                  geneCounts=numFound[ord],
-                  universeCounts=numAtCat[ord],
-                  universeMappedCount=length(p@universeGeneIds),
-                  geneMappedCount=length(p@geneIds),
-                  annotation=p@annotation,
-                  geneIds=origGeneIds,
-                  testName=p@categoryName,
-                  ontology=p@ontology,
+              new("GeneGoHyperGeoTestResult",
                   goDag=goDag,
-                  pvalue.cutoff=p@pvalue.cutoff)
+                  annotation=p@annotation,
+                  geneIds=p@geneIds,
+                  testName=categoryName(p),
+                  pvalue.cutoff=p@pvalue.cutoff,
+                  pvalue.order=order(pvals))
           })
+
+
+geneGoCondHyperGeoTest <- function(entrezGeneIds, lib, ontology, universe=NULL,
+                                   conditional=FALSE, pvalue.cutoff)
+{
+    if (missing(universe) || is.null(universe))
+      universe <- character(0)
+
+    if (conditional && missing(pvalue.cutoff))
+      stop("conditional computation requires ",
+           sQuote("pvalue.cutoff"), " to be specified")
+    if (missing(pvalue.cutoff))
+      pvalue.cutoff <-  0.01
+    
+    params <- new("GeneGoHyperGeoTestParams",
+                  geneIds=entrezGeneIds,
+                  universeGeneIds=universe,
+                  annotation=lib,
+                  ontology=ontology,
+                  pvalue.cutoff=pvalue.cutoff)
+    
+    if (conditional)
+      condHyperGeoTest(params)
+    else
+      geneCategoryHyperGeoTest(params)
+}
