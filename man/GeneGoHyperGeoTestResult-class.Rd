@@ -40,6 +40,7 @@ Objects can be created by calls of the form \code{new("GeneGoHyperGeoTestResult"
     \item{\code{pvalue.cutoff}:}{Object of class \code{"numeric"}.
         The cutoff for significance used for some testing methods.
         Also used for pretty display in the \code{show} method.}
+
   }
 }
 \section{Extends}{

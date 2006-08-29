@@ -17,14 +17,15 @@ makeSimpleGeneGoHyperGeoTestParams <- function() {
                   annotation="hgu95av2", 
                   ontology="BP",
                   pvalue.cutoff=0.05,
-                  conditional=TRUE)
+                  conditional=TRUE,
+                  test.direction="over")
     params
 }
     
 
-test_condHyperGeoTest_regression <- function() {
+test_goHyperGeoTest_regression1 <- function() {
     p <- makeSimpleGeneGoHyperGeoTestParams()
-    res <- condHyperGeoTest(p)
+    res <- goHyperGeoTest(p)
     checkEquals(9, sum(pvalues(res) < res@pvalue.cutoff))
     first5 <- c("GO:0009057", "GO:0019320", "GO:0006096",
                 "GO:0006006", "GO:0046164")
@@ -34,10 +35,10 @@ test_condHyperGeoTest_regression <- function() {
 }
 
 
-test_nonCondHyperGeoTest_regression <- function() {
+test_goHyperGeoTest_regression2 <- function() {
     p <- makeSimpleGeneGoHyperGeoTestParams()
     p@conditional <- FALSE
-    res <- condHyperGeoTest(p)
+    res <- goHyperGeoTest(p)
     checkEquals(18, sum(pvalues(res) < res@pvalue.cutoff))
     
     res2 <- geneCategoryHyperGeoTest(p)

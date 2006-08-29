@@ -2,7 +2,7 @@ setGeneric("getGoGraph", function(p, goIds) standardGeneric("getGoGraph"))
 
 setGeneric("goDag", function(r) standardGeneric("goDag"))
 
-setGeneric("condHyperGeoTest", 
+setGeneric("goHyperGeoTest", 
            function(p) {
-               standardGeneric("condHyperGeoTest")
+               standardGeneric("goHyperGeoTest")
            }, valueClass="GeneGoHyperGeoTestResult")
