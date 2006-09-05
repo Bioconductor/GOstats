@@ -13,7 +13,7 @@ export(combGOGraph, compCorrGraph, compGdist,
        reduce2Degreek, shortestPath, simLL,
        simLP, simUI, triadCensus,
        hyperGtable, hyperG2Affy,
-       GOHG)
+       GOHG, GOHyperG)
 
 exportClasses("GeneGoHyperGeoTestResult")
 exportMethods("goHyperGeoTest", "getGoGraph",
