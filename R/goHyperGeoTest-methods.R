@@ -10,6 +10,7 @@ setMethod("goHyperGeoTest",
               goDag <- getGoGraph(p, goIds)
               nodeDataDefaults(goDag, "pvalue") <- 1
               nodeDataDefaults(goDag, "geneIds") <- numeric(0)
+              nodeDataDefaults(goDag, "condGeneIds") <- numeric(0)
               ## store the Entrez Gene IDs as attrs on the GO DAG.
               nodeData(goDag, n=names(cat2Entrez),
                        attr="geneIds") <- cat2Entrez
@@ -26,18 +27,17 @@ setMethod("goHyperGeoTest",
                   if (p@conditional) {
                       curCatKids <- edges(goDag)[names(curCat2Entrez)]
                       curCatKids <- removeLengthZero(curCatKids)
-                  } else {
-                      curCatKids <- character(0)
+                      if (length(curCatKids)) { ## sanity check
+                          ## they should be all complete
+                          stopifnot(all(unlist(curCatKids) %in% complete))
+                      }
+                      curCat2Entrez <- removeSigKidGenes(curCatKids, goDag,
+                                                         curCat2Entrez,
+                                                         SIGNIF, cat2Entrez)
+                      ## Store the conditioned cat => entrez map
+                      nodeData(goDag, n=names(curCat2Entrez),
+                               attr="condGeneIds") <- curCat2Entrez
                   }
-                  if (length(curCatKids)) { ## sanity check
-                      ## they should be all complete
-                      stopifnot(all(unlist(curCatKids) %in% complete))
-                  }
-                  curCat2Entrez <- removeSigKidGenes(curCatKids, goDag,
-                                                     curCat2Entrez,
-                                                     SIGNIF, cat2Entrez)
-                  ##FIXME: store the conditioned cat => entrez map
-                  ## in a an additional graph node attr
                   pvals <- getHyperGeoPvalues(p, curCat2Entrez, selected)
 
                   ## store the pvals, mark these nodes as complete,

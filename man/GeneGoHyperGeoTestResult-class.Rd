@@ -10,6 +10,12 @@
 \alias{universeCounts,GeneGoHyperGeoTestResult-method}
 \alias{universeMappedCount,GeneGoHyperGeoTestResult-method}
 
+\alias{geneIdUniverse}
+\alias{geneIdUniverse,GeneGoHyperGeoTestResult-method}
+
+\alias{condGeneIdUniverse}
+\alias{condGeneIdUniverse,GeneGoHyperGeoTestResult-method}
+
 \title{Class "GeneGoHyperGeoTestResult"}
 
 \description{	
@@ -69,6 +75,21 @@ Class \code{"GeneCategoryHyperGeoTestResultBase"}, directly.
   \item{universeMappedCount}{\code{signature(r =
         "GeneGoHyperGeoTestResult")}: return an \code{"integer"}
       vector of length one giving the size of the gene universe set. }
+
+  \item{geneIdUniverse}{\code{signature(r =
+        "GeneGoHyperGeoTestResult")}: return a list named by the
+      tested GO terms.  Each element of the list is a vector of gene
+      identifiers (from the gene universe) annotated at the
+      corresponding GO term.}
+
+  \item{condGeneIdUniverse}{\code{signature(r =
+        "GeneGoHyperGeoTestResult")}: return a list named by the
+      tested GO terms.  Each element of the list is a vector of the
+      remaining gene identifiers (from the gene universe) annotated at
+      the corresponding GO term after the identifiers from significant
+      children were removed.  This is only available when the
+      calculation performed used the conditional Hypergeometric
+      algorithm.}
 
   }
 }
