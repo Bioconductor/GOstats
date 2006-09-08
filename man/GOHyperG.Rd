@@ -98,9 +98,9 @@ GOHyperG(x, lib, what="MF", universe=NULL)
 \author{R. Gentleman}
 
 \seealso{
-  \code{\link{geneGoHyperGeoTest}}
-  \code{\link{geneKeggHyperGeoTest}}
-  \code{\link{geneCategoryHyperGeoTest}}
+  \code{\link{goHyperGeoTest}}
+  \code{\link[Category]{geneKeggHyperGeoTest}}
+  \code{\link[Category]{geneCategoryHyperGeoTest}}
   \code{\link{phyper}}
 }
 
@@ -108,7 +108,7 @@ GOHyperG(x, lib, what="MF", universe=NULL)
 
 library(hgu95av2)
 library(GO)
-w1<-as.list(hgu95av2LOCUSID)
+w1<-as.list(hgu95av2ENTREZID)
 w2<-unique(unlist(w1))
 set.seed(123)
 #pick a hundred interesting genes
