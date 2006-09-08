@@ -43,7 +43,7 @@ Objects can be created by calls of the form \code{new("GeneGoHyperGeoTestResult"
         computed gene universe.}
     \item{\code{testName}:}{Object of class \code{"character"}.
         Identifies the testing method used to produce this result instance.}
-    \item{\code{pvalue.cutoff}:}{Object of class \code{"numeric"}.
+    \item{\code{pvalueCutoff}:}{Object of class \code{"numeric"}.
         The cutoff for significance used for some testing methods.
         Also used for pretty display in the \code{show} method.}
 

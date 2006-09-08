@@ -5,7 +5,7 @@ setClass("GeneGoHyperGeoTestResult",
            pvalue.order="integer"),
          prototype=prototype(
            testName="GO",
-           pvalue.cutoff=0.01,
+           pvalueCutoff=0.01,
            goDag=new("graphNEL")))
 
 

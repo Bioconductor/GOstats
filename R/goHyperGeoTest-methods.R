@@ -19,7 +19,7 @@ setMethod("goHyperGeoTest",
               ## FIXME: consider replacing with RBGL tsort?
               needsProc <- goDag
               complete <- character(0)
-              SIGNIF <- p@pvalue.cutoff
+              SIGNIF <- p@pvalueCutoff
               while (length(nodes(needsProc))) {
                   numKids <- sapply(edges(needsProc), length)
                   noKids <- names(numKids[numKids == 0])
@@ -55,8 +55,8 @@ setMethod("goHyperGeoTest",
                   annotation=p@annotation,
                   geneIds=p@geneIds,
                   testName=categoryName(p),
-                  test.direction=p@test.direction,
-                  pvalue.cutoff=p@pvalue.cutoff,
+                  testDirection=p@testDirection,
+                  pvalueCutoff=p@pvalueCutoff,
                   pvalue.order=order(pvals))
           })
 
@@ -122,7 +122,7 @@ getHyperGeoPvalues <- function(p, curCat2Entrez, selected) {
     numAtCat <- sapply(curCat2Entrez, length)
     ## num black in urn
     numNotAtCat <- length(p@universeGeneIds) - numAtCat
-    if (p@test.direction == "over") {
+    if (p@testDirection == "over") {
         ## take the -1 because we want evidence for as extreme or more
         pvals <- phyper(numFound - 1, numAtCat, numNotAtCat,
                         numDrawn, lower.tail=FALSE)
@@ -135,25 +135,25 @@ getHyperGeoPvalues <- function(p, curCat2Entrez, selected) {
 
 
 GOHG <- function(entrezGeneIds, lib, ontology, universe=NULL,
-                 conditional=FALSE, test.direction="over",
-                 pvalue.cutoff=0.01)
+                 conditional=FALSE, testDirection="over",
+                 pvalueCutoff=0.01)
 {
     if (missing(universe) || is.null(universe))
       universe <- character(0)
 
-    if (conditional && missing(pvalue.cutoff))
+    if (conditional && missing(pvalueCutoff))
       stop("conditional computation requires ",
-           sQuote("pvalue.cutoff"), " to be specified")
-    if (missing(pvalue.cutoff))
-      pvalue.cutoff <-  0.01
+           sQuote("pvalueCutoff"), " to be specified")
+    if (missing(pvalueCutoff))
+      pvalueCutoff <-  0.01
     
     params <- new("GeneGoHyperGeoTestParams",
                   geneIds=entrezGeneIds,
                   universeGeneIds=universe,
                   annotation=lib,
                   ontology=ontology,
-                  test.direction=test.direction,
-                  pvalue.cutoff=pvalue.cutoff)
+                  testDirection=testDirection,
+                  pvalueCutoff=pvalueCutoff)
     
     goHyperGeoTest(params)
 }
