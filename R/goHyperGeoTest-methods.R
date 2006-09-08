@@ -29,11 +29,15 @@ setMethod("goHyperGeoTest",
                   } else {
                       curCatKids <- character(0)
                   }
-                  tmp <- removeSigKidGenes(curCatKids, goDag,
-                                           complete, curCat2Entrez,
-                                           SIGNIF, cat2Entrez)
-                  curCat2Entrez <- tmp$curCat2Entrez
-                  complete <- tmp$complete
+                  if (length(curCatKids)) { ## sanity check
+                      ## they should be all complete
+                      stopifnot(all(unlist(curCatKids) %in% complete))
+                  }
+                  curCat2Entrez <- removeSigKidGenes(curCatKids, goDag,
+                                                     curCat2Entrez,
+                                                     SIGNIF, cat2Entrez)
+                  ##FIXME: store the conditioned cat => entrez map
+                  ## in a an additional graph node attr
                   pvals <- getHyperGeoPvalues(p, curCat2Entrez, selected)
 
                   ## store the pvals, mark these nodes as complete,
@@ -78,11 +82,9 @@ setMethod("getGoGraph", signature(p="GeneGoHyperGeoTestParams",
           })
 
 
-removeSigKidGenes <- function(curCatKids, goDag, complete,
-                              curCat2Entrez, SIGNIF, cat2Entrez) {
+removeSigKidGenes <- function(curCatKids, goDag, curCat2Entrez, SIGNIF,
+                              cat2Entrez) {
     if (length(curCatKids)) {
-        ## they should be all complete (sanity check)
-        stopifnot(all(unlist(curCatKids) %in% complete))
         ## keep only those kids with SIGNIF pvalue
         curCatKids <- lapply(curCatKids, function(x) {
             pvKids <- nodeData(goDag, n=x, attr="pvalue")
@@ -100,17 +102,15 @@ removeSigKidGenes <- function(curCatKids, goDag, complete,
             if (length(kids)) {
                 kidEgs <- unlist(cat2Entrez[kids])
                 newEgs <- setdiff(curCat2Entrez[[goid]], kidEgs)
-                if (length(newEgs))
-                  curCat2EntrezCond[[goid]] <- newEgs
-                else ## we skip the test, but mark complete
-                  complete <- c(complete, goid)
+                ## newEgs may be length 0
+                curCat2EntrezCond[[goid]] <- newEgs
             } else {
                 curCat2EntrezCond[[goid]] <- curCat2Entrez[[goid]]
             }
         }
         curCat2Entrez <- curCat2EntrezCond
     }
-    list(curCat2Entrez=curCat2Entrez, complete=complete)
+    curCat2Entrez
 }
 
 
@@ -122,17 +122,14 @@ getHyperGeoPvalues <- function(p, curCat2Entrez, selected) {
     numAtCat <- sapply(curCat2Entrez, length)
     ## num black in urn
     numNotAtCat <- length(p@universeGeneIds) - numAtCat
-    ## take the -1 because we want evidence for as extreme or
-    ## more.
-    ## NOTE: change to pyhper(numFound, ...) to
-    ## compute underrepresentation.
-    overUnder <- switch(p@test.direction,
-                        over=1,
-                        under=0,
-                        stop("Unknown test.direction",
-                             p@test.direction))
-    pvals <- phyper(numFound-overUnder, numAtCat, numNotAtCat,
-                    numDrawn, lower.tail=FALSE)
+    if (p@test.direction == "over") {
+        ## take the -1 because we want evidence for as extreme or more
+        pvals <- phyper(numFound - 1, numAtCat, numNotAtCat,
+                        numDrawn, lower.tail=FALSE)
+    } else {
+        pvals <- phyper(numFound, numAtCat, numNotAtCat,
+                        numDrawn, lower.tail=TRUE)
+    }
     pvals
 }
 
