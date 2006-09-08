@@ -32,13 +32,14 @@
   significant, the appropriate conditioning is performed.
 }
 \value{
-  A \code{GeneGoCondHyperGeoTestResult} instance.
+  A \code{GeneGoHyperGeoTestResult} instance.
 }
 
 \references{FIXME}
 
 \author{Seth Falcon}
 \seealso{
+  \code{\link{GeneGoHyperGeoTestResult-class}}
   \code{\link[Category]{geneCategoryHyperGeoTest}}
   \code{\link[Category]{geneGoHyperGeoTest}}
   \code{\link[Category]{geneKeggHyperGeoTest}}
