@@ -11,6 +11,7 @@ setMethod("goHyperGeoTest",
               nodeDataDefaults(goDag, "pvalue") <- 1
               nodeDataDefaults(goDag, "geneIds") <- numeric(0)
               nodeDataDefaults(goDag, "condGeneIds") <- numeric(0)
+              nodeDataDefaults(goDag, "oddsRatio") <- numeric(0)
               ## store the Entrez Gene IDs as attrs on the GO DAG.
               nodeData(goDag, n=names(cat2Entrez),
                        attr="geneIds") <- cat2Entrez
@@ -39,12 +40,15 @@ setMethod("goHyperGeoTest",
                                attr="condGeneIds") <- curCat2Entrez
                   }
                   pvals <- getHyperGeoPvalues(p, curCat2Entrez, selected)
+                  odd_ratio <- getOddsRatio(p, curCat2Entrez, selected)
 
                   ## store the pvals, mark these nodes as complete,
                   ## then compute the next set of nodes to do.  
                   noKids <- names(curCat2Entrez)
                   ## drop names on pvals to avoid weird names upon unlisting
                   nodeData(goDag, n=noKids, attr="pvalue") <- as.numeric(pvals)
+                  nodeData(goDag, n=noKids,
+                           attr="oddsRatio") <- as.numeric(pvals)
                   complete <- c(complete, noKids)
                   hasKids <- names(numKids[numKids > 0])
                   needsProc <- subGraph(hasKids, needsProc)
@@ -131,6 +135,40 @@ getHyperGeoPvalues <- function(p, curCat2Entrez, selected) {
                         numDrawn, lower.tail=TRUE)
     }
     pvals
+}
+
+
+getOddsRatio <- function(p, curCat2Entrez, selected) {
+    ##  W = white, B = black, O = in cateogry, X = not in category
+    ##  
+    ##       W    B
+    ##    O  n11  n12
+    ##    X  n21  n22
+    ##
+    ##  odds_ratio = (n11 * n22) / (n12 * n21)
+    ##
+    
+    ## num white drawn (n11)
+    numWhiteFound <- sapply(curCat2Entrez, 
+                            function(x) sum(selected %in% x))
+    ## num white in urn
+    numAtCat <- sapply(curCat2Entrez, length)
+
+    ## num black in urn
+    numNotAtCat <- length(p@universeGeneIds) - numAtCat
+
+    ## (n12)
+    numBlackAtCat <- numAtCat - numWhiteFound  
+
+    ## (n21)
+    numWhiteNotAtCat <- length(selected) - numWhiteFound
+
+    ## (n22)
+    numBlackNotAtCat <- numNotAtCat - numBlackAtCat
+
+    odds_ratio <- (numWhiteFound * numBlackNotAtCat)
+    odds_ratio <- odds_ratio / (numBlackAtCat * numWhiteNotAtCat)
+    odds_ratio
 }
 
 

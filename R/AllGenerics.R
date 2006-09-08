@@ -11,3 +11,5 @@ setGeneric("goHyperGeoTest",
            function(p) {
                standardGeneric("goHyperGeoTest")
            }, valueClass="GeneGoHyperGeoTestResult")
+
+setGeneric("oddsRatio", function(r) standardGeneric("oddsRatio"))

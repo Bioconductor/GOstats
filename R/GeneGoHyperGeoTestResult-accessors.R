@@ -8,6 +8,12 @@ setMethod("pvalues", signature(r="GeneGoHyperGeoTestResult"),
               })
 
 
+setMethod("oddsRatio", signature(r="GeneGoHyperGeoTestResult"),
+          function(r) {
+              unlist(nodeData(r@goDag, attr="oddsRatio"))[r@pvalue.order]
+              })
+
+
 entrezGeneUniverse <- function(r) {
     nodeData(r@goDag, n=nodes(r@goDag)[r@pvalue.order],
              attr="geneIds")

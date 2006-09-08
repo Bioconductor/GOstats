@@ -18,6 +18,7 @@ export(combGOGraph, compCorrGraph, compGdist,
 exportClasses("GeneGoHyperGeoTestResult")
 exportMethods("goHyperGeoTest", "getGoGraph",
               "pvalues",
+              "oddsRatio",
               "goDag",
               "geneCounts",
               "universeCounts",
