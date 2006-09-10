@@ -40,7 +40,7 @@ setMethod("goHyperGeoTest",
                                attr="condGeneIds") <- curCat2Entrez
                   }
                   pvals <- getHyperGeoPvalues(p, curCat2Entrez, selected)
-                  odd_ratio <- getOddsRatio(p, curCat2Entrez, selected)
+                  odds_ratio <- getOddsRatio(p, curCat2Entrez, selected)
 
                   ## store the pvals, mark these nodes as complete,
                   ## then compute the next set of nodes to do.  
@@ -48,7 +48,7 @@ setMethod("goHyperGeoTest",
                   ## drop names on pvals to avoid weird names upon unlisting
                   nodeData(goDag, n=noKids, attr="pvalue") <- as.numeric(pvals)
                   nodeData(goDag, n=noKids,
-                           attr="oddsRatio") <- as.numeric(pvals)
+                           attr="oddsRatio") <- as.numeric(odds_ratio)
                   complete <- c(complete, noKids)
                   hasKids <- names(numKids[numKids > 0])
                   needsProc <- subGraph(hasKids, needsProc)
