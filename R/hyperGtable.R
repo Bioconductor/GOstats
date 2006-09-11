@@ -64,4 +64,47 @@ hyperG2Affy <- function(probids, lib, type="MF", pvalue=0.05,
   names(out) <- names(tmp.terms)
   out
 }
- 
+
+
+sigCategories <- function(res, p) {
+    if (missing(p))
+      p <- res@pvalue.cutoff
+    pv <- pvalues(res)
+    goIds <- names(pv[pv < p])
+    goIds
+}
+
+
+setMethod("summary", signature(object="GeneGoHyperGeoTestResult"),
+          function(object, pvalue, categorySize, htmlLinks=TRUE) {
+              AMIGO_URL <- "http://www.godatabase.org/cgi-bin/amigo/go.cgi?view=details&search_constraint=terms&depth=0&query=%s"
+              if (missing(pvalue))
+                pvalue <- pvalueCutoff(res)
+              
+              ## Filter GO terms based on p-value and category size
+              pvals <- pvalues(res)
+              ucounts <- universeCounts(res)
+              wanted <- pvals < pvalue
+              if (!missing(categorySize)) {
+                  hasMinSize <- ucounts >= categorySize
+                  wanted <- wanted & hasMinSize
+              }
+              pvals <- pvals[wanted]
+              ucounts <- ucounts[wanted]
+              
+              goIds <- names(pvals)
+              goTerms <- sapply(mget(goIds, GOTERM), Term)
+              goIdUrls <- sapply(goIds, function(x) sprintf(AMIGO_URL, x))
+              odds <- oddsRatios(res)[wanted]
+              ecounts <- expectedCounts(res)[wanted]
+              counts <- geneCounts(res)[wanted]
+              if (htmlLinks) {
+                  goTerms <- paste('<a href="', goIdUrls, '">', goTerms,
+                                   '</a>', sep="")
+              }
+              df <- data.frame(ID=goIds, Pvalue=pvals, OddsRatio=odds,
+                               ExpCount=ecounts, Count=counts, Size=ucounts,
+                               Term=goTerms)
+              df
+          })
+    

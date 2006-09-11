@@ -6,6 +6,12 @@
 \alias{goDag}
 \alias{goDag,GeneGoHyperGeoTestResult-method}
 
+\alias{oddsRatios}
+\alias{oddsRatios,GeneGoHyperGeoTestResult-method}
+
+\alias{expectedCounts}
+\alias{expectedCounts,GeneGoHyperGeoTestResult-method}
+
 \alias{pvalues,GeneGoHyperGeoTestResult-method}
 \alias{universeCounts,GeneGoHyperGeoTestResult-method}
 \alias{universeMappedCount,GeneGoHyperGeoTestResult-method}
@@ -15,6 +21,8 @@
 
 \alias{condGeneIdUniverse}
 \alias{condGeneIdUniverse,GeneGoHyperGeoTestResult-method}
+
+\alias{summary,GeneGoHyperGeoTestResult-method}
 
 \title{Class "GeneGoHyperGeoTestResult"}
 
@@ -63,9 +71,17 @@ Class \code{"GeneCategoryHyperGeoTestResultBase"}, directly.
         return the \code{graph} instance representing the DAG of the
         GO terms that were tested.}
 
- \item{pvalues}{\code{signature(r =
-        "GeneGoHyperGeoTestResult")}: return a \code{"numeric"}
-      vector: the ordered p-values for each category term tested.}
+    \item{pvalues}{\code{signature(r =
+          "GeneGoHyperGeoTestResult")}: return a \code{"numeric"}
+        vector: the ordered p-values for each category term tested.}
+
+    \item{oddsRatios}{\code{signature(r =
+          "GeneGoHyperGeoTestResult")}: return a \code{"numeric"}
+        vector: the odds ratio for each category term tested.}
+
+    \item{expectedCounts}{\code{signature(r =
+          "GeneGoHyperGeoTestResult")}: return a \code{"numeric"}
+        vector: the expected number of genes for each GO term tested.}
 
   \item{universeCounts}{\code{signature(r =
         "GeneGoHyperGeoTestResult")}: return an \code{"integer"}
@@ -90,6 +106,15 @@ Class \code{"GeneCategoryHyperGeoTestResultBase"}, directly.
       children were removed.  This is only available when the
       calculation performed used the conditional Hypergeometric
       algorithm.}
+
+  \item{summary}{\code{signature(r = "GeneGoHyperGeoTestResult")}:
+      Returns a \code{data.frame} summarizing the test result.
+      Optional arguments \code{pvalue} and \code{categorySize} allow
+      specification of minimum p-value and cateogyrSize, respectively.
+      Optional argument \code{htmlLinks} is a logical value indicating
+      whether to add HTML links (useful in conjunction with xtables
+      print method with \code{type} set to \code{"html"}).}
+
 
   }
 }

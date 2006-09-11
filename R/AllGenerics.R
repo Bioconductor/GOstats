@@ -12,4 +12,7 @@ setGeneric("goHyperGeoTest",
                standardGeneric("goHyperGeoTest")
            }, valueClass="GeneGoHyperGeoTestResult")
 
-setGeneric("oddsRatio", function(r) standardGeneric("oddsRatio"))
+setGeneric("oddsRatios", function(r) standardGeneric("oddsRatios"))
+
+setGeneric("expectedCounts",
+           function(r) standardGeneric("expectedCounts"))

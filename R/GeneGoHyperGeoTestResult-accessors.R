@@ -8,9 +8,15 @@ setMethod("pvalues", signature(r="GeneGoHyperGeoTestResult"),
               })
 
 
-setMethod("oddsRatio", signature(r="GeneGoHyperGeoTestResult"),
+setMethod("oddsRatios", signature(r="GeneGoHyperGeoTestResult"),
           function(r) {
               unlist(nodeData(r@goDag, attr="oddsRatio"))[r@pvalue.order]
+              })
+
+
+setMethod("expectedCounts", signature(r="GeneGoHyperGeoTestResult"),
+          function(r) {
+              unlist(nodeData(r@goDag, attr="expCount"))[r@pvalue.order]
               })
 
 

@@ -12,6 +12,7 @@ setMethod("goHyperGeoTest",
               nodeDataDefaults(goDag, "geneIds") <- numeric(0)
               nodeDataDefaults(goDag, "condGeneIds") <- numeric(0)
               nodeDataDefaults(goDag, "oddsRatio") <- numeric(0)
+              nodeDataDefaults(goDag, "expCount") <- numeric(0)
               ## store the Entrez Gene IDs as attrs on the GO DAG.
               nodeData(goDag, n=names(cat2Entrez),
                        attr="geneIds") <- cat2Entrez
@@ -39,16 +40,20 @@ setMethod("goHyperGeoTest",
                       nodeData(goDag, n=names(curCat2Entrez),
                                attr="condGeneIds") <- curCat2Entrez
                   }
-                  pvals <- getHyperGeoPvalues(p, curCat2Entrez, selected)
-                  odds_ratio <- getOddsRatio(p, curCat2Entrez, selected)
+                  stats <- getHyperGeoPvalues(p, curCat2Entrez,
+                                              cat2Entrez, selected)
+                  ##odds_ratio <- getOddsRatio(p, curCat2Entrez, selected)
 
                   ## store the pvals, mark these nodes as complete,
                   ## then compute the next set of nodes to do.  
                   noKids <- names(curCat2Entrez)
                   ## drop names on pvals to avoid weird names upon unlisting
-                  nodeData(goDag, n=noKids, attr="pvalue") <- as.numeric(pvals)
                   nodeData(goDag, n=noKids,
-                           attr="oddsRatio") <- as.numeric(odds_ratio)
+                           attr="pvalue") <- as.numeric(stats$p)
+                  nodeData(goDag, n=noKids,
+                           attr="oddsRatio") <- as.numeric(stats$odds)
+                  nodeData(goDag, n=noKids,
+                           attr="expCount") <- as.numeric(stats$expected)
                   complete <- c(complete, noKids)
                   hasKids <- names(numKids[numKids > 0])
                   needsProc <- subGraph(hasKids, needsProc)
@@ -118,57 +123,76 @@ removeSigKidGenes <- function(curCatKids, goDag, curCat2Entrez, SIGNIF,
 }
 
 
-getHyperGeoPvalues <- function(p, curCat2Entrez, selected) {
-    numFound <- sapply(curCat2Entrez, 
-                       function(x) sum(selected %in% x))
-    numDrawn <- length(selected)
-    ## num white in urn
-    numAtCat <- sapply(curCat2Entrez, length)
-    ## num black in urn
-    numNotAtCat <- length(p@universeGeneIds) - numAtCat
-    if (p@testDirection == "over") {
-        ## take the -1 because we want evidence for as extreme or more
-        pvals <- phyper(numFound - 1, numAtCat, numNotAtCat,
-                        numDrawn, lower.tail=FALSE)
-    } else {
-        pvals <- phyper(numFound, numAtCat, numNotAtCat,
-                        numDrawn, lower.tail=TRUE)
-    }
-    pvals
-}
-
-
-getOddsRatio <- function(p, curCat2Entrez, selected) {
-    ##  W = white, B = black, O = in cateogry, X = not in category
-    ##  
-    ##       W    B
-    ##    O  n11  n12
-    ##    X  n21  n22
+getHyperGeoPvalues <- function(p, curCat2Entrez, cat2Entrez, selected) {
+    ## Here is how we conceptualize the test:
     ##
-    ##  odds_ratio = (n11 * n22) / (n12 * n21)
+    ## The urn contains genes from the gene universe.  For each GO ID,
+    ## genes annotated at the given GO term are white and the rest
+    ## black.
+    ##
+    ## The number drawn is the size of the selected gene list.  The
+    ## number of white drawn is the size of the intersection of the
+    ## selected list and the GO list.
+    ##
+    ## In the conditional case, the GO ID annotation set has been
+    ## reduced and we also adjust the selected list (num drawn) and gene
+    ## universe according to what was removed by the conditioning.
+    ##
+    ##          inGO    notGO
+    ##          White   Black
+    ## selected  n11     n12
+    ## not       n21     n22
     ##
     
-    ## num white drawn (n11)
-    numWhiteFound <- sapply(curCat2Entrez, 
-                            function(x) sum(selected %in% x))
-    ## num white in urn
-    numAtCat <- sapply(curCat2Entrez, length)
+    if (p@conditional) {
+        cat2RemovedEntrez <- lapply(names(curCat2Entrez),
+                                    function(goid) {
+                                        setdiff(cat2Entrez[[goid]],
+                                                curCat2Entrez[[goid]])
+                                    })
 
-    ## num black in urn
-    numNotAtCat <- length(p@universeGeneIds) - numAtCat
+        ## White balls removed from urn by conditioning
+        numSelectedRemoved <- sapply(cat2RemovedEntrez,
+                                     function(x) sum(selected %in% x))
 
-    ## (n12)
-    numBlackAtCat <- numAtCat - numWhiteFound  
+        ## Black balls removed from urn by conditioning
+        numOtherRemoved <- listLen(cat2RemovedEntrez) - numSelectedRemoved
+    } else {
+        numSelectedRemoved <- rep(0, length(curCat2Entrez))
+        numOtherRemoved <- numSelectedRemoved
+    }
 
-    ## (n21)
-    numWhiteNotAtCat <- length(selected) - numWhiteFound
+    ## Num white drawn (n11)
+    numWdrawn <- sapply(curCat2Entrez, 
+                        function(x) sum(selected %in% x))
 
-    ## (n22)
-    numBlackNotAtCat <- numNotAtCat - numBlackAtCat
+    ## Num white
+    numW <- listLen(curCat2Entrez)
+    
+    ## Num black
+    numB <- length(p@universeGeneIds) - numOtherRemoved - numW
 
-    odds_ratio <- (numWhiteFound * numBlackNotAtCat)
-    odds_ratio <- odds_ratio / (numBlackAtCat * numWhiteNotAtCat)
-    odds_ratio
+    ## Num drawn
+    numDrawn <- length(selected) - numSelectedRemoved
+
+    n21 <- numW - numWdrawn
+    n12 <- numDrawn - numWdrawn
+    n22 <- numB - n12
+
+    odds_ratio <-  (numWdrawn * n22) / (n12 * n21)
+
+    expected <- (numWdrawn + n12) * (numWdrawn + n21)
+    expected <- expected / (numWdrawn + n21 + n21 + n22)
+
+    if (p@testDirection == "over") {
+        ## take the -1 because we want evidence for as extreme or more
+        pvals <- phyper(numWdrawn - 1, numW, numB,
+                        numDrawn, lower.tail=FALSE)
+    } else {
+        pvals <- phyper(numWdrawn, numW, numB,
+                        numDrawn, lower.tail=TRUE)
+    }
+    list(p=pvals, odds=odds_ratio, expected=expected)
 }
 
 
