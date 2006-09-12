@@ -170,7 +170,8 @@ getHyperGeoPvalues <- function(p, curCat2Entrez, cat2Entrez, selected) {
     numW <- listLen(curCat2Entrez)
     
     ## Num black
-    numB <- length(p@universeGeneIds) - numOtherRemoved - numW
+    numB <- (length(p@universeGeneIds) - numOtherRemoved - numSelectedRemoved
+             - numW)
 
     ## Num drawn
     numDrawn <- length(selected) - numSelectedRemoved
