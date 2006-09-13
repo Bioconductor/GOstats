@@ -16,7 +16,7 @@ License: Artistic
 Collate:
     AllClasses.R
     AllGenerics.R
-    goHyperGeoTest-methods.R
+    hyperGTest-methods.R
     GOHyperGResult-accessors.R
     GOgraph.R
     GOhyptest.R
