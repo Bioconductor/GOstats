@@ -16,3 +16,10 @@ setGeneric("oddsRatios", function(r) standardGeneric("oddsRatios"))
 
 setGeneric("expectedCounts",
            function(r) standardGeneric("expectedCounts"))
+
+## Accessors for GeneGoHyperGeoTestResult
+
+setGeneric("isConditional", function(r) standardGeneric("isConditional"))
+
+setGeneric("htmlReport", function(r, ..., file="", append=TRUE, label="")
+           standardGeneric("htmlReport"))

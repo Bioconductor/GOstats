@@ -2,7 +2,8 @@ setClass("GeneGoHyperGeoTestResult",
          contains="GeneCategoryHyperGeoTestResultBase",
          representation=representation(
            goDag="graph",
-           pvalue.order="integer"),
+           pvalue.order="integer",
+           conditional="logical"),
          prototype=prototype(
            testName="GO",
            pvalueCutoff=0.01,

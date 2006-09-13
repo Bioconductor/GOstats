@@ -108,7 +108,7 @@ GOHyperG(x, lib, what="MF", universe=NULL)
 
 library(hgu95av2)
 library(GO)
-w1<-as.list(hgu95av2ENTREZID)
+w1<-as.list(hgu95av2LOCUSID)
 w2<-unique(unlist(w1))
 set.seed(123)
 #pick a hundred interesting genes

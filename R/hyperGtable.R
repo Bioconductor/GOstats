@@ -79,11 +79,11 @@ setMethod("summary", signature(object="GeneGoHyperGeoTestResult"),
           function(object, pvalue, categorySize, htmlLinks=TRUE) {
               AMIGO_URL <- "http://www.godatabase.org/cgi-bin/amigo/go.cgi?view=details&search_constraint=terms&depth=0&query=%s"
               if (missing(pvalue))
-                pvalue <- pvalueCutoff(res)
+                pvalue <- pvalueCutoff(object)
               
               ## Filter GO terms based on p-value and category size
-              pvals <- pvalues(res)
-              ucounts <- universeCounts(res)
+              pvals <- pvalues(object)
+              ucounts <- universeCounts(object)
               wanted <- pvals < pvalue
               if (!missing(categorySize)) {
                   hasMinSize <- ucounts >= categorySize
@@ -95,16 +95,47 @@ setMethod("summary", signature(object="GeneGoHyperGeoTestResult"),
               goIds <- names(pvals)
               goTerms <- sapply(mget(goIds, GOTERM), Term)
               goIdUrls <- sapply(goIds, function(x) sprintf(AMIGO_URL, x))
-              odds <- oddsRatios(res)[wanted]
-              ecounts <- expectedCounts(res)[wanted]
-              counts <- geneCounts(res)[wanted]
+              odds <- oddsRatios(object)[wanted]
+              ecounts <- expectedCounts(object)[wanted]
+              counts <- geneCounts(object)[wanted]
               if (htmlLinks) {
                   goTerms <- paste('<a href="', goIdUrls, '">', goTerms,
                                    '</a>', sep="")
               }
               df <- data.frame(ID=goIds, Pvalue=pvals, OddsRatio=odds,
-                               ExpCount=ecounts, Count=counts, Size=ucounts,
-                               Term=goTerms)
+                               ExpCount=ecounts, Count=counts,
+                               Size=ucounts, Term=goTerms,
+                               stringsAsFactors=FALSE,
+                               row.names=NULL)
               df
           })
+
+
+htmlReport0 <- function(res, file, append=TRUE, label="",
+                       dframizer=summary, ...) {
+    ## FIXME: make this a method
+    if (!is(res, "GeneGoHyperGeoTestResult"))
+      stop("res must be a GeneGoHyperGeoTestResult instance")
+    have_xtable <- suppressWarnings({
+        require("xtable", quietly=TRUE, warn.conflicts=FALSE)
+    })
+    if (!have_xtable)
+      stop("htmlReport needs the xtable package and it is not",
+           "available")
     
+    caption <- paste(label, description(res))
+    dig <- rep(2, 8)
+    dig[5:7] <- 0
+    xt <- xtable(dframizer(res, ...), caption=caption,
+                 digits=dig)
+    print(xt, type="html", file=file, append=append,
+          caption.placement="top")
+}
+
+setMethod("htmlReport", signature(r="GeneGoHyperGeoTestResult"),
+          function(r, file="", append=TRUE, label="", ...)
+          {
+              htmlReport0(r=r, file=file, append=append,
+                          label=label, dframizer=summary, ...)
+          })
+

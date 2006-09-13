@@ -66,7 +66,8 @@ setMethod("goHyperGeoTest",
                   testName=categoryName(p),
                   testDirection=p@testDirection,
                   pvalueCutoff=p@pvalueCutoff,
-                  pvalue.order=order(pvals))
+                  pvalue.order=order(pvals),
+                  conditional=p@conditional)
           })
 
 
