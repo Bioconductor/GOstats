@@ -24,7 +24,7 @@ GOHyperG <- function(x, lib, what="MF", universe=NULL)
     if (missing(lib) || !is.character(lib))
       stop("argument ", sQuote("lib"), " must be character")
 
-    res <- geneCategoryHyperGeoTest(params)
+    res <- hyperGTest(params)
     resultToGOHyperG(res, origIds=x)
 }
 
