@@ -101,6 +101,7 @@ library("multtest")
 library("hgu95av2")
 library("genefilter")
 library("RBGL")
+library("ALL")
 @
 
 <<RgraphvizPlotHelper, echo=FALSE, results=hide>>=
