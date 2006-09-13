@@ -10,7 +10,7 @@ biocViews: Statistics, Annotation, GO, MultipleComparisons
 Depends: graph (>= 1.9.25), GO (>= 1.12.0), annotate, RBGL, 
          Biobase, genefilter, multtest, Category (>= 1.5.9), methods
 Imports: methods, Category (>= 1.5.9)
-Suggests: hgu95av2 (>= 1.12.0), xtable
+Suggests: hgu95av2 (>= 1.12.0), xtable, ALL
 Maintainer: S. Falcon <sfalcon@fhcrc.org>
 License: Artistic
 Collate:
