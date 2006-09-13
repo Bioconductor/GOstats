@@ -35,12 +35,12 @@ shortest-path analysis of gene expression data.}
 \seealso{\code{\link{compGdist}}}
 \examples{
 
- data(ALL)
+ ## Create an ExpressionSet to work with
  set.seed(123)
- gs = sample(1:dim(ALL@exprs)[1], 200)
- Tsub = ALL[gs, grep("^T", as.character(ALL$BT))]
+ exprMat <- matrix(runif(100 * 10), nrow=100)
+ genData <- new("ExpressionSet", exprs=exprMat)
 
- corrG = compCorrGraph(Tsub)
+ corrG = compCorrGraph(genData)
 
 }
 \keyword{ manip }
