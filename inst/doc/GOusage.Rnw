@@ -174,9 +174,9 @@ then follow this chains of relationships or use the \texttt{ANCESTOR}
 and \texttt{OFFSPRING} hash tables to get more information.
 
 The mappings of genes to GO terms is contained in the
-\Robject{GOLOCUSID2GO} hash table. This contains mappings from a
+\Robject{GOENTREZID2GO} hash table. This contains mappings from a
 LocusLink ID to the most specific applicable GO terms.  Each entry in
-the \Robject{GOLOCUSID2GO} hash table is a list of lists. The actual
+the \Robject{GOENTREZID2GO} hash table is a list of lists. The actual
 entries are named lists, with three names:
 \begin{itemize}
 \item \texttt{GOID}: the GO identifier
@@ -198,7 +198,7 @@ In this next example we consider the gene with LocusLink ID
 \texttt{25310}. FIXME: what is its symbol etc.
 <<locusid>>=
 
- ll1 = GOLOCUSID2GO[["4121"]]
+ ll1 = GOENTREZID2GO[["4121"]]
  length(ll1)
  sapply(ll1, function(x) x$Ontology)
 
@@ -266,7 +266,7 @@ evidence codes are used to map LocusLink Identifiers to GO terms.
 
 <<evC>>=
 
- LLec = eapply(GOLOCUSID2GO, getEvidence)
+ LLec = eapply(GOENTREZID2GO, getEvidence)
  table(unlist(LLec))
 
 @
@@ -304,14 +304,14 @@ the examples on the Affymetrix HGu95av2 chips and so use the package
 \Rpackage{hgu95av2}. Each of these packages has a data environment
 whose name is the name of the package with a \texttt{GO} suffix, so in
 this case \Robject{hgu95av2GO}. And these data environments have
-exactly the same internal structure as the \Robject{GOLOCUSID2GO}
+exactly the same internal structure as the \Robject{GOENTREZID2GO}
 environment except that the keys are the manufacturers identifiers and
 not LocusLink identifiers. Note that if there are many manufacturer
 ids that map to the same LocusLink identifier then these will be
 duplicate entries (with different keys).
 
 The software tools for working with these packages is then exactly the
-same as we described above for working with \Robject{GOLOCUSID2GO}.
+same as we described above for working with \Robject{GOENTREZID2GO}.
 
 We can get all the \texttt{MF} terms for our Affymetrix data.
 

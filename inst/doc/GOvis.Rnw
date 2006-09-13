@@ -195,11 +195,11 @@ than 100 units. Applying both of these transformations yielded
  eSet = esetSub[Fstats$index[Fstats$adjp<pvCutOff],]
 
  gN = geneNames(eSet)
- lls = unlist(mget(gN, hgu95av2LOCUSID, ifnotfound=NA))
+ lls = unlist(mget(gN, hgu95av2ENTREZID, ifnotfound=NA))
 
  eS = eSet[!duplicated(lls),]
  gN = geneNames(eS)
- lls = unlist(mget(gN, hgu95av2LOCUSID, ifnotfound=NA))
+ lls = unlist(mget(gN, hgu95av2ENTREZID, ifnotfound=NA))
  lls = as.character(lls)
  syms = unlist(mget(gN, hgu95av2SYMBOL, ifnotfound=NA))
 
@@ -533,13 +533,13 @@ respect to the BP ontology.
 
 <<multip>>=
 
- igenes = unlist(mget(gN[1:10], hgu95av2LOCUSID))
+ igenes = unlist(mget(gN[1:10], hgu95av2ENTREZID))
 
  igenes = igenes[!is.na(igenes)]
  igenes = as.character(igenes)
 
 
- GOs = mget(as.character(igenes), GOLOCUSID2GO, ifnotfound=NA)
+ GOs = mget(as.character(igenes), GOENTREZID2GO, ifnotfound=NA)
  gBP = sapply(GOs, getOntology, "BP")
  ##how many terms
 

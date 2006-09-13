@@ -293,17 +293,17 @@ the multiplicity of mappings between the manufacturer IDs and
 LocusLink IDs.
 
 Mappings from GO terms to specific genes is provided in the hash table
-(R \Robject{environment}) named \Robject{GOLOCUSID}, which maps from GO
+(R \Robject{environment}) named \Robject{GOENTREZID}, which maps from GO
 terms to EntrezGene identifiers. These are only the set of most
 specific mappings. To get all EntrezGene IDs associated with a specific
-GO term use \Robject{GOALLLOCUSID} instead. A histogram of the logarithm of the
+GO term use \Robject{GOALLENTREZID} instead. A histogram of the logarithm of the
 number of EntrezGene identifiers per GO term is given in
 Figure~\ref{fig:GO2LL}.
 
 \begin{figure}[htbp]
 \begin{center}
 <<GO2LL, fig=TRUE, echo=FALSE>>=
- go2LLcounts <- unlist(eapply(GOLOCUSID, length))
+ go2LLcounts <- unlist(eapply(GOENTREZID, length))
  hist(log(go2LLcounts), main="Log Counts of EntrezGene IDs per GO ID",
       xlab="")
 @
@@ -322,7 +322,7 @@ below.
 
 %%borrowed from the Wiley paper
 <<duplicates, echo=FALSE>>=
-lls <- unlist(as.list(hgu95av2LOCUSID))
+lls <- unlist(as.list(hgu95av2ENTREZID))
 tab <- table(table(lls))
 cat("Multiplicity      ", sapply(names(tab),
      function(x) sprintf("%4s", x)),
@@ -387,7 +387,7 @@ bcrAblOrNeg <- eset
 @ 
 
 <<Example-noEntrez, results=hide, echo=FALSE>>=
-entrezIds <- mget(geneNames(bcrAblOrNeg), envir=hgu95av2LOCUSID)
+entrezIds <- mget(geneNames(bcrAblOrNeg), envir=hgu95av2ENTREZID)
 haveEntrezId <- names(entrezIds)[sapply(entrezIds, function(x) !is.na(x))]
 numNoEntrezId <- length(geneNames(bcrAblOrNeg)) - length(haveEntrezId)
 bcrAblOrNeg <- bcrAblOrNeg[haveEntrezId, ]
@@ -449,7 +449,7 @@ deGenes <- names(adjp[which(adjp < 0.05)])
 
 ## get the gene names
 ABL1 <- "1635_at"
-ABL1LL <- get(ABL1, hgu95av2LOCUSID)
+ABL1LL <- get(ABL1, hgu95av2ENTREZID)
 gnames <- mget(geneNames(esetSub), env = hgu95av2SYMBOL, ifnotfound=NA)
 top5 <- resT$index[1:5]
 unlist(gnames[top5]) #$ sorted according to adjusted p-values
@@ -504,7 +504,7 @@ such plots.  We will return to this plot in the next section and use
 it to provide a more detailed view of the data.
 
 <<inducedGO, echo=FALSE, results=hide>>=
-gNll = as.character(unlist(mget(deGenes, hgu95av2LOCUSID)))
+gNll = as.character(unlist(mget(deGenes, hgu95av2ENTREZID)))
 gGO <- makeGOGraph(gNll, "MF")
 nattr <- list()
 if (haveRgraphviz) {
@@ -594,7 +594,7 @@ interesting. Nodes that are interesting are typically those with a
 reasonable number of genes (10 or more) and small $p$-values.
 
 <<HyperG, echo=FALSE, results=hide>>=
-deGenes_entrez <- mget(deGenes, env=hgu95av2LOCUSID, ifnotfound=NA)
+deGenes_entrez <- mget(deGenes, env=hgu95av2ENTREZID, ifnotfound=NA)
 stopifnot(!any(duplicated(deGenes_entrez)))
 stopifnot(!any(is.na(deGenes_entrez)))
 gGhyp <- GOHyperG(deGenes_entrez, lib="hgu95av2")
