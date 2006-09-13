@@ -17,7 +17,7 @@ Collate:
     AllClasses.R
     AllGenerics.R
     goHyperGeoTest-methods.R
-    GeneGoHyperGeoTestResult-accessors.R
+    GOHyperGResult-accessors.R
     GOgraph.R
     GOhyptest.R
     GOterms.R
