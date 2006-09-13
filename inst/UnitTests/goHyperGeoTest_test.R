@@ -21,9 +21,9 @@ makeSimpleGOHyperGParams <- function() {
 }
     
 
-test_goHyperGeoTest_regression1 <- function() {
+test_hyperGTest_regression1 <- function() {
     p <- makeSimpleGOHyperGParams()
-    res <- goHyperGeoTest(p)
+    res <- hyperGTest(p)
     checkEquals(9, sum(pvalues(res) < res@pvalueCutoff))
     first5 <- c("GO:0009057", "GO:0019320", "GO:0006096",
                 "GO:0006006", "GO:0046164")
@@ -33,15 +33,15 @@ test_goHyperGeoTest_regression1 <- function() {
 }
 
 
-test_goHyperGeoTest_regression2 <- function() {
+test_hyperGTest_regression2 <- function() {
     p <- makeSimpleGOHyperGParams()
     p@conditional <- FALSE
-    res <- goHyperGeoTest(p)
+    res <- hyperGTest(p)
     checkEquals(18, sum(pvalues(res) < res@pvalueCutoff))
 
     ## Verify result is same using geneCategoryHyperGeoTest
     ## from Category
-    res2 <- geneCategoryHyperGeoTest(p)
+    res2 <- Category::hyperGTest(p)
     checkEquals(pvalues(res), pvalues(res2))
     checkEquals(geneCounts(res), geneCounts(res2))
     checkEquals(universeCounts(res), universeCounts(res2))

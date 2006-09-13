@@ -1,4 +1,4 @@
-setMethod("goHyperGeoTest",
+setMethod("hyperGTest",
           signature(p="GOHyperGParams"), 
           function(p) {
               p@universeGeneIds <- universeBuilder(p)
@@ -219,5 +219,5 @@ GOHG <- function(entrezGeneIds, lib, ontology, universe=NULL,
                   testDirection=testDirection,
                   pvalueCutoff=pvalueCutoff)
     
-    goHyperGeoTest(params)
+    hyperGTest(params)
 }

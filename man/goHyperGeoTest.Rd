@@ -1,6 +1,6 @@
-\name{goHyperGeoTest}
-\alias{goHyperGeoTest}
-\alias{goHyperGeoTest,GeneGoCondHyperGeoTestParams-method}
+\name{hyperGTest}
+\alias{hyperGTest}
+\alias{hyperGTest,GeneGoCondHyperGeoTestParams-method}
 
 \title{Conditional Hypergeometric Tests for GO}
 
@@ -11,7 +11,7 @@
   overrepresentation of each GO term in the specified ontology among
   the GO annotations for the interesting genes.} 
 
-\usage{ goHyperGeoTest(p) }
+\usage{ hyperGTest(p) }
 
 \arguments{
   \item{p}{A \code{GOHyperGParams} instance }
@@ -19,7 +19,7 @@
 
 \details{
 
-  The \code{goHyperGeoTest} function uses the structure of the GO
+  The \code{hyperGTest} function uses the structure of the GO
   graph to estimate for each term whether or not there is evidence
   beyond that which is provided by the term's children to call the
   term in question statistically overrepresented.

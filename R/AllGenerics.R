@@ -7,11 +7,6 @@ setGeneric("geneIdUniverse", function(r) standardGeneric("geneIdUniverse"))
 setGeneric("condGeneIdUniverse",
            function(r) standardGeneric("condGeneIdUniverse"))
 
-setGeneric("goHyperGeoTest", 
-           function(p) {
-               standardGeneric("goHyperGeoTest")
-           }, valueClass="GOHyperGResult")
-
 setGeneric("oddsRatios", function(r) standardGeneric("oddsRatios"))
 
 setGeneric("expectedCounts",

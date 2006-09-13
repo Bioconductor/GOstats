@@ -98,7 +98,7 @@ GOHyperG(x, lib, what="MF", universe=NULL)
 \author{R. Gentleman}
 
 \seealso{
-  \code{\link{goHyperGeoTest}}
+  \code{\link{hyperGTest}}
   \code{\link[Category]{geneKeggHyperGeoTest}}
   \code{\link[Category]{geneCategoryHyperGeoTest}}
   \code{\link{phyper}}
