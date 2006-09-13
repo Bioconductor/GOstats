@@ -21,5 +21,9 @@ setGeneric("expectedCounts",
 
 setGeneric("isConditional", function(r) standardGeneric("isConditional"))
 
-setGeneric("htmlReport", function(r, ..., file="", append=TRUE, label="")
-           standardGeneric("htmlReport"))
+setGeneric("htmlReport", function(r, file="", append=TRUE, label="", ...)
+           standardGeneric("htmlReport"),
+           signature=c("r"))
+
+## Create generics for non-generics defined in base
+setGeneric("summary")
