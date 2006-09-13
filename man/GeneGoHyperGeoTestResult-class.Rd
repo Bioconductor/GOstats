@@ -1,30 +1,30 @@
-\name{GeneGoHyperGeoTestResult-class}
+\name{GOHyperGResult-class}
 \docType{class}
-\alias{GeneGoHyperGeoTestResult-class}
-\alias{geneCounts,GeneGoHyperGeoTestResult-method}
+\alias{GOHyperGResult-class}
+\alias{geneCounts,GOHyperGResult-method}
 
 \alias{goDag}
-\alias{goDag,GeneGoHyperGeoTestResult-method}
+\alias{goDag,GOHyperGResult-method}
 
 \alias{oddsRatios}
-\alias{oddsRatios,GeneGoHyperGeoTestResult-method}
+\alias{oddsRatios,GOHyperGResult-method}
 
 \alias{expectedCounts}
-\alias{expectedCounts,GeneGoHyperGeoTestResult-method}
+\alias{expectedCounts,GOHyperGResult-method}
 
-\alias{pvalues,GeneGoHyperGeoTestResult-method}
-\alias{universeCounts,GeneGoHyperGeoTestResult-method}
-\alias{universeMappedCount,GeneGoHyperGeoTestResult-method}
+\alias{pvalues,GOHyperGResult-method}
+\alias{universeCounts,GOHyperGResult-method}
+\alias{universeMappedCount,GOHyperGResult-method}
 
 \alias{geneIdUniverse}
-\alias{geneIdUniverse,GeneGoHyperGeoTestResult-method}
+\alias{geneIdUniverse,GOHyperGResult-method}
 
 \alias{condGeneIdUniverse}
-\alias{condGeneIdUniverse,GeneGoHyperGeoTestResult-method}
+\alias{condGeneIdUniverse,GOHyperGResult-method}
 
-\alias{summary,GeneGoHyperGeoTestResult-method}
+\alias{summary,GOHyperGResult-method}
 
-\title{Class "GeneGoHyperGeoTestResult"}
+\title{Class "GOHyperGResult"}
 
 \description{	
 
@@ -35,7 +35,7 @@
 }
 
 \section{Objects from the Class}{
-Objects can be created by calls of the form \code{new("GeneGoHyperGeoTestResult", ...)}.
+Objects can be created by calls of the form \code{new("GOHyperGResult", ...)}.
 }
 
 \section{Slots}{
@@ -58,48 +58,48 @@ Objects can be created by calls of the form \code{new("GeneGoHyperGeoTestResult"
   }
 }
 \section{Extends}{
-Class \code{"GeneCategoryHyperGeoTestResultBase"}, directly.
+Class \code{"HyperGResultBase"}, directly.
 }
 \section{Methods}{
   \describe{
   \item{geneCounts}{\code{signature(r =
-        "GeneGoHyperGeoTestResult")}: return an \code{"integer"}
+        "GOHyperGResult")}: return an \code{"integer"}
       vector: for each category term tested, the number of genes from
       the gene set that are annotated at the term.}
 
-    \item{goDag}{\code{signature(r = "GeneGoHyperGeoTestResult")}:
+    \item{goDag}{\code{signature(r = "GOHyperGResult")}:
         return the \code{graph} instance representing the DAG of the
         GO terms that were tested.}
 
     \item{pvalues}{\code{signature(r =
-          "GeneGoHyperGeoTestResult")}: return a \code{"numeric"}
+          "GOHyperGResult")}: return a \code{"numeric"}
         vector: the ordered p-values for each category term tested.}
 
     \item{oddsRatios}{\code{signature(r =
-          "GeneGoHyperGeoTestResult")}: return a \code{"numeric"}
+          "GOHyperGResult")}: return a \code{"numeric"}
         vector: the odds ratio for each category term tested.}
 
     \item{expectedCounts}{\code{signature(r =
-          "GeneGoHyperGeoTestResult")}: return a \code{"numeric"}
+          "GOHyperGResult")}: return a \code{"numeric"}
         vector: the expected number of genes for each GO term tested.}
 
   \item{universeCounts}{\code{signature(r =
-        "GeneGoHyperGeoTestResult")}: return an \code{"integer"}
+        "GOHyperGResult")}: return an \code{"integer"}
       vector: for each category term tested, the number of genes from
       the gene universe that are annotated at the term.}
 
   \item{universeMappedCount}{\code{signature(r =
-        "GeneGoHyperGeoTestResult")}: return an \code{"integer"}
+        "GOHyperGResult")}: return an \code{"integer"}
       vector of length one giving the size of the gene universe set. }
 
   \item{geneIdUniverse}{\code{signature(r =
-        "GeneGoHyperGeoTestResult")}: return a list named by the
+        "GOHyperGResult")}: return a list named by the
       tested GO terms.  Each element of the list is a vector of gene
       identifiers (from the gene universe) annotated at the
       corresponding GO term.}
 
   \item{condGeneIdUniverse}{\code{signature(r =
-        "GeneGoHyperGeoTestResult")}: return a list named by the
+        "GOHyperGResult")}: return a list named by the
       tested GO terms.  Each element of the list is a vector of the
       remaining gene identifiers (from the gene universe) annotated at
       the corresponding GO term after the identifiers from significant
@@ -107,7 +107,7 @@ Class \code{"GeneCategoryHyperGeoTestResultBase"}, directly.
       calculation performed used the conditional Hypergeometric
       algorithm.}
 
-  \item{summary}{\code{signature(r = "GeneGoHyperGeoTestResult")}:
+  \item{summary}{\code{signature(r = "GOHyperGResult")}:
       Returns a \code{data.frame} summarizing the test result.
       Optional arguments \code{pvalue} and \code{categorySize} allow
       specification of minimum p-value and cateogyrSize, respectively.

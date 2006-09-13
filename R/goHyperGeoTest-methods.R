@@ -1,5 +1,5 @@
 setMethod("goHyperGeoTest",
-          signature(p="GeneGoHyperGeoTestParams"), 
+          signature(p="GOHyperGParams"), 
           function(p) {
               p@universeGeneIds <- universeBuilder(p)
               selected <- intersect(p@geneIds, p@universeGeneIds)
@@ -59,7 +59,7 @@ setMethod("goHyperGeoTest",
                   needsProc <- subGraph(hasKids, needsProc)
               } ## end while
               pvals <- unlist(nodeData(goDag, attr="pvalue"))
-              new("GeneGoHyperGeoTestResult",
+              new("GOHyperGResult",
                   goDag=goDag,
                   annotation=p@annotation,
                   geneIds=p@geneIds,
@@ -77,7 +77,7 @@ removeLengthZero <- function(x) {
 }
 
 
-setMethod("getGoGraph", signature(p="GeneGoHyperGeoTestParams",
+setMethod("getGoGraph", signature(p="GOHyperGParams",
                                   goIds="character"),
           function(p, goIds) {
               ## FIXME: ':::'
@@ -211,7 +211,7 @@ GOHG <- function(entrezGeneIds, lib, ontology, universe=NULL,
     if (missing(pvalueCutoff))
       pvalueCutoff <-  0.01
     
-    params <- new("GeneGoHyperGeoTestParams",
+    params <- new("GOHyperGParams",
                   geneIds=entrezGeneIds,
                   universeGeneIds=universe,
                   annotation=lib,

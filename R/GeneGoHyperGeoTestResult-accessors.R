@@ -1,20 +1,20 @@
-setMethod("goDag", signature(r="GeneGoHyperGeoTestResult"),
+setMethod("goDag", signature(r="GOHyperGResult"),
           function(r) r@goDag)
 
 
-setMethod("pvalues", signature(r="GeneGoHyperGeoTestResult"),
+setMethod("pvalues", signature(r="GOHyperGResult"),
           function(r) {
               unlist(nodeData(r@goDag, attr="pvalue"))[r@pvalue.order]
               })
 
 
-setMethod("oddsRatios", signature(r="GeneGoHyperGeoTestResult"),
+setMethod("oddsRatios", signature(r="GOHyperGResult"),
           function(r) {
               unlist(nodeData(r@goDag, attr="oddsRatio"))[r@pvalue.order]
               })
 
 
-setMethod("expectedCounts", signature(r="GeneGoHyperGeoTestResult"),
+setMethod("expectedCounts", signature(r="GOHyperGResult"),
           function(r) {
               unlist(nodeData(r@goDag, attr="expCount"))[r@pvalue.order]
               })
@@ -26,13 +26,13 @@ entrezGeneUniverse <- function(r) {
 }
 
 
-setMethod("geneIdUniverse", signature(r="GeneGoHyperGeoTestResult"),
+setMethod("geneIdUniverse", signature(r="GOHyperGResult"),
           function(r) {
               entrezGeneUniverse(r)
           })
 
 
-setMethod("condGeneIdUniverse", signature(r="GeneGoHyperGeoTestResult"),
+setMethod("condGeneIdUniverse", signature(r="GOHyperGResult"),
           function(r) {
               if (isConditional(r))
                 nodeData(r@goDag, n=nodes(r@goDag)[r@pvalue.order],
@@ -42,7 +42,7 @@ setMethod("condGeneIdUniverse", signature(r="GeneGoHyperGeoTestResult"),
           })
 
 
-setMethod("geneCounts", signature(r="GeneGoHyperGeoTestResult"),
+setMethod("geneCounts", signature(r="GOHyperGResult"),
           function(r) {
               sapply(condGeneIdUniverse(r), function(x) {
                   sum(r@geneIds %in% x)
@@ -50,7 +50,7 @@ setMethod("geneCounts", signature(r="GeneGoHyperGeoTestResult"),
           })
 
 
-## setMethod("condGeneCounts", signature(r="GeneGoHyperGeoTestResult"),
+## setMethod("condGeneCounts", signature(r="GOHyperGResult"),
 ##           function(r) {
 ##               sapply(condGeneIdUniverse(r), function(x) {
 ##                   sum(r@geneIds %in% x)
@@ -58,23 +58,23 @@ setMethod("geneCounts", signature(r="GeneGoHyperGeoTestResult"),
 ##           })
 
 
-setMethod("universeCounts", signature(r="GeneGoHyperGeoTestResult"),
+setMethod("universeCounts", signature(r="GOHyperGResult"),
           function(r) {
               sapply(entrezGeneUniverse(r), length)
           })
 
 
-setMethod("universeMappedCount", signature(r="GeneGoHyperGeoTestResult"),
+setMethod("universeMappedCount", signature(r="GOHyperGResult"),
           function(r) {
               length(unique(unlist(entrezGeneUniverse(r))))
           })
 
 
-setMethod("isConditional", signature(r="GeneGoHyperGeoTestResult"),
+setMethod("isConditional", signature(r="GOHyperGResult"),
           function(r) r@conditional)
 
 
-setMethod("description", signature(object="GeneGoHyperGeoTestResult"),
+setMethod("description", signature(object="GOHyperGResult"),
           function(object) {
               cond <- "Conditional"
               if (!isConditional(object))

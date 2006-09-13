@@ -75,7 +75,7 @@ sigCategories <- function(res, p) {
 }
 
 
-setMethod("summary", signature(object="GeneGoHyperGeoTestResult"),
+setMethod("summary", signature(object="GOHyperGResult"),
           function(object, pvalue, categorySize, htmlLinks=TRUE) {
               AMIGO_URL <- "http://www.godatabase.org/cgi-bin/amigo/go.cgi?view=details&search_constraint=terms&depth=0&query=%s"
               if (missing(pvalue))
@@ -114,8 +114,8 @@ setMethod("summary", signature(object="GeneGoHyperGeoTestResult"),
 htmlReport0 <- function(res, file, append=TRUE, label="",
                        dframizer=summary, ...) {
     ## FIXME: make this a method
-    if (!is(res, "GeneGoHyperGeoTestResult"))
-      stop("res must be a GeneGoHyperGeoTestResult instance")
+    if (!is(res, "GOHyperGResult"))
+      stop("res must be a GOHyperGResult instance")
     have_xtable <- suppressWarnings({
         require("xtable", quietly=TRUE, warn.conflicts=FALSE)
     })
@@ -132,7 +132,7 @@ htmlReport0 <- function(res, file, append=TRUE, label="",
           caption.placement="top")
 }
 
-setMethod("htmlReport", signature(r="GeneGoHyperGeoTestResult"),
+setMethod("htmlReport", signature(r="GOHyperGResult"),
           function(r, file="", append=TRUE, label="", ...)
           {
               htmlReport0(r=r, file=file, append=append,

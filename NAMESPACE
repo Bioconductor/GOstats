@@ -15,7 +15,7 @@ export(combGOGraph, compCorrGraph, compGdist,
        hyperGtable, hyperG2Affy,
        GOHG, GOHyperG)
 
-exportClasses("GeneGoHyperGeoTestResult")
+exportClasses("GOHyperGResult")
 exportMethods("goHyperGeoTest", "getGoGraph",
               "pvalues",
               "isConditional",

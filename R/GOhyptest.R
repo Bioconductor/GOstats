@@ -16,7 +16,7 @@ GOHyperG <- function(x, lib, what="MF", universe=NULL)
 {
     if (missing(universe) || is.null(universe))
       universe <- character(0)
-    params <- new("GeneGoHyperGeoTestParams",
+    params <- new("GOHyperGParams",
                   geneIds=x,
                   universeGeneIds=universe,
                   annotation=lib,

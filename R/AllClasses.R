@@ -1,5 +1,5 @@
-setClass("GeneGoHyperGeoTestResult",
-         contains="GeneCategoryHyperGeoTestResultBase",
+setClass("GOHyperGResult",
+         contains="HyperGResultBase",
          representation=representation(
            goDag="graph",
            pvalue.order="integer",

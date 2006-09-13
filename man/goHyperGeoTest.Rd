@@ -14,7 +14,7 @@
 \usage{ goHyperGeoTest(p) }
 
 \arguments{
-  \item{p}{A \code{GeneGoHyperGeoTestParams} instance }
+  \item{p}{A \code{GOHyperGParams} instance }
 }
 
 \details{
@@ -32,14 +32,14 @@
   significant, the appropriate conditioning is performed.
 }
 \value{
-  A \code{GeneGoHyperGeoTestResult} instance.
+  A \code{GOHyperGResult} instance.
 }
 
 \references{FIXME}
 
 \author{Seth Falcon}
 \seealso{
-  \code{\link{GeneGoHyperGeoTestResult-class}}
+  \code{\link{GOHyperGResult-class}}
   \code{\link[Category]{geneCategoryHyperGeoTest}}
   \code{\link[Category]{geneGoHyperGeoTest}}
   \code{\link[Category]{geneKeggHyperGeoTest}}

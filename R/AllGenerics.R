@@ -10,14 +10,14 @@ setGeneric("condGeneIdUniverse",
 setGeneric("goHyperGeoTest", 
            function(p) {
                standardGeneric("goHyperGeoTest")
-           }, valueClass="GeneGoHyperGeoTestResult")
+           }, valueClass="GOHyperGResult")
 
 setGeneric("oddsRatios", function(r) standardGeneric("oddsRatios"))
 
 setGeneric("expectedCounts",
            function(r) standardGeneric("expectedCounts"))
 
-## Accessors for GeneGoHyperGeoTestResult
+## Accessors for GOHyperGResult
 
 setGeneric("isConditional", function(r) standardGeneric("isConditional"))
 
