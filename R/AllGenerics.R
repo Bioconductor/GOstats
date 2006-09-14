@@ -14,8 +14,6 @@ setGeneric("expectedCounts",
 
 ## Accessors for GOHyperGResult
 
-setGeneric("isConditional", function(r) standardGeneric("isConditional"))
-
 setGeneric("htmlReport", function(r, file="", append=TRUE, label="", ...)
            standardGeneric("htmlReport"),
            signature=c("r"))

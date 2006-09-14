@@ -127,24 +127,25 @@ removeSigKidGenes <- function(curCatKids, goDag, curCat2Entrez, SIGNIF,
 getHyperGeoPvalues <- function(p, curCat2Entrez, cat2Entrez, selected) {
     ## Here is how we conceptualize the test:
     ##
-    ## The urn contains genes from the gene universe.  For each GO ID,
-    ## genes annotated at the given GO term are white and the rest
-    ## black.
+    ## The urn contains genes from the gene universe.  Genes annotated at a
+    ## given cateogry term are white and the rest black.
     ##
     ## The number drawn is the size of the selected gene list.  The
     ## number of white drawn is the size of the intersection of the
-    ## selected list and the GO list.
+    ## selected list and the genes annotated at the category.
     ##
-    ## In the conditional case, the GO ID annotation set has been
-    ## reduced and we also adjust the selected list (num drawn) and gene
-    ## universe according to what was removed by the conditioning.
+    ## In the conditional case, currently only implemented for GO, the
+    ## category ID annotation set has been reduced and we also adjust the
+    ## selected list (num drawn) and gene universe according to what was
+    ## removed by the conditioning.
+    ##
+    ## Here's a diagram based on using GO as the category:
     ##
     ##          inGO    notGO
     ##          White   Black
     ## selected  n11     n12
     ## not       n21     n22
     ##
-    
     if (p@conditional) {
         cat2RemovedEntrez <- lapply(names(curCat2Entrez),
                                     function(goid) {
