@@ -1,3 +1,5 @@
+library("hgu95av2")
+
 makeSimpleGOHyperGParams <- function() {
     set.seed(344)
     probeIds <- ls(hgu95av2LOCUSID)

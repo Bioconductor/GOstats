@@ -7,10 +7,6 @@ setGeneric("geneIdUniverse", function(r) standardGeneric("geneIdUniverse"))
 setGeneric("condGeneIdUniverse",
            function(r) standardGeneric("condGeneIdUniverse"))
 
-setGeneric("oddsRatios", function(r) standardGeneric("oddsRatios"))
-
-setGeneric("expectedCounts",
-           function(r) standardGeneric("expectedCounts"))
 
 ## Accessors for GOHyperGResult
 
