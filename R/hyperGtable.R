@@ -89,18 +89,26 @@ setMethod("summary", signature(object="GOHyperGResult"),
                   hasMinSize <- ucounts >= categorySize
                   wanted <- wanted & hasMinSize
               }
-              pvals <- pvals[wanted]
-              ucounts <- ucounts[wanted]
-              
-              goIds <- names(pvals)
-              goTerms <- sapply(mget(goIds, GOTERM), Term)
-              goIdUrls <- sapply(goIds, function(x) sprintf(AMIGO_URL, x))
-              odds <- oddsRatios(object)[wanted]
-              ecounts <- expectedCounts(object)[wanted]
-              counts <- geneCounts(object)[wanted]
-              if (htmlLinks) {
-                  goTerms <- paste('<a href="', goIdUrls, '">', goTerms,
-                                   '</a>', sep="")
+              if (!any(wanted)) {
+                  warning("No results met the specified criteria.  ",
+                          "Returning 0-row data.frame", call.=FALSE)
+                  goIds <- goTerms <- character(0)
+                  pvals <- odds <- ecounts <- numeric(0)
+                  counts <- ucounts <- integer(0)
+              } else {
+                  pvals <- pvals[wanted]
+                  ucounts <- ucounts[wanted]
+                  
+                  goIds <- names(pvals)
+                  goTerms <- sapply(mget(goIds, GOTERM), Term)
+                  goIdUrls <- sapply(goIds, function(x) sprintf(AMIGO_URL, x))
+                  odds <- oddsRatios(object)[wanted]
+                  ecounts <- expectedCounts(object)[wanted]
+                  counts <- geneCounts(object)[wanted]
+                  if (htmlLinks) {
+                      goTerms <- paste('<a href="', goIdUrls, '">', goTerms,
+                                       '</a>', sep="")
+                  }
               }
               df <- data.frame(ID=goIds, Pvalue=pvals, OddsRatio=odds,
                                ExpCount=ecounts, Count=counts,
@@ -126,10 +134,16 @@ htmlReport0 <- function(res, file, append=TRUE, label="",
     caption <- paste(label, description(res))
     dig <- rep(2, 8)
     dig[5:7] <- 0
-    xt <- xtable(dframizer(res, ...), caption=caption,
+    df <- dframizer(res, ...)
+    if (nrow(df) == 0) {
+        warning("No rows to report.  Skipping")
+        return(FALSE)
+    }
+    xt <- xtable(df, caption=caption,
                  digits=dig)
     print(xt, type="html", file=file, append=append,
           caption.placement="top")
+    TRUE
 }
 
 setMethod("htmlReport", signature(r="GOHyperGResult"),
