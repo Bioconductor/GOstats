@@ -12,7 +12,7 @@ Depends: graph (>= 1.9.25), GO (>= 1.12.0), annotate, RBGL,
 Imports: Biobase, Category (>= 1.5.16), methods
 Suggests: hgu95av2 (>= 1.12.0), xtable, ALL, multtest, genefilter
 Maintainer: S. Falcon <sfalcon@fhcrc.org>
-License: Artistic
+License: The Artistic License, Version 2.0
 Collate:
     AllClasses.R
     AllGenerics.R
