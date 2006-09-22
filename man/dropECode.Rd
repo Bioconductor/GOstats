@@ -33,10 +33,10 @@ dropECode(inlist, code="IEA")
 
 \examples{
  bb=GOLOCUSID2GO$"4121"
- getEvidence(bb)
- cc = dropECode(bb)
- getEvidence(cc)
-
+ getEvidence(bb[1:3])
+ cc = dropECode(bb[1:3])
+ if (length(cc))
+   getEvidence(cc)
 }
 
 

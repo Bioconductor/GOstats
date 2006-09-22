@@ -37,7 +37,7 @@ shortest-path analysis of gene expression data.}
 
  ## Create an ExpressionSet to work with
  set.seed(123)
- exprMat <- matrix(runif(100 * 10), nrow=100)
+ exprMat <- matrix(runif(50 * 5), nrow=50)
  genData <- new("ExpressionSet", exprs=exprMat)
 
  corrG = compCorrGraph(genData)

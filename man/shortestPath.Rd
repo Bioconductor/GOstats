@@ -51,8 +51,7 @@ shortestPath(g, GOnode)
 library(GO)
 library(RBGL)
 
-tst <- unique(unlist(mget(c("GO:0005778", "GO:0005779",
-                            "GO:0030060"), GOLOCUSID)))
+tst <- unique(unlist(mget(c("GO:0005778"), GOLOCUSID)))
 set.seed(123)
 v1 <- randomGraph(tst, 1:10, .3, weights=FALSE)
 ## Since v1 is random, it might be disconnected and we need a
