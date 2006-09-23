@@ -24,7 +24,7 @@ getEvidence(inlist)
 \seealso{\code{\link{getOntology}}, \code{\link{dropECode}} }
 
 \examples{
- bb=GOLOCUSID2GO$"4121"
+ bb=GOENTREZID2GO$"4121"
  getEvidence(bb)
 }
 

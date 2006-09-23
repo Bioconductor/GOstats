@@ -4,7 +4,7 @@
 \description{
 Find the subset of GO terms for the specified ontology, for each element 
 of the supplied list of associations. The input list is typically from
-one of the chip-specific meta-data files or from GOLOCUSID2GO.
+one of the chip-specific meta-data files or from \code{GOENTREZID2GO}.
 }
 \usage{
 getOntology(inlist, ontology=c("MF", "BP", "CC"))
@@ -29,7 +29,7 @@ getOntology(inlist, ontology=c("MF", "BP", "CC"))
 \seealso{\code{\link{getEvidence}}, \code{\link{dropECode}} }
 
 \examples{
- bb=GOLOCUSID2GO$"4121"
+ bb=GOENTREZID2GO$"4121"
  getOntology(bb)
  sapply(bb, function(x) x$Ontology)
 }
