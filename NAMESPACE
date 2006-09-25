@@ -4,8 +4,7 @@ import("Category")
 importMethodsFrom("Biobase", "annotation", "description")
 
 export(combGOGraph, compCorrGraph, compGdist,
-       dropECode, enumPairs, 
-       getGOChildren, getGOOntology, getGOParents,
+       enumPairs, 
        .getWHEC,
        GOGraph, GOLeaves,
        hasGOannote, idx2dimnames, isTriad,
