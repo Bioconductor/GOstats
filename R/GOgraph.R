@@ -61,32 +61,6 @@ makeGOGraph <- function (x, Ontology = "MF", removeRoot=TRUE)
 }
 
 
- ## helper function, determines if there is a GO annotation for the
- ## desired mode
- hasGOannote <- function(x, which="MF") {
-     if( is(x, "GOTerms") ) {
-         cat = Ontology(x)
-         if( !is.na(cat) && cat == which )
-            return(TRUE) else return(FALSE)
-     }
-     if( is.list(x) ) {
-         gT = sapply(x, function(y) is(y, "GOTerms"))
-         if( any(gT) ) {
-             if( all(gT) ) {
-                 cats = sapply(x, Ontology)
-                 return(cats == which)
-             }
-             else
-                 stop("mixed arguments not allowed")
-         }
-     }
-     if( !is.character(x) )
-         stop("wrong argument")
-     tm <- getGOOntology(x)
-     return(tm == which)
- }
-
-
 ##start with one specific term and find it's more general terms
 ## if A has edges to B, C and D
 ##then at step 2, the nodes are A,B,C,D; new nodes B,C,D
