@@ -1,0 +1,408 @@
+%\VignetteIndexEntry{Hypergeometric Tests Using GOstats}
+%\VignetteDepends{ALL, genefilter, RColorBrewer, xtable, Rgraphviz}
+%\VignetteKeywords{Hypergeometric, GO, ontology}
+%\VignettePackage{GOstats}
+\documentclass[11pt]{article}
+
+\usepackage{times}
+\usepackage{hyperref}
+\usepackage[authoryear,round]{natbib}
+\usepackage{times}
+\usepackage{comment}
+
+\textwidth=6.2in
+\textheight=8.5in
+\oddsidemargin=.1in
+\evensidemargin=.1in
+\headheight=-.3in
+
+\newlength{\smallfigwidth}
+\setlength{\smallfigwidth}{6cm}
+
+\newcommand{\scscst}{\scriptscriptstyle}
+\newcommand{\scst}{\scriptstyle}
+\newcommand{\Rfunction}[1]{{\texttt{#1}}}
+\newcommand{\Robject}[1]{{\texttt{#1}}}
+\newcommand{\Rpackage}[1]{{\textsf{#1}}}
+\newcommand{\Rclass}[1]{{\textit{#1}}}
+
+\bibliographystyle{plainnat}
+
+\title{Testing Gene Lists for GO Term Association using GOstats}
+\author{S. Falcon and R. Gentleman}
+
+\begin{document}
+
+\maketitle
+
+\section{Introduction}
+
+<<SubsetDef, echo=FALSE, results=hide>>=
+## For this data we can have ALL1/AF4 or BCR/ABL
+subsetType <- "ALL1/AF4"
+@ 
+
+The\Rpackage{GOstats} package has extensive facilities for testing the
+association of Gene Ontology (GO)~\cite{GO} terms among a given gene
+list.  You can test for both over and under representation of GO terms
+using either the standard Hypergeometric test or a conditional
+Hypergeometric test that uses the relationships among the GO terms for
+conditioning (similar to that presented in~\cite{Alexa06}).
+
+In this vignette we describe the preprocessing required to construct
+inputs for the main testing function, \Rfunction{hyperGTest}, the
+algorithms used, and the structure of the return value.  We use a
+microarray data set \citep{Chiaretti2004} from a clinical trial in
+acute lymphoblastic leukemia (ALL) to work an example analysis.  In
+the ALL data, we focus on the patients with B-cell derived ALL, and in
+particular on comparing the group with \Sexpr{subsetType} to those
+with no observed cytogenetic abnormalities.
+
+<<Setup, echo=FALSE, results=hide>>=
+library("ALL")
+library("annotate")
+library("genefilter")
+library("GOstats")
+library("RColorBrewer")
+library("xtable")
+library("Rgraphviz")
+@
+
+\section{Preprocessing and Inputs}
+
+To perform an analysis using the Hypergeometric-based tests, one needs
+to define a \textit{gene universe} (usually conceptualized as the
+number of balls in an urn) and a list of selected genes from the
+universe.  While it is clear that the selected gene list determines to
+a large degree the results of the analysis, the fact that the universe
+has a large effect on the conclusions is, perhaps, less obvious.
+
+For microarray data, one can use the unique gene identifiers assayed
+in the experiment as the gene universe.  However, the presence of a
+gene on the array does not necessarily mean much.  Some arrays, such
+as those from Affymetrix, attempt to include probes for as much of the
+genome as possible.  Since not all genes will be expressed under all
+conditions (a widely held belief is that about 40\% of the genome
+is expressed in any tissue), it may be sensible to reduce the universe
+to those that are expressed.
+
+To identify the set of expressed genes from a microarray experiment,
+we propose that a non-specific filter be applied and that the genes
+that pass the filter be used to form the universe for any subsequent
+functional analyses.  Below, we outline the non-specific filtering
+procedure used for the example analysis.
+
+Once a gene universe has been established, one can apply any number of
+methods to select genes.  For the example analysis we use a simple
+$t$-test to identify differentially expressed genes among the two
+subgroups in the sample population.
+
+<<universeSizeVsPvalue, echo=FALSE, results=hide>>=
+hg_tester <- function(size) {
+    numFound <- 10
+    numDrawn <- 400
+    numAtCat <- 40
+    numNotAtCat <- size - numAtCat
+    phyper(numFound-1, numAtCat, numNotAtCat, numDrawn, lower.tail=FALSE)
+}
+pv1000 <- hg_tester(1000)
+pv5000 <- hg_tester(5000)
+@ 
+
+It is worth noting that the effect of increasing the universe size
+with genes that are irrelevant to the questions at hand, in general,
+has the effect of making the resultant $p$-values look more
+significant.  For example, in a universe of 1000 genes where 400 have
+been selected, suppose that a GO term has 40 gene annotations from the
+universe of 1000.  If 10 of the genes in the selected gene list are
+among the 40 genes annotated at this category, then the Hypergeometric
+$p$-value is \Sexpr{round(pv1000,2)}.  However, if the gene universe
+contained 5000 genes, the $p$-value would drop to \Sexpr{round(pv5000,3)}.
+
+
+\subsection{Non-specific filtering}
+
+<<bcrAblOrNegSubset, results=hide, echo=FALSE, cache=TRUE>>=
+data(ALL, package="ALL")
+## Subset of interest: 37BRC/ABL + 42NEG = 79 samples
+Bcell <- grep("^B", as.character(ALL$BT))
+bcrAblOrNegIdx <- which(as.character(ALL$mol) %in% c("NEG", subsetType))
+
+bcrAblOrNeg <- ALL[, intersect(Bcell, bcrAblOrNegIdx)]
+bcrAblOrNeg$mol.biol = factor(bcrAblOrNeg$mol.biol)
+@ 
+
+<<nsFiltering-noEntrez, results=hide, echo=FALSE, cache=TRUE>>=
+## Remove genes that have no entrezGene id
+entrezIds <- mget(featureNames(bcrAblOrNeg), envir=hgu95av2LOCUSID)
+haveEntrezId <- names(entrezIds)[sapply(entrezIds, function(x) !is.na(x))]
+numNoEntrezId <- length(featureNames(bcrAblOrNeg)) - length(haveEntrezId)
+bcrAblOrNeg <- bcrAblOrNeg[haveEntrezId, ]
+@ 
+
+<<nsFiltering-noGO, results=hide, echo=FALSE, cache=TRUE>>=
+## Remove genes with no GO mapping
+haveGo <- sapply(mget(featureNames(bcrAblOrNeg), hgu95av2GO),
+                 function(x) if (length(x) == 1 && is.na(x)) FALSE else TRUE)
+numNoGO <- sum(!haveGo)
+bcrAblOrNeg <- bcrAblOrNeg[haveGo, ]
+@
+
+<<nsFiltering-IQR, results=hide, echo=FALSE, cache=TRUE>>=
+## Non-specific filtering based on IQR
+iqrCutoff <- 0.5
+bcrAblOrNegIqr <- apply(exprs(bcrAblOrNeg), 1, IQR)
+selected <- bcrAblOrNegIqr > iqrCutoff
+
+## FIXME: document this step - 
+## Now drop those that are on the Y chromosome
+## because there is an imbalance of men and women by group
+chrN <- mget(featureNames(bcrAblOrNeg), envir=hgu95av2CHR)
+onY <- sapply(chrN, function(x) any(x=="Y"))
+onY[is.na(onY)] <- FALSE
+selected = selected & !onY
+
+nsFiltered <- bcrAblOrNeg[selected, ]
+numNsWithDups <- length(featureNames(nsFiltered))
+
+## Reduce to unique probe <--> gene mapping here by keeping largest IQR
+## We will want "unique genes" in the non-specific filtered gene 
+## set if we want to use this as the universe for GOHyperG
+nsFilteredIqr <- bcrAblOrNegIqr[selected]
+uniqGenes <- findLargest(featureNames(nsFiltered), nsFilteredIqr, "hgu95av2")
+nsFiltered <- nsFiltered[uniqGenes, ]
+numSelected <- length(featureNames(nsFiltered))
+
+##set up some colors
+BCRcols = ifelse(nsFiltered$mol == subsetType, "goldenrod", "skyblue")
+cols = brewer.pal(10, "RdBu")
+@
+
+<<defineGeneUniverse, echo=FALSE, results=hide, cache=TRUE>>=
+## Define gene universe based on results of non-specific filtering
+affyUniverse <- featureNames(nsFiltered)
+entrezUniverse <- unlist(mget(affyUniverse, hgu95av2LOCUSID))
+if (any(duplicated(entrezUniverse)))
+  stop("error in gene universe: can't have duplicate Entrez Gene Ids")
+
+## Also define an alternate universe based on the entire chip
+chipAffyUniverse <- featureNames(bcrAblOrNeg)
+chipEntrezUniverse <- mget(chipAffyUniverse, hgu95av2LOCUSID)
+chipEntrezUniverse <- unique(unlist(chipEntrezUniverse)) 
+@ 
+
+<<parametric1, echo=FALSE, results=hide, cache=TRUE>>=
+ttestCutoff <- 0.05
+ttests = rowttests(nsFiltered, "mol.biol")
+
+smPV = ttests$p.value < ttestCutoff
+
+## Find the probes that we are going to use
+## these define our Universe
+pvalFiltered <- nsFiltered[smPV, ]
+@
+
+
+Our non-specific filtering procedure removed probes missing either
+Entrez Gene identifies or mappings to GO terms.  Because of an
+imbalance of men and women by group, probes measuring genes on the Y
+chromosome were dropped.  The inter-quartile range was used with a
+cutoff of \Sexpr{iqrCutoff} to select probes with sufficient
+variability across samples to be informative; probes with little
+variability across all samples are inherently uninteresting.  Finally,
+the set of remaining probes was refined by ensuring that each probe
+maps to exactly one Entrez Gene identifier.  For those probes mapping
+to the same Entrez Gene ID, the probe with largest IQR was selected.
+
+Producing a set of Entrez Gene identifiers that map to a unique set of
+probes at the non-specific filtering stage is important because genes
+are mapped to GO categories using Entrez Gene IDs and we want to avoid
+double counting any GO categories.  In all, the filtering left
+\Sexpr{length(featureNames(nsFiltered))} genes.
+
+\subsection{Gene selection via t-test}
+
+After applying the non-specific filtering described above, a standard
+$t$-test was used to identify a set of genes with differential
+expression between the \Sexpr{subsetType} and NEG groups.  There were
+\Sexpr{sum(smPV)} genes with $p$-values less than \Sexpr{ttestCutoff}.
+We did not make use of any $p$-value correction methods since we are
+interested in a relatively long gene list.
+
+A detail often omitted from GO association analyses is the fact that
+the $t$-test, and most similar statistics, are directional.  For a
+given gene, average expression might be higher in the
+\Sexpr{subsetType} group than in the NEG group, whereas for a
+different gene it might be the NEG group that shows the increased
+expression.  By only looking at the $p$-values for the test
+statistics, the directionality is lost.  The danger is that an
+association with a GO category may be found where the genes are not
+differentially expressed in the same direction.  One way to tackle
+this problem is by separating the selected gene list into two lists
+according to direction and running two analyses.  A more elegant
+approach is the subject of further research.
+
+
+\subsection{Inputs}
+
+Often one wishes to perform many similar analyses using slightly
+different sets of parameters and to facilitate this pattern of usage
+the main interface to the Hypergeometric tests,
+\Rfunction{hyperGTest}, takes a single parameter object as its
+argument. This argument is an instance of class
+\Rclass{GOHyperGParams}.  Using a parameter class instead of
+individual arguments makes it easier to organize and execute a series
+of related analyses.  For example, one can create a list of
+\Rclass{GOHyperGParams} instances and perform the Hypergeometric test
+on each using R's \Rfunction{lapply} function:
+
+\begin{verbatim}
+resultList <- lapply(lisOfParamObjs, hyperGTest)
+\end{verbatim}
+
+Below, we create a parameter instance by specifying the gene list, the
+universe, the name of the annotation data package, and the GO ontology
+we wish to interrogate.  For the example analysis, we have stored the
+vector of Entrez Gene identifiers making up the gene universe in
+\Robject{entrezUniverse}.  The selected genes are stored in
+\Robject{selectedEntrezIds}.  In addition, users can specify a
+$p$-value cutoff, a flag to indicate whether the conditional
+Hypergeometric calculation should be used, and indicate whether the
+test should evaluate over or under-representation of GO terms.
+
+<<standardHyperGeo, echo=TRUE, results=hide, cache=TRUE>>=
+hgCutoff <- 0.001
+params <- new("GOHyperGParams",
+              geneIds=selectedEntrezIds,
+              universeGeneIds=entrezUniverse,
+              annotation="hgu95av2",
+              ontology="BP",
+              pvalueCutoff=hgCutoff,
+              conditional=FALSE,
+              testDirection="over")
+
+@ 
+
+\section{GOstats Capabilities}
+
+In the Hypergeometric model, each term is treated as an independent
+classification.  Each gene is cross-classified according to whether or
+not it has been selected and whether or not it is annotated, not
+necessarily specifically annotated, at a particular term.  A
+Hypergeometric probability is computed to assess whether the number of
+selected genes associated with the term is larger than expected.
+
+The \Rfunction{hyperGTest} function provides an implementation of the
+commonly applied Hypergeometric calculation for over or
+under-representation of GO terms in a specified gene list.  This
+computation ignores the structure of the GO terms, treating each term
+as independent from all other terms.
+
+%%FIXME: need to cite Alexa here again...
+Often an analysis for GO term associations results in the
+identification of directly related GO terms with considerable overlap
+of genes.  This is because each GO term inherits all annotations from
+its more specific descendants.  To alleviate this problem, we have
+implemented a method which conditions on all child terms that are
+themselves significant at a specified $p$-value cutoff.  Given a
+subgraph of one of the three GO ontologies, we test the leaves of the
+graph, that is, those terms with no child terms.  Before testing the
+terms whose children have already been tested, we remove all genes
+annotated at significant children from the parent's gene list.  This
+continues until all terms have been tested.
+
+
+\section{Outputs}
+
+
+The \Rfunction{hyperGTest} function returns an instance of class
+\Rclass{GOHyperGResult}.  Printing the result at the R prompt provides
+a brief summary of the test performed and the number of significant
+terms found.
+
+<<standardHGTEST, cache=TRUE, echo=TRUE, results=hide>>=
+hgOver <- hyperGTest(params)
+conditional(params) <- TRUE
+hgCondOver <- hyperGTest(params)
+@ 
+
+<<standardHGTestAns>>=
+hgOver
+@ 
+
+The \Rclass{GOHyperGResult} instance returned by
+\Rfunction{hyperGTest} contains the $p$-value, odds ratio, expected
+gene count, and actual gene count for each term tested along with the
+vector of gene identifiers annotated at each term.  It is also
+possible to retrieve a \Rclass{graph} instance representing the GO DAG
+for further computation.  All result components can be accessed
+programatically using accessor functions (see the manual page for the
+\Rclass{GOHyperGResult} class for details).  Calling
+\Rfunction{summary} on the result produces a \Robject{data.frame}
+summarizing the results which can optionally be limited to a
+user-specified minimum $p$-value and/or minimum gene count for the
+terms.  To make it easy for non-technical users to review the results,
+the \Rfunction{htmlReport} function generates an HTML file that can be
+viewed in any web browser.  The output generated by
+\Rfunction{htmlReport} as called below is available at FIXMEPOSTURL.
+
+<<htmlReportExample, results=hide, echo=TRUE>>=
+htmlReport(hgCondOver, file="ALL_hgco.html")
+@ 
+
+
+
+<<helperFunc, echo=FALSE, results=hide, cache=TRUE>>=
+sigCategories <- function(res, p) {
+    if (missing(p))
+      p <- pvalueCutoff(res)
+    pv <- pvalues(res)
+    goIds <- names(pv[pv < p])
+    goIds
+}
+@ 
+
+<<plotFuns, echo=FALSE, results=hide, cache=TRUE>>=
+coloredGoPlot <- function(ccMaxGraph, hgOver, hgCondOver) {
+    nodeColors <- sapply(nodes(ccMaxGraph),
+                         function(n) {
+                             if (n %in% sigCategories(hgCondOver))
+                               "dark red"
+                             else if (n %in% sigCategories(hgOver))
+                               "pink"
+                             else 
+                               "gray"
+                         })
+    nattr <- makeNodeAttrs(ccMaxGraph,
+                           label=nodes(ccMaxGraph),
+                           shape="ellipse",
+                           fillcolor=nodeColors,
+                           fixedsize=FALSE)
+    plot(ccMaxGraph, nodeAttrs=nattr)
+}
+
+getMaxConnCompGraph <- function(hgOver, hgCondOver) {
+    ##uGoDagRev <- ugraph(goDag(hgOver))
+    sigNodes <- sigCategories(hgOver)
+    ##adjNodes <- unlist(adj(uGoDagRev, sigNodes))
+    adjNodes <- unlist(adj(goDag(hgOver), sigNodes))
+    displayNodes <- unique(c(sigNodes, adjNodes))
+    displayGraph <- subGraph(displayNodes, goDag(hgOver))
+    cc <- connComp(displayGraph)
+    ccSizes <- listLen(cc)
+    ccMaxIdx <- which(ccSizes == max(ccSizes))
+    ccMaxGraph <- subGraph(cc[[ccMaxIdx]], displayGraph)
+    ccMaxGraph 
+}
+
+@ 
+
+
+<<info, results=tex>>=
+toLatex(sessionInfo())
+@ 
+
+\bibliography{GO}
+
+
+\end{document}
