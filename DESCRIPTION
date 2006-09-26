@@ -6,10 +6,11 @@ Description: A set of tools for interacting with GO and microarray
         data. A variety of basic manipulation tools for graphs,
         hypothesis testing and other simple calculations.
 biocViews: Statistics, Annotation, GO, MultipleComparisons
-Depends: graph (>= 1.9.25), GO (>= 1.12.0), annotate, RBGL, 
-         Biobase, Category (>= 1.5.16), methods
-Imports: Biobase, Category (>= 1.5.16), methods
-Suggests: hgu95av2 (>= 1.12.0), xtable, ALL, multtest, genefilter
+Depends: graph (>= 1.9.25), GO (>= 1.13.0), annotate, RBGL, 
+         Biobase (>= 1.11.42), Category (>= 1.5.16), methods
+Imports: Biobase (>= 1.11.42), Category (>= 1.5.16), methods
+Suggests: hgu95av2 (>= 1.13.0), xtable, ALL, multtest, genefilter,
+          RColorBrewer, Rgraphviz
 Maintainer: S. Falcon <sfalcon@fhcrc.org>
 License: The Artistic License, Version 2.0
 Collate:

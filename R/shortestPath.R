@@ -14,7 +14,7 @@ shortestPath <- function(g, GOnode)
 
     ##obtain the LLIDs at the GO term
 
-    LLs <- unique(get(GOnode, GOLOCUSID))
+    LLs <- unique(get(GOnode, GOENTREZID))
 
     m1 <- match(LLs, nodes(g))
     notthere <- LLs[is.na(m1)]
@@ -67,7 +67,7 @@ compCorrGraph <- function(eSet, k=1, tau=0.6) {
     diag(cB) = 0
     require("SparseM", quietly=TRUE) || stop("need SparseM package")
     v1<-as.matrix.csr(cB, nr=dim(cB)[1], nc=dim(cB)[2])
-    rv <- sparseM2Graph(v1, geneNames(eSet))
+    rv <- sparseM2Graph(v1, featureNames(eSet))
 }
 
  ##given a matrix and a logical vector return two lists

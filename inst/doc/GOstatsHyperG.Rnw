@@ -405,7 +405,7 @@ getMaxConnCompGraph <- function(hgOver, hgCondOver) {
 toLatex(sessionInfo())
 @ 
 
-\bibliography{GO}
+\bibliography{GOstats}
 
 
 \end{document}
