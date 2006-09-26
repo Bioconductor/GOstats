@@ -134,7 +134,7 @@ bcrAblOrNeg$mol.biol = factor(bcrAblOrNeg$mol.biol)
 
 <<nsFiltering-noEntrez, results=hide, echo=FALSE, cache=TRUE>>=
 ## Remove genes that have no entrezGene id
-entrezIds <- mget(featureNames(bcrAblOrNeg), envir=hgu95av2LOCUSID)
+entrezIds <- mget(featureNames(bcrAblOrNeg), envir=hgu95av2ENTREZID)
 haveEntrezId <- names(entrezIds)[sapply(entrezIds, function(x) !is.na(x))]
 numNoEntrezId <- length(featureNames(bcrAblOrNeg)) - length(haveEntrezId)
 bcrAblOrNeg <- bcrAblOrNeg[haveEntrezId, ]
@@ -181,13 +181,13 @@ cols = brewer.pal(10, "RdBu")
 <<defineGeneUniverse, echo=FALSE, results=hide, cache=TRUE>>=
 ## Define gene universe based on results of non-specific filtering
 affyUniverse <- featureNames(nsFiltered)
-entrezUniverse <- unlist(mget(affyUniverse, hgu95av2LOCUSID))
+entrezUniverse <- unlist(mget(affyUniverse, hgu95av2ENTREZID))
 if (any(duplicated(entrezUniverse)))
   stop("error in gene universe: can't have duplicate Entrez Gene Ids")
 
 ## Also define an alternate universe based on the entire chip
 chipAffyUniverse <- featureNames(bcrAblOrNeg)
-chipEntrezUniverse <- mget(chipAffyUniverse, hgu95av2LOCUSID)
+chipEntrezUniverse <- mget(chipAffyUniverse, hgu95av2ENTREZID)
 chipEntrezUniverse <- unique(unlist(chipEntrezUniverse)) 
 @ 
 
@@ -200,6 +200,8 @@ smPV = ttests$p.value < ttestCutoff
 ## Find the probes that we are going to use
 ## these define our Universe
 pvalFiltered <- nsFiltered[smPV, ]
+selectedEntrezIds <- unlist(mget(featureNames(pvalFiltered), 
+                                 hgu95av2ENTREZID))
 @
 
 
