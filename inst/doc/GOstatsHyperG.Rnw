@@ -1,5 +1,5 @@
 %\VignetteIndexEntry{Hypergeometric Tests Using GOstats}
-%\VignetteDepends{ALL, genefilter, RColorBrewer, xtable, Rgraphviz}
+%\VignetteDepends{ALL, hgu95av2, genefilter, RColorBrewer, xtable, Rgraphviz}
 %\VignetteKeywords{Hypergeometric, GO, ontology}
 %\VignettePackage{GOstats}
 \documentclass[11pt]{article}
@@ -60,6 +60,7 @@ with no observed cytogenetic abnormalities.
 
 <<Setup, echo=FALSE, results=hide>>=
 library("ALL")
+library("hgu95av2")
 library("annotate")
 library("genefilter")
 library("GOstats")
