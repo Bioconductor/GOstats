@@ -81,8 +81,7 @@ setMethod("getGoGraph", signature(p="GOHyperGParams",
           function(p, goIds) {
               ## FIXME: ':::'
               goEnv <- Category:::getDataEnv(paste(p@ontology,
-                                                   "CHILDREN", sep=""),
-                                             "GO")
+                                                   "CHILDREN", sep=""), "GO")
               gobpkids <- eapply(goEnv, function(x) {
                   intersect(x, goIds)
               })
