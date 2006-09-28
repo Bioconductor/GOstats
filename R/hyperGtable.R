@@ -65,6 +65,55 @@ hyperG2Affy <- function(probids, lib, type="MF", pvalue=0.05,
   out
 }
 
+probeSetSummary <- function(selectedProbeSetIDs, result, pvalue, categorySize) {
+    ## build reverse map
+    ps2egEnv <- Category:::getDataEnv("ENTREZID", annotation(result))
+    psids <- ls(ps2egEnv)
+    ## each psid maps to _exactly_ one egid
+    ## Need to remove NAs.  This is where the database stuff
+    ## will be _much_ easier.
+    havePsids <- eapply(ps2egEnv, function(ids) {
+        if (length(ids) == 1 && is.na(ids))
+          FALSE
+        else
+          TRUE
+    })
+    psids <- psids[unlist(havePsids)]
+    eg2ps <- split(psids, unlist(mget(psids, ps2egEnv)))
+
+    if (missing(pvalue))
+      pvalue <- pvalueCutoff(result)
+    if (missing(categorySize))
+      categorySize <- NULL
+    wanted <- getWantedGOIDs(result, pvalue, categorySize)
+    goids <- names(pvalues(result)[wanted])
+    ## XXX: these are unconditional, not sure if we want the
+    ##      condGeneIdUniverse here if the calculation used
+    ##      the conditional calculation.
+    egids <- geneIdUniverse(result)[goids]
+    psetids <- lapply(egids, function(ids) {
+        ids <- as.character(ids)
+        have <- ids %in% names(eg2ps)
+        ans <- eg2ps[ids[have]]
+        if (length(ans))
+          unlist(ans)
+        else
+          NULL
+    })
+    psetidsNULL <- sapply(psetids, is.null)
+    psetids <- psetids[!psetidsNULL]
+    selectedInd <- lapply(psetids, function(ids) {
+        ids %in% selectedProbeSetIDs
+    })
+    psetLens <- listLen(psetids)
+    goids <- rep(goids, psetLens)
+    egids <- unlist(mget(unlist(psetids), ps2egEnv))
+    data.frame(GOID=goids,
+               EntrezID=egids,
+               ProbeSetID=unlist(psetids),
+               selected=as.integer(unlist(selectedInd)),
+               stringsAsFactors=FALSE)
+}
 
 sigCategories <- function(res, p) {
     if (missing(p))
@@ -74,21 +123,32 @@ sigCategories <- function(res, p) {
     goIds
 }
 
+getWantedGOIDs <- function(result, pvalue, categorySize=NULL) {
+    ## Filter GO terms based on p-value and category size
+    ## Returns a logical vector with TRUE indicating selected
+    ## GO IDs from those tested in result instance.
+    pvals <- pvalues(result)
+    wanted <- pvals < pvalue
+    if (!is.null(categorySize)) {
+        ucounts <- universeCounts(result)
+        hasMinSize <- ucounts >= categorySize
+        wanted <- wanted & hasMinSize
+    }
+    wanted
+}
 
 setMethod("summary", signature(object="GOHyperGResult"),
           function(object, pvalue, categorySize, htmlLinks=TRUE) {
               AMIGO_URL <- "http://www.godatabase.org/cgi-bin/amigo/go.cgi?view=details&search_constraint=terms&depth=0&query=%s"
               if (missing(pvalue))
                 pvalue <- pvalueCutoff(object)
+              if (missing(categorySize))
+                categorySize <- NULL
               
               ## Filter GO terms based on p-value and category size
+              wanted <- getWantedGOIDs(object, pvalue, categorySize)
               pvals <- pvalues(object)
               ucounts <- universeCounts(object)
-              wanted <- pvals < pvalue
-              if (!missing(categorySize)) {
-                  hasMinSize <- ucounts >= categorySize
-                  wanted <- wanted & hasMinSize
-              }
               if (!any(wanted)) {
                   warning("No results met the specified criteria.  ",
                           "Returning 0-row data.frame", call.=FALSE)
