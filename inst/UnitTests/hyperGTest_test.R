@@ -2,12 +2,12 @@ library("hgu95av2")
 
 makeSimpleGOHyperGParams <- function() {
     set.seed(344)
-    probeIds <- ls(hgu95av2LOCUSID)
+    probeIds <- ls(hgu95av2ENTREZID)
     randProbeIds <- sample(probeIds, 500)
     ## This is "wrong", should unlist, but the code
     ## should catch/correct it.  The right way is to
     ## unlist the mget result.
-    entrezUniverse <- mget(randProbeIds, hgu95av2LOCUSID,
+    entrezUniverse <- mget(randProbeIds, hgu95av2ENTREZID,
                            ifnotfound=NA)
     entrezUniverse <- entrezUniverse[!is.na(entrezUniverse)]
     selectedEntrezIds <- sample(entrezUniverse, 30)
