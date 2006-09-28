@@ -22,7 +22,13 @@
 \alias{condGeneIdUniverse}
 \alias{condGeneIdUniverse,GOHyperGResult-method}
 
+\alias{htmlReport}
+\alias{htmlReport,GOHyperGResult-method}
+
 \alias{summary,GOHyperGResult-method}
+
+\alias{description,GOHyperGResult-method}
+\alias{isConditional,GOHyperGResult-method}
 
 \title{Class "GOHyperGResult"}
 
@@ -115,8 +121,28 @@ Class \code{"HyperGResultBase"}, directly.
       whether to add HTML links (useful in conjunction with xtables
       print method with \code{type} set to \code{"html"}).}
 
+    \item{htmlReport}{\code{signature(r = "GOHyperGResult")}: Write an
+      HTML version of the table produced by the \code{summary}
+      method.  The path of a file to write the report to can be
+      specified using the \code{file} argument.  The default is
+      \code{file=""} which will cause the report to be printed to the
+      screen.  If you wish to create a single report comprising
+      multiple results you can set \code{append=TRUE}.  The default is
+      \code{FALSE} (overwrite preexisting report file).  You can
+      specify a string to use as an identifier for each table by
+      providing a value for the \code{label} argument.  Additional
+      named arguments will be passed to the \code{summary} method.}
+
+  \item{description}{\code{signature(object = "GOHyperGResult")}:
+      Return a string giving a one-line description of the result.}
+
+    \item{isConditional}{\code{signature(r = "GOHyperGResult")}:
+        Return a \code{TRUE} if the result was created using a
+        conditional algorithm and \code{FALSE} otherwise.}
 
   }
+
+
 }
 
 \author{Seth Falcon}
