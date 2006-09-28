@@ -2,8 +2,8 @@ setMethod("hyperGTest",
           signature(p="GOHyperGParams"), 
           function(p) {
               p@universeGeneIds <- universeBuilder(p)
-              selected <- intersect(p@geneIds, p@universeGeneIds)
-              p@geneIds <- selected
+              ## preserve names on geneIds
+              p@geneIds <- p@geneIds[p@geneIds %in% p@universeGeneIds]
               cat2Entrez <- categoryToEntrezBuilder(p)
               ## build the GO graph for the relevant GO nodes
               goIds <- names(cat2Entrez)
@@ -41,7 +41,7 @@ setMethod("hyperGTest",
                                attr="condGeneIds") <- curCat2Entrez
                   }
                   stats <- .doHyperGTest(p, curCat2Entrez, cat2Entrez,
-                                         selected)
+                                         p@geneIds)
 
                   ## store the pvals, mark these nodes as complete,
                   ## then compute the next set of nodes to do.  

@@ -12,7 +12,6 @@
   the GO annotations for the interesting genes.  The computations can
   be done conditionally based on the structure of the GO graph.}
 
-\usage{ hyperGTest(p) }
 
 \arguments{
   \item{p}{A \code{GOHyperGParams} instance }
