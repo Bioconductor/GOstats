@@ -20,6 +20,8 @@
 hyperGtable <- function(probids, lib, type="MF", pvalue=0.05,
                         min.count=10, save = FALSE, output = TRUE,
                         filename = NULL, universe = NULL){
+    .Deprecated("summary")
+    message("use summary(result) where result is the output of hyperGTest")
   require(lib, quietly = TRUE, character.only = TRUE) || stop(paste("The ", lib, " package is required"))
   lls <- getLL(probids, lib)
   lls <- unique(lls)
@@ -48,6 +50,7 @@ hyperGtable <- function(probids, lib, type="MF", pvalue=0.05,
 
 hyperG2Affy <- function(probids, lib, type="MF", pvalue=0.05,
                         min.count=10, universe = NULL){
+    .Deprecated("probeSetSummary")
   require(lib, quietly = TRUE, character.only = TRUE) || stop(paste("The ", lib, " package is required"))
   lls <- getLL(probids, lib)
   lls <- unique(lls)
@@ -65,7 +68,10 @@ hyperG2Affy <- function(probids, lib, type="MF", pvalue=0.05,
   out
 }
 
-probeSetSummary <- function(selectedProbeSetIDs, result, pvalue, categorySize) {
+
+probeSetSummary <- function(result, pvalue, categorySize) {
+    if (!is(result, "GOHyperGResult"))
+      stop("result must be a GOHyperGResult instance (or subclass)")
     ## build reverse map
     ps2egEnv <- Category:::getDataEnv("ENTREZID", annotation(result))
     psids <- ls(ps2egEnv)
@@ -90,10 +96,11 @@ probeSetSummary <- function(selectedProbeSetIDs, result, pvalue, categorySize) {
     ## XXX: these are unconditional, not sure if we want the
     ##      condGeneIdUniverse here if the calculation used
     ##      the conditional calculation.
+    sigegids <- geneIds(result)
     egids <- geneIdUniverse(result)[goids]
     psetids <- lapply(egids, function(ids) {
         ids <- as.character(ids)
-        have <- ids %in% names(eg2ps)
+        have <- ids %in% sigegids
         ans <- eg2ps[ids[have]]
         if (length(ans))
           unlist(ans)
@@ -102,18 +109,23 @@ probeSetSummary <- function(selectedProbeSetIDs, result, pvalue, categorySize) {
     })
     psetidsNULL <- sapply(psetids, is.null)
     psetids <- psetids[!psetidsNULL]
+    selectedProbeSetIDs <- names(geneIds(result))
     selectedInd <- lapply(psetids, function(ids) {
         ids %in% selectedProbeSetIDs
     })
-    psetLens <- listLen(psetids)
-    goids <- rep(goids, psetLens)
-    egids <- unlist(mget(unlist(psetids), ps2egEnv))
-    data.frame(GOID=goids,
-               EntrezID=egids,
-               ProbeSetID=unlist(psetids),
-               selected=as.integer(unlist(selectedInd)),
-               stringsAsFactors=FALSE)
+    egids <- lapply(psetids, function(ids) unlist(mget(ids, ps2egEnv)))
+    out <- vector(mode="list", length=length(psetids))
+    for (i in seq(along=psetids)) {
+        out[[i]] <- data.frame(EntrezID=egids[[i]],
+                               ProbeSetID=psetids[[i]],
+                               selected=as.integer(selectedInd[[i]]),
+                               row.names=NULL,
+                               stringsAsFactors=FALSE)
+    }
+    names(out) <- names(psetids)
+    out
 }
+
 
 sigCategories <- function(res, p) {
     if (missing(p))

@@ -12,7 +12,8 @@ export(combGOGraph, compCorrGraph, compGdist,
        reduce2Degreek, shortestPath, simLL,
        simLP, simUI, triadCensus,
        hyperGtable, hyperG2Affy,
-       GOHyperG)
+       GOHyperG,
+       probeSetSummary)
 
 exportClasses("GOHyperGResult")
 exportMethods("hyperGTest", "getGoGraph",

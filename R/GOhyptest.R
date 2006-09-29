@@ -14,6 +14,7 @@ resultToGOHyperG <- function(res, origIds) {
 
 GOHyperG <- function(x, lib, what="MF", universe=NULL)
 {
+    .Deprecated("hyperGTest")
     if (missing(universe) || is.null(universe))
       universe <- character(0)
     params <- new("GOHyperGParams",
@@ -31,5 +32,5 @@ GOHyperG <- function(x, lib, what="MF", universe=NULL)
 
 GOKEGGHyperG <- function (x, lib = "hgu95av2", what = "MF", universe=NULL)
 {
-    .Defunct("geneKeggHyperGeoTest", "Category")
+    .Defunct("hyperGTest", "Category")
 }
