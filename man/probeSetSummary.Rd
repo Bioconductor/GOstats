@@ -25,6 +25,27 @@ probeSetSummary(result, pvalue, categorySize)
       omitted, no category size criteria will be used.}
 }
 
+\details{
+  Usually the goal of doing a Fisher's exact test on a set of
+  significant probesets is to find pathways or cellular activities that
+  are being perturbed in an experiment. After doing the test, one
+  usually gets a list of significant GO terms, and the next logical step
+  might be to determine which probesets contributed to the significance
+  of a certain term.
+
+  Because the input for the Fisher's exact test consists of a vector of
+  unique Entrez Gene IDs, and there may be multiple probesets that
+  interrogate a particular transcript, the ouput for this function lists
+  all of the probesets that map to each Entrez Gene ID, along with an
+  indicator that shows which of the probesets were used as input.
+
+  The rationale for this is that one might not be able to assume a given
+  probeset actually interrogates the intended transcript, so it might be
+  useful to be able to check to see what other similar probesets are
+  doing.
+}
+  
+
 \value{
   A \code{list} of \code{data.frame}.  Each element of the list
   corresponds to one of the GO terms (the term is provides as the name

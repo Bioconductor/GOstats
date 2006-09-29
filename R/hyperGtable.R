@@ -84,7 +84,8 @@ probeSetSummary <- function(result, pvalue, categorySize) {
         else
           TRUE
     })
-    psids <- psids[unlist(havePsids)]
+    ord <- order(names(havePsids))
+    psids <- psids[unlist(havePsids)[ord]]
     eg2ps <- split(psids, unlist(mget(psids, ps2egEnv)))
 
     if (missing(pvalue))
