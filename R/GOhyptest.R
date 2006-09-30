@@ -14,7 +14,7 @@ resultToGOHyperG <- function(res, origIds) {
 
 GOHyperG <- function(x, lib, what="MF", universe=NULL)
 {
-    .Deprecated("hyperGTest")
+    .Defunct("hyperGTest")
     if (missing(universe) || is.null(universe))
       universe <- character(0)
     params <- new("GOHyperGParams",
