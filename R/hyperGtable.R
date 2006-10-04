@@ -20,7 +20,7 @@
 hyperGtable <- function(probids, lib, type="MF", pvalue=0.05,
                         min.count=10, save = FALSE, output = TRUE,
                         filename = NULL, universe = NULL){
-    .Defunct("summary")
+    .Deprecated("summary")
     message("use summary(result) where result is the output of hyperGTest")
   require(lib, quietly = TRUE, character.only = TRUE) || stop(paste("The ", lib, " package is required"))
   lls <- getLL(probids, lib)
@@ -50,7 +50,7 @@ hyperGtable <- function(probids, lib, type="MF", pvalue=0.05,
 
 hyperG2Affy <- function(probids, lib, type="MF", pvalue=0.05,
                         min.count=10, universe = NULL){
-    .Defunct("probeSetSummary")
+    .Deprecated("probeSetSummary")
   require(lib, quietly = TRUE, character.only = TRUE) || stop(paste("The ", lib, " package is required"))
   lls <- getLL(probids, lib)
   lls <- unique(lls)

@@ -1,9 +1,13 @@
 \name{GOHyperG}
 \alias{GOHyperG}
 
-\title{ Hypergeometric Tests for GO  (DEFUNCT)}
+\title{ Hypergeometric Tests for GO  }
 \description{
- This function is defunct.  Use \code{hyperGTest}.
+ Given a set of unique Entrez Gene Identifiers, a microarray annotation
+ data package name, and the GO category of interest, this function will
+ compute Hypergeomtric p-values for overrepresentation of each GO term
+ in the specified category among the GO annotations for the interesting
+ genes (as indicated by the Entrez Gene ids).
 }
 \usage{
 GOHyperG(x, lib, what="MF", universe=NULL)
@@ -100,4 +104,19 @@ GOHyperG(x, lib, what="MF", universe=NULL)
   \code{\link{phyper}}
 }
 
+\examples{
+
+library(hgu95av2)
+library(GO)
+w1<-as.list(hgu95av2ENTREZID)
+w2<-unique(unlist(w1))
+set.seed(123)
+## pick a 25 interesting genes
+myLL <- sample(w2, 25)
+xx <- GOHyperG(myLL, lib="hgu95av2", what="CC")
+xx$numLL
+xx$numInt
+sum(xx$pvalues < 0.01)
+
+}
 \keyword{ htest }
