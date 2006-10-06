@@ -192,7 +192,7 @@ setMethod("summary", signature(object="GOHyperGResult"),
           })
 
 
-htmlReport0 <- function(res, file, append=TRUE, label="",
+htmlReport0 <- function(res, file, append=FALSE, label="",
                        dframizer=summary, ...) {
     ## FIXME: make this a method
     if (!is(res, "GOHyperGResult"))
