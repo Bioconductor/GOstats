@@ -220,7 +220,7 @@ htmlReport0 <- function(res, file, append=FALSE, label="",
 }
 
 setMethod("htmlReport", signature(r="GOHyperGResult"),
-          function(r, file="", append=TRUE, label="", ...)
+          function(r, file="", append=FALSE, label="", ...)
           {
               htmlReport0(r=r, file=file, append=append,
                           label=label, dframizer=summary, ...)

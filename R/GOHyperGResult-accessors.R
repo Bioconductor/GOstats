@@ -79,7 +79,7 @@ setMethod("description", signature(object="GOHyperGResult"),
               cond <- "Conditional"
               if (!isConditional(object))
                 cond <- ""
-              desc <- paste("Gene to %s", cond, "Test for %s Representation")
+              desc <- paste("Gene to %s", cond, "test for %s-representation")
               desc <- sprintf(desc,
                               paste(testName(object), collapse=" "),
                               testDirection(object))
