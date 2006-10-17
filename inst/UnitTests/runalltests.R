@@ -3,7 +3,7 @@ require("GOstats")
 
 
 TEST_DATA_DIR <- "data"
-runitPat <- ".*_test\.R$"
+runitPat <- ".*_test\\.R$"
 runitDirs <- c(".")
 suite <- defineTestSuite(name="GOstats Test Suite",
                          dirs=runitDirs,
