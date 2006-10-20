@@ -128,14 +128,6 @@ probeSetSummary <- function(result, pvalue, categorySize) {
 }
 
 
-sigCategories <- function(res, p) {
-    if (missing(p))
-      p <- res@pvalue.cutoff
-    pv <- pvalues(res)
-    goIds <- names(pv[pv < p])
-    goIds
-}
-
 getWantedGOIDs <- function(result, pvalue, categorySize=NULL) {
     ## Filter GO terms based on p-value and category size
     ## Returns a logical vector with TRUE indicating selected

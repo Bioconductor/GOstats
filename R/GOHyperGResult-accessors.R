@@ -85,3 +85,57 @@ setMethod("description", signature(object="GOHyperGResult"),
                               testDirection(object))
               desc
           })
+
+
+selectedGenes <- function(r, id) {
+    ## FIXME: make me a method!
+    ans <- geneIdUniverse(r)[id]
+    ans <- lapply(ans, intersect, geneIds(r))
+    ans
+}
+
+
+sigCategories <- function(res, p) {
+    ## FIXME: make me a method!
+    if (missing(p))
+      p <- pvalueCutoff(res)
+    pv <- pvalues(res)
+    goIds <- names(pv[pv < p])
+    goIds
+}
+
+
+plotTermGraphs <- function(r, pvalue=NULL, dev="x11", ...) {
+    if (missing(pvalue) || is.null(pvalue))
+      pvalue <- pvalueCutoff(r)
+    goids <- sigCategories(r, pvalue)
+    g <-  subGraph(goids, goDag(r))
+    cc <- connectedComp(g)
+    if (!interactive())
+      dev <- getOption("device")
+    openMany <- TRUE
+    if (!(dev %in% c("x11", "X11", "quartz", "windows", "win.graph")))
+      openMany <- FALSE
+    theDev <- get(dev)
+    if (!openMany)
+      theDev(...)
+    for (n in cc) {
+        if (length(n) == 1) {
+            cat("Skipping singleton component:", n,
+                " (", geneCounts(r)[n], ")\n", sep="")
+            next
+        }
+        sg <- subGraph(n, g)
+        nlab <- paste(sub("^GO:", "", nodes(sg)), " (",
+                      geneCounts(r)[n], ")", sep="")
+        nattr <- makeNodeAttrs(sg,
+                               label=nlab,
+                               shape="ellipse",
+                               fixedsize=FALSE)
+        if (openMany) 
+          theDev(...)
+        plot(sg, nodeAttrs=nattr)
+    }
+    if (!openMany)
+      dev.off()
+}

@@ -34,3 +34,5 @@ exportMethods("hyperGTest", "getGoGraph",
               "testName",
               "summary",
               "htmlReport")
+
+export(plotTermGraphs, selectedGenes, sigCategories)
