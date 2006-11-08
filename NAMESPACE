@@ -32,7 +32,6 @@ exportMethods("hyperGTest", "getGoGraph",
               "geneMappedCount",
               "annotation",
               "testName",
-              "summary",
-              "htmlReport")
+              "summary")
 
 export(plotTermGraphs, selectedGenes, sigCategories)

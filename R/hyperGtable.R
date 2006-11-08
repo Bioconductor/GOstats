@@ -128,93 +128,24 @@ probeSetSummary <- function(result, pvalue, categorySize) {
 }
 
 
-getWantedGOIDs <- function(result, pvalue, categorySize=NULL) {
-    ## Filter GO terms based on p-value and category size
-    ## Returns a logical vector with TRUE indicating selected
-    ## GO IDs from those tested in result instance.
-    pvals <- pvalues(result)
-    wanted <- pvals < pvalue
-    if (!is.null(categorySize)) {
-        ucounts <- universeCounts(result)
-        hasMinSize <- ucounts >= categorySize
-        wanted <- wanted & hasMinSize
-    }
-    wanted
-}
-
 setMethod("summary", signature(object="GOHyperGResult"),
-          function(object, pvalue, categorySize, htmlLinks=TRUE) {
+          function(object, pvalue=pvalueCutoff(object),
+                   categorySize=NULL, htmlLinks=TRUE) {
               AMIGO_URL <- "http://www.godatabase.org/cgi-bin/amigo/go.cgi?view=details&search_constraint=terms&depth=0&query=%s"
-              if (missing(pvalue))
-                pvalue <- pvalueCutoff(object)
-              if (missing(categorySize))
-                categorySize <- NULL
-              
-              ## Filter GO terms based on p-value and category size
-              wanted <- getWantedGOIDs(object, pvalue, categorySize)
-              pvals <- pvalues(object)
-              ucounts <- universeCounts(object)
-              if (!any(wanted)) {
-                  warning("No results met the specified criteria.  ",
-                          "Returning 0-row data.frame", call.=FALSE)
-                  goIds <- goTerms <- character(0)
-                  pvals <- odds <- ecounts <- numeric(0)
-                  counts <- ucounts <- integer(0)
-              } else {
-                  pvals <- pvals[wanted]
-                  ucounts <- ucounts[wanted]
-                  
-                  goIds <- names(pvals)
-                  goTerms <- sapply(mget(goIds, GOTERM), Term)
-                  goIdUrls <- sapply(goIds, function(x) sprintf(AMIGO_URL, x))
-                  odds <- oddsRatios(object)[wanted]
-                  ecounts <- expectedCounts(object)[wanted]
-                  counts <- geneCounts(object)[wanted]
-                  if (htmlLinks) {
-                      goTerms <- paste('<a href="', goIdUrls, '">', goTerms,
-                                       '</a>', sep="")
-                  }
+              df <- callNextMethod(object=object, pvalue=pvalue,
+                                   categorySize=categorySize)
+              if (nrow(df) == 0)  {
+                  df$Term <- character(0)
+                  return(df)
               }
-              df <- data.frame(ID=goIds, Pvalue=pvals, OddsRatio=odds,
-                               ExpCount=ecounts, Count=counts,
-                               Size=ucounts, Term=goTerms,
-                               stringsAsFactors=FALSE,
-                               row.names=NULL)
+              goIds <- df[[1]]
+              goTerms <- sapply(mget(goIds, GOTERM), Term)
+              if (htmlLinks) {
+                  goIdUrls <- sapply(goIds,
+                                     function(x) sprintf(AMIGO_URL, x))
+                  goTerms <- paste('<a href="', goIdUrls, '">', goTerms,
+                                   '</a>', sep="")
+              }
+              df$Term <- goTerms
               df
           })
-
-
-htmlReport0 <- function(res, file, append=FALSE, label="",
-                       dframizer=summary, ...) {
-    ## FIXME: make this a method
-    if (!is(res, "GOHyperGResult"))
-      stop("res must be a GOHyperGResult instance")
-    have_xtable <- suppressWarnings({
-        require("xtable", quietly=TRUE, warn.conflicts=FALSE)
-    })
-    if (!have_xtable)
-      stop("htmlReport needs the xtable package and it is not",
-           "available")
-    
-    caption <- paste(label, description(res))
-    dig <- rep(2, 8)
-    dig[5:7] <- 0
-    df <- dframizer(res, ...)
-    if (nrow(df) == 0) {
-        warning("No rows to report.  Skipping")
-        return(FALSE)
-    }
-    xt <- xtable(df, caption=caption,
-                 digits=dig)
-    print(xt, type="html", file=file, append=append,
-          caption.placement="top")
-    TRUE
-}
-
-setMethod("htmlReport", signature(r="GOHyperGResult"),
-          function(r, file="", append=FALSE, label="", ...)
-          {
-              htmlReport0(r=r, file=file, append=append,
-                          label=label, dframizer=summary, ...)
-          })
-
