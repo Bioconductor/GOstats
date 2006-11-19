@@ -1,6 +1,10 @@
 #!/bin/bash
 
-PKG=GOstats
+RUNIT_DIR=`pwd`
+INST_PATH=`dirname $RUNIT_DIR`
+PKG_PATH=`dirname $INST_PATH`
+PKG=`basename $PKG_PATH`
+
 TEST_FILE=$1
 
 if test $# -ne 1; then
