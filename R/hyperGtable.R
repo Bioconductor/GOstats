@@ -92,8 +92,7 @@ probeSetSummary <- function(result, pvalue, categorySize) {
       pvalue <- pvalueCutoff(result)
     if (missing(categorySize))
       categorySize <- NULL
-    wanted <- getWantedGOIDs(result, pvalue, categorySize)
-    goids <- names(pvalues(result)[wanted])
+    goids <- summary(result, pvalue, categorySize)[,1]
     ## XXX: these are unconditional, not sure if we want the
     ##      condGeneIdUniverse here if the calculation used
     ##      the conditional calculation.
