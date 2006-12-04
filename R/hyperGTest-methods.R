@@ -7,7 +7,7 @@ setMethod("hyperGTest",
               cat2Entrez <- categoryToEntrezBuilder(p)
               ## build the GO graph for the relevant GO nodes
               goIds <- names(cat2Entrez)
-              goDag <- getGoGraph(p, goIds)
+              goDag <- getGoToChildGraph(p, goIds)
               nodeDataDefaults(goDag, "pvalue") <- 1
               nodeDataDefaults(goDag, "geneIds") <- numeric(0)
               nodeDataDefaults(goDag, "condGeneIds") <- numeric(0)
@@ -76,12 +76,27 @@ removeLengthZero <- function(x) {
 }
 
 
+getGoToChildGraph <- function(p, goIds) {
+    ## We might want a method here so that we can dispatch on
+    ## a SQLite-based GO package.
+    ## FIXME: ':::'
+    goEnv <- Category:::getDataEnv(paste(p@ontology,
+                                         "CHILDREN", sep=""), "GO")
+    gobpkids <- eapply(goEnv, function(x) {
+        intersect(x, goIds)
+    })
+    gobpkids <- l2e(gobpkids)
+    GOGraph(goIds, gobpkids)
+}
+
+
 setMethod("getGoGraph", signature(p="GOHyperGParams",
                                   goIds="character"),
           function(p, goIds) {
+              .Deprecated("GOGraph")
               ## FIXME: ':::'
               goEnv <- Category:::getDataEnv(paste(p@ontology,
-                                                   "CHILDREN", sep=""), "GO")
+                                                   "PARENTS", sep=""), "GO")
               gobpkids <- eapply(goEnv, function(x) {
                   intersect(x, goIds)
               })
