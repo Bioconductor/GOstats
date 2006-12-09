@@ -243,9 +243,6 @@ double counting any GO categories.  In all, the filtering left
 
 We apply a standard $t$-test to identify a set of genes with
 differential expression between the \Sexpr{subsetType} and NEG groups.
-There are \Sexpr{sum(smPV)} genes with $p$-values less than
-\Sexpr{ttestCutoff}.  We do not make use of any $p$-value correction
-methods since we are interested in a relatively long gene list.
 
 <<parametric1, echo=TRUE, results=hide, cache=TRUE>>=
 ttestCutoff <- 0.05
@@ -257,6 +254,10 @@ pvalFiltered <- nsFiltered[smPV, ]
 selectedEntrezIds <- unlist(mget(featureNames(pvalFiltered),
                                  hgu95av2ENTREZID))
 @
+
+There are \Sexpr{sum(smPV)} genes with $p$-values less than
+\Sexpr{ttestCutoff}.  We do not make use of any $p$-value correction
+methods since we are interested in a relatively long gene list.
 
 A detail often omitted from GO association analyses is the fact that
 the $t$-test, and most similar statistics, are directional.  For a
@@ -390,42 +391,23 @@ paramsCond <- params
 conditional(paramsCond) <- TRUE
 @ 
 
-\section{GOstats Capabilities}
-
-In the Hypergeometric model, each term is treated as an independent
-classification.  Each gene is cross-classified according to whether or
-not it has been selected and whether or not it is annotated, not
-necessarily specifically annotated, at a particular term.  A
-Hypergeometric probability is computed to assess whether the number of
-selected genes associated with the term is larger than expected.
-
-The \Rfunction{hyperGTest} function provides an implementation of the
-commonly applied Hypergeometric calculation for over or
-under-representation of GO terms in a specified gene list.  This
-computation ignores the structure of the GO terms, treating each term
-as independent from all other terms.
-
-%%FIXME: need to cite Alexa here again...
-Often an analysis for GO term associations results in the
-identification of directly related GO terms with considerable overlap
-of genes.  This is because each GO term inherits all annotations from
-its more specific descendants.  To alleviate this problem, we have
-implemented a method which conditions on all child terms that are
-themselves significant at a specified $p$-value cutoff.  Given a
-subgraph of one of the three GO ontologies, we test the leaves of the
-graph, that is, those terms with no child terms.  Before testing the
-terms whose children have already been tested, we remove all genes
-annotated at significant children from the parent's gene list.  This
-continues until all terms have been tested.
+A similar approach would work to create a parameter object for testing
+a different GO ontology or to create an object for testing under
+representation.
 
 
-\section{Outputs}
-
+\section{Outputs and Result Summarization}
 
 The \Rfunction{hyperGTest} function returns an instance of class
-\Rclass{GOHyperGResult}.  Printing the result at the R prompt provides
-a brief summary of the test performed and the number of significant
-terms found.
+\Rclass{GOHyperGResult}.  When the input parameter object is a
+\Rclass{KEGGHyperGParams} or \Rclass{PFAMHyperGParams} instance, the
+result will instead be a \Rclass{HyperGResult} object.  Most of the
+reporting and summarization methods demonstrated here will work the
+same, except for those that deal specifically with GO or the GO graph.
+
+As shown below, printing the result at the R prompt provides a brief
+summary of the test performed and the number of significant terms
+found.
 
 <<standardHGTEST, cache=TRUE, echo=TRUE, results=hide>>=
 hgOver <- hyperGTest(params)
@@ -433,24 +415,62 @@ hgCondOver <- hyperGTest(paramsCond)
 
 @ 
 
+%% use separate chunk for printing so computation can
+%% be cached
 <<HGTestAns>>=
 hgOver
 hgCondOver
 @ 
 
-The \Rclass{GOHyperGResult} instance returned by
-\Rfunction{hyperGTest} contains the $p$-value, odds ratio, expected
-gene count, and actual gene count for each term tested along with the
-vector of gene identifiers annotated at each term.  It is also
-possible to retrieve a \Rclass{graph} instance representing the GO DAG
-for further computation.  All result components can be accessed
-programatically using accessor functions (see the manual page for the
-\Rclass{GOHyperGResult} class for details).  Calling
-\Rfunction{summary} on the result produces a \Robject{data.frame}
-summarizing the results which can optionally be limited to a
-user-specified minimum $p$-value and/or minimum gene count for the
-terms.  To make it easy for non-technical users to review the results,
-the \Rfunction{htmlReport} function generates an HTML file that can be
+The \Rfunction{summary} function returns a \Rclass{data.frame}
+summarizing the result.  By default, only the results for terms with a
+$p$-value less than the cutoff specified in the parameter instance
+will be shown.  However, you can set a new cutoff using the
+\Robject{pvalue} argument.  You can also set a minimum number of genes
+for each term using the \Robject{categorySize} argument.  For
+\Rclass{GOHyperGResult} objects, the \Rfunction{summary} method also
+has a \Robject{htmlLinks} argument.  When \Robject{TRUE}, the GO term
+names are printed as HTML links to the GO website.
+%% FIXME: the default should be changed to be htmlLinks=FALSE
+%% and htmlReport should turn it on.
+<<summaryEx>>=
+df <- summary(hgOver)
+names(df)                               # the columns
+dim(summary(hgOver, pvalue=0.1))
+dim(summary(hgOver, categorySize=10))
+@ 
+
+Now we demonstrate some of the accessor functions that can be used to
+extract detail from a result object.
+
+<<resultAccessors>>=
+pvalues(hgOver)[1:3]
+
+oddsRatios(hgOver)[1:3]
+
+expectedCounts(hgOver)[1:3]
+
+geneCounts(hgOver)[1:3]
+universeCounts(hgOver)[1:3]
+
+length(geneIds(hgOver))
+length(geneIdUniverse(hgOver)[[3]])
+
+## GOHyperGResult _only_
+## (NB: edges go from parent to child)
+goDag(hgOver)
+
+geneMappedCount(hgOver)
+universeMappedCount(hgOver)
+
+isConditional(hgOver)
+testDirection(hgOver)
+testName(hgOver)
+
+@ 
+
+To make it easy for non-technical users to review the results, the
+\Rfunction{htmlReport} function generates an HTML file that can be
 viewed in any web browser.  The output generated by
 \Rfunction{htmlReport} as called below is available at FIXMEPOSTURL.
 
@@ -504,6 +524,35 @@ getMaxConnCompGraph <- function(hgOver, hgCondOver) {
 }
 
 @ 
+
+\section{GOstats Capabilities}
+
+In the Hypergeometric model, each term is treated as an independent
+classification.  Each gene is cross-classified according to whether or
+not it has been selected and whether or not it is annotated, not
+necessarily specifically annotated, at a particular term.  A
+Hypergeometric probability is computed to assess whether the number of
+selected genes associated with the term is larger than expected.
+
+The \Rfunction{hyperGTest} function provides an implementation of the
+commonly applied Hypergeometric calculation for over or
+under-representation of GO terms in a specified gene list.  This
+computation ignores the structure of the GO terms, treating each term
+as independent from all other terms.
+
+%%FIXME: need to cite Alexa here again...
+Often an analysis for GO term associations results in the
+identification of directly related GO terms with considerable overlap
+of genes.  This is because each GO term inherits all annotations from
+its more specific descendants.  To alleviate this problem, we have
+implemented a method which conditions on all child terms that are
+themselves significant at a specified $p$-value cutoff.  Given a
+subgraph of one of the three GO ontologies, we test the leaves of the
+graph, that is, those terms with no child terms.  Before testing the
+terms whose children have already been tested, we remove all genes
+annotated at significant children from the parent's gene list.  This
+continues until all terms have been tested.
+
 
 
 <<info, results=tex>>=
