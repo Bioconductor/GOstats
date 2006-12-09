@@ -63,7 +63,8 @@ To get started, load the packages needed for this analysis:
 
 <<Setup, echo=TRUE, results=hide>>=
 library("ALL")
-library("hgu95av2db")
+## coming soon
+##library("hgu95av2db")
 library("hgu95av2")
 library("annotate")
 library("genefilter")
@@ -372,9 +373,12 @@ hgCutoff <- 0.001
 params <- new("GOHyperGParams",
               geneIds=selectedEntrezIds,
               universeGeneIds=entrezUniverse,
-              annotation="hgu95av2db",
+## coming soon
+##              annotation="hgu95av2db",
+              annotation="hgu95av2",
 ## FIXME
-              datPkg=Category:::DatPkgFactory("hgu95av2db"),
+## coming soon
+##              datPkg=Category:::DatPkgFactory("hgu95av2db"),
               ontology="BP",
               pvalueCutoff=hgCutoff,
               conditional=FALSE,
