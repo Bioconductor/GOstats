@@ -28,7 +28,8 @@
 
 \bibliographystyle{plainnat}
 
-\title{Testing Gene Lists for GO Term Association using GOstats}
+\title{How To Use GOstats \\
+Testing Gene Lists for GO Term Association}
 \author{S. Falcon and R. Gentleman}
 
 \begin{document}
@@ -43,7 +44,7 @@ subsetType <- "ALL1/AF4"
 @ 
 
 The\Rpackage{GOstats} package has extensive facilities for testing the
-association of Gene Ontology (GO)~\cite{GO} terms among a given gene
+association of Gene Ontology (GO)~\cite{GO} terms to genes in a gene
 list.  You can test for both over and under representation of GO terms
 using either the standard Hypergeometric test or a conditional
 Hypergeometric test that uses the relationships among the GO terms for
@@ -58,8 +59,11 @@ the ALL data, we focus on the patients with B-cell derived ALL, and in
 particular on comparing the group with \Sexpr{subsetType} to those
 with no observed cytogenetic abnormalities.
 
-<<Setup, echo=FALSE, results=hide>>=
+To get started, load the packages needed for this analysis:
+
+<<Setup, echo=TRUE, results=hide>>=
 library("ALL")
+library("hgu95av2db")
 library("hgu95av2")
 library("annotate")
 library("genefilter")
@@ -118,12 +122,17 @@ been selected, suppose that a GO term has 40 gene annotations from the
 universe of 1000.  If 10 of the genes in the selected gene list are
 among the 40 genes annotated at this category, then the Hypergeometric
 $p$-value is \Sexpr{round(pv1000,2)}.  However, if the gene universe
-contained 5000 genes, the $p$-value would drop to \Sexpr{round(pv5000,3)}.
+contained 5000 genes, the $p$-value would drop to
+\Sexpr{round(pv5000,3)}.
 
 
 \subsection{Non-specific filtering}
 
-<<bcrAblOrNegSubset, results=hide, echo=FALSE, cache=TRUE>>=
+First we load the \Robject{ALL} data object and extract the subset of
+the data we wish to analyze: subjects with either no cytogenetic
+abnormality (``NEG'') or those with ``\Sexpr{subsetType}''.
+
+<<bcrAblOrNegSubset, results=hide, echo=TRUE, cache=TRUE>>=
 data(ALL, package="ALL")
 ## Subset of interest: 37BRC/ABL + 42NEG = 79 samples
 Bcell <- grep("^B", as.character(ALL$BT))
@@ -133,7 +142,10 @@ bcrAblOrNeg <- ALL[, intersect(Bcell, bcrAblOrNegIdx)]
 bcrAblOrNeg$mol.biol = factor(bcrAblOrNeg$mol.biol)
 @ 
 
-<<nsFiltering-noEntrez, results=hide, echo=FALSE, cache=TRUE>>=
+We begin our non-specific filtering by removing probe sets that have
+no Entrez Gene identifier in our annotation data.
+
+<<nsFiltering-noEntrez, results=hide, echo=TRUE, cache=TRUE>>=
 ## Remove genes that have no entrezGene id
 entrezIds <- mget(featureNames(bcrAblOrNeg), envir=hgu95av2ENTREZID)
 haveEntrezId <- names(entrezIds)[sapply(entrezIds, function(x) !is.na(x))]
@@ -141,36 +153,50 @@ numNoEntrezId <- length(featureNames(bcrAblOrNeg)) - length(haveEntrezId)
 bcrAblOrNeg <- bcrAblOrNeg[haveEntrezId, ]
 @ 
 
-<<nsFiltering-noGO, results=hide, echo=FALSE, cache=TRUE>>=
+Similarly, we remove probe sets for which we have no GO annotation.
+
+<<nsFiltering-noGO, results=hide, echo=TRUE, cache=TRUE>>=
 ## Remove genes with no GO mapping
 haveGo <- sapply(mget(featureNames(bcrAblOrNeg), hgu95av2GO),
-                 function(x) if (length(x) == 1 && is.na(x)) FALSE else TRUE)
+                 function(x) {
+                     if (length(x) == 1 && is.na(x)) 
+                       FALSE 
+                     else TRUE
+                 })
 numNoGO <- sum(!haveGo)
 bcrAblOrNeg <- bcrAblOrNeg[haveGo, ]
 @
 
-<<nsFiltering-IQR, results=hide, echo=FALSE, cache=TRUE>>=
+Now use the IQR of each probe set across samples to remove those probe
+sets that have little variation across samples.  Also, since there is
+an imbalance of men and women by group, we remove probe sets that
+measure genes on the Y chromosome.
+
+<<nsFiltering-IQR, results=hide, echo=TRUE, cache=TRUE>>=
 ## Non-specific filtering based on IQR
 iqrCutoff <- 0.5
 bcrAblOrNegIqr <- apply(exprs(bcrAblOrNeg), 1, IQR)
 selected <- bcrAblOrNegIqr > iqrCutoff
 
-## FIXME: document this step - 
-## Now drop those that are on the Y chromosome
+## Drop those that are on the Y chromosome
 ## because there is an imbalance of men and women by group
 chrN <- mget(featureNames(bcrAblOrNeg), envir=hgu95av2CHR)
 onY <- sapply(chrN, function(x) any(x=="Y"))
 onY[is.na(onY)] <- FALSE
-selected = selected & !onY
+selected <- selected & !onY
 
 nsFiltered <- bcrAblOrNeg[selected, ]
-numNsWithDups <- length(featureNames(nsFiltered))
+@ 
 
-## Reduce to unique probe <--> gene mapping here by keeping largest IQR
-## We will want "unique genes" in the non-specific filtered gene 
-## set if we want to use this as the universe for GOHyperG
+Here we ensure that each probe set maps to exactly one Entrez Gene ID.
+If multiple probes are found to map to the same Entrez Gene ID, we
+select the probe with largest IQR (from the computation above).
+
+<<nsFiltering-unique, results=hide, echo=TRUE, cache=TRUE>>=
+numNsWithDups <- length(featureNames(nsFiltered))
 nsFilteredIqr <- bcrAblOrNegIqr[selected]
-uniqGenes <- findLargest(featureNames(nsFiltered), nsFilteredIqr, "hgu95av2")
+uniqGenes <- findLargest(featureNames(nsFiltered), nsFilteredIqr, 
+                         "hgu95av2")
 nsFiltered <- nsFiltered[uniqGenes, ]
 numSelected <- length(featureNames(nsFiltered))
 
@@ -179,7 +205,10 @@ BCRcols = ifelse(nsFiltered$mol == subsetType, "goldenrod", "skyblue")
 cols = brewer.pal(10, "RdBu")
 @
 
-<<defineGeneUniverse, echo=FALSE, results=hide, cache=TRUE>>=
+Finally, we can define the gene universe we will use for the
+Hypergeometric tests.
+
+<<defineGeneUniverse, echo=TRUE, results=hide, cache=TRUE>>=
 ## Define gene universe based on results of non-specific filtering
 affyUniverse <- featureNames(nsFiltered)
 entrezUniverse <- unlist(mget(affyUniverse, hgu95av2ENTREZID))
@@ -192,30 +221,17 @@ chipEntrezUniverse <- mget(chipAffyUniverse, hgu95av2ENTREZID)
 chipEntrezUniverse <- unique(unlist(chipEntrezUniverse)) 
 @ 
 
-<<parametric1, echo=FALSE, results=hide, cache=TRUE>>=
-ttestCutoff <- 0.05
-ttests = rowttests(nsFiltered, "mol.biol")
-
-smPV = ttests$p.value < ttestCutoff
-
-## Find the probes that we are going to use
-## these define our Universe
-pvalFiltered <- nsFiltered[smPV, ]
-selectedEntrezIds <- unlist(mget(featureNames(pvalFiltered), 
-                                 hgu95av2ENTREZID))
-@
-
-
-Our non-specific filtering procedure removed probes missing either
-Entrez Gene identifies or mappings to GO terms.  Because of an
-imbalance of men and women by group, probes measuring genes on the Y
-chromosome were dropped.  The inter-quartile range was used with a
-cutoff of \Sexpr{iqrCutoff} to select probes with sufficient
-variability across samples to be informative; probes with little
-variability across all samples are inherently uninteresting.  Finally,
-the set of remaining probes was refined by ensuring that each probe
-maps to exactly one Entrez Gene identifier.  For those probes mapping
-to the same Entrez Gene ID, the probe with largest IQR was selected.
+\textbf{Summary of non-specific filtering:} Our non-specific filtering
+procedure removed probes missing either Entrez Gene identifies or
+mappings to GO terms.  Because of an imbalance of men and women by
+group, probes measuring genes on the Y chromosome were dropped.  The
+inter-quartile range was used with a cutoff of \Sexpr{iqrCutoff} to
+select probes with sufficient variability across samples to be
+informative; probes with little variability across all samples are
+inherently uninteresting.  Finally, the set of remaining probes was
+refined by ensuring that each probe maps to exactly one Entrez Gene
+identifier.  For those probes mapping to the same Entrez Gene ID, the
+probe with largest IQR was selected.
 
 Producing a set of Entrez Gene identifiers that map to a unique set of
 probes at the non-specific filtering stage is important because genes
@@ -225,12 +241,22 @@ double counting any GO categories.  In all, the filtering left
 
 \subsection{Gene selection via t-test}
 
-After applying the non-specific filtering described above, a standard
-$t$-test was used to identify a set of genes with differential
-expression between the \Sexpr{subsetType} and NEG groups.  There were
-\Sexpr{sum(smPV)} genes with $p$-values less than \Sexpr{ttestCutoff}.
-We did not make use of any $p$-value correction methods since we are
-interested in a relatively long gene list.
+We apply a standard $t$-test to identify a set of genes with
+differential expression between the \Sexpr{subsetType} and NEG groups.
+There are \Sexpr{sum(smPV)} genes with $p$-values less than
+\Sexpr{ttestCutoff}.  We do not make use of any $p$-value correction
+methods since we are interested in a relatively long gene list.
+
+<<parametric1, echo=TRUE, results=hide, cache=TRUE>>=
+ttestCutoff <- 0.05
+ttests = rowttests(nsFiltered, "mol.biol")
+
+smPV = ttests$p.value < ttestCutoff
+
+pvalFiltered <- nsFiltered[smPV, ]
+selectedEntrezIds <- unlist(mget(featureNames(pvalFiltered),
+                                 hgu95av2ENTREZID))
+@
 
 A detail often omitted from GO association analyses is the fact that
 the $t$-test, and most similar statistics, are directional.  For a
@@ -253,37 +279,115 @@ different sets of parameters and to facilitate this pattern of usage
 the main interface to the Hypergeometric tests,
 \Rfunction{hyperGTest}, takes a single parameter object as its
 argument. This argument is an instance of class
-\Rclass{GOHyperGParams}.  Using a parameter class instead of
-individual arguments makes it easier to organize and execute a series
-of related analyses.  For example, one can create a list of
-\Rclass{GOHyperGParams} instances and perform the Hypergeometric test
-on each using R's \Rfunction{lapply} function:
+\Rclass{GOHyperGParams}.  There are also parameter classes
+\Rclass{KEGGHyperGParams} and \Rclass{PFAMHyperGParams} defined in the
+\Rpackage{Category} package that allow for testing for association
+with KEGG pathways and PFAM protein domains, respectively.
+
+Using a parameter class instead of individual arguments makes it
+easier to organize and execute a series of related analyses.  For
+example, one can create a list of \Rclass{GOHyperGParams} instances
+and perform the Hypergeometric test on each using R's
+\Rfunction{lapply} function:
 
 \begin{verbatim}
 resultList <- lapply(lisOfParamObjs, hyperGTest)
 \end{verbatim}
+
+In the absence of a parameter class, this could be achieved using
+\Rfunction{mapply}, but the result would be less readable.  Because
+parameter objects can be copied and modified, they tend to reduce
+duplication of code.  We'll demonstrate this in the following example.
 
 Below, we create a parameter instance by specifying the gene list, the
 universe, the name of the annotation data package, and the GO ontology
 we wish to interrogate.  For the example analysis, we have stored the
 vector of Entrez Gene identifiers making up the gene universe in
 \Robject{entrezUniverse}.  The selected genes are stored in
-\Robject{selectedEntrezIds}.  In addition, users can specify a
-$p$-value cutoff, a flag to indicate whether the conditional
-Hypergeometric calculation should be used, and indicate whether the
-test should evaluate over or under-representation of GO terms.
+\Robject{selectedEntrezIds}.  If you are following along with your own
+data and have an \Rclass{ExpressionSet} instance resulting from a
+non-specific filtering procedure, you can create the
+\Robject{entrezUniverse} and \Robject{selectedEntrezIds} vectors using
+code similar to that shown here:
+
+<<withYourData1, eval=FALSE>>=
+entrezUniverse <- unlist(mget(featureNames(yourData), 
+                              hgu95av2ENTREZID))
+if (any(duplicated(entrezUniverse)))
+  stop("error in gene universe: can't have duplicate Entrez Gene Ids")
+
+pvalFiltered <- yourData[hasSmallPvalue, ]
+selectedEntrezIds <- unlist(mget(featureNames(pvalFiltered),
+                                 hgu95av2ENTREZID))
+@ 
+
+Here is a description of all the arguments needed to construct a
+\Rclass{GOHyperGParams} instance.
+
+\begin{description}
+\item[\Robject{geneIds}] A vector of gene identifiers that defines the
+  selected list of genes.  This is often the output of a test for
+  differential expression among two sample groups.  For experiments
+  using Affymetrix expression arrays, this should be a vector of
+  Entrez Gene IDs.  If you are using the \Rpackage{YEAST} annotation
+  package, the vector will consist of FIXME.
+
+\item[\Robject{universeGeneIds}] A vector of gene identifiers that
+  defines the universe of possible genes.  We recommend using the set
+  of gene IDs that result from non-specific filtering.  The
+  identifiers should be of the same type as the \Robject{geneIds}; for
+  Affymetrix arrays, these will be Entrez Gene IDs.
+
+\item[\Robject{annotation}] A string giving the name of the annotation
+  data package that corresponds to the chip used in the experiment.
+
+\item[\Robject{ontology}] A two-letter string specifying one of the
+  three GO ontologies: BP, CC, or MF.  The \Rfunction{hyperGTest}
+  function only tests a single GO ontology at one time.
+
+\item[\Robject{pvalueCutoff}] A numeric values between zero and one
+  used as a $p$-value cutoff for $p$-values generated by the
+  Hypergeometric test.  When the test being performed is
+  non-conditional, this is only used as a default value for printing
+  and summarizing the results.  For a conditional analysis, the cutoff
+  is used during the computation to determine perform the
+  conditioning: child terms with a $p$-value less than
+  \Robject{pvalueCutoff} are conditioned out of the test for their
+  parent term.
+
+\item[\Robject{conditional}] A logical value.  If \Robject{TRUE}, the
+  test performed uses the conditional algorithm.  Otherwise, a
+  standard Hypergeometric test is performed.
+
+\item[\Robject{testDirection}] A string which can be either ``over''
+  or ``under''.  This determines whether the test performed detects
+  over or under represented GO terms.
+
+\end{description}
+
 
 <<standardHyperGeo, echo=TRUE, results=hide, cache=TRUE>>=
 hgCutoff <- 0.001
 params <- new("GOHyperGParams",
               geneIds=selectedEntrezIds,
               universeGeneIds=entrezUniverse,
-              annotation="hgu95av2",
+              annotation="hgu95av2db",
+## FIXME
+              datPkg=Category:::DatPkgFactory("hgu95av2db"),
               ontology="BP",
               pvalueCutoff=hgCutoff,
               conditional=FALSE,
               testDirection="over")
 
+@ 
+
+We would also like to perform a conditional test.  Instead of having
+to define a new \Rclass{GOHyperGParams} instance by hand, we can
+create a copy and update just the parameter of interest.
+
+<<condHyperGeo, echo=TRUE, results=hide, cache=TRUE>>=
+paramsCond <- params
+conditional(paramsCond) <- TRUE
 @ 
 
 \section{GOstats Capabilities}
@@ -325,12 +429,13 @@ terms found.
 
 <<standardHGTEST, cache=TRUE, echo=TRUE, results=hide>>=
 hgOver <- hyperGTest(params)
-conditional(params) <- TRUE
-hgCondOver <- hyperGTest(params)
+hgCondOver <- hyperGTest(paramsCond)
+
 @ 
 
-<<standardHGTestAns>>=
+<<HGTestAns>>=
 hgOver
+hgCondOver
 @ 
 
 The \Rclass{GOHyperGResult} instance returned by
