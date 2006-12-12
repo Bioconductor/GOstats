@@ -1,6 +1,7 @@
 setMethod("hyperGTest",
           signature(p="GOHyperGParams"), 
           function(p) {
+              validObject(p)
               p@universeGeneIds <- universeBuilder(p)
               ## preserve names on geneIds
               p@geneIds <- p@geneIds[p@geneIds %in% p@universeGeneIds]
