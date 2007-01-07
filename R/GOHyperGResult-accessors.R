@@ -105,11 +105,12 @@ sigCategories <- function(res, p) {
 }
 
 
-plotTermGraphs <- function(r, pvalue=NULL, dev="x11", ...) {
+plotTermGraphs <- function(r, pvalue=NULL, use.terms=TRUE,
+                           dev="x11", ...) {
     if (missing(pvalue) || is.null(pvalue))
       pvalue <- pvalueCutoff(r)
     goids <- sigCategories(r, pvalue)
-    g <-  subGraph(goids, goDag(r))
+    g <-  reverseEdgeDirections(subGraph(goids, goDag(r)))
     cc <- connectedComp(g)
     if (!interactive())
       dev <- getOption("device")
@@ -120,14 +121,21 @@ plotTermGraphs <- function(r, pvalue=NULL, dev="x11", ...) {
     if (!openMany)
       theDev(...)
     for (n in cc) {
+        sg <- subGraph(n, g)
+        if (use.terms) {
+            termLab <- sapply(mget(nodes(sg), GOTERM), Term)
+        } else {
+            termLab <- sub("^GO:", "", nodes(sg))
+        }
+        nlab <- paste(termLab, " (",
+                      geneCounts(r)[n], "/",
+                      universeCounts(r)[n],
+                      ")", sep="")
         if (length(n) == 1) {
-            cat("Skipping singleton component:", n,
-                " (", geneCounts(r)[n], ")\n", sep="")
+            message("Skipping singleton component: ",
+                    nlab)
             next
         }
-        sg <- subGraph(n, g)
-        nlab <- paste(sub("^GO:", "", nodes(sg)), " (",
-                      geneCounts(r)[n], ")", sep="")
         nattr <- makeNodeAttrs(sg,
                                label=nlab,
                                shape="ellipse",
