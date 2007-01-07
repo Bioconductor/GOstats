@@ -129,7 +129,7 @@ probeSetSummary <- function(result, pvalue, categorySize) {
 
 setMethod("summary", signature(object="GOHyperGResult"),
           function(object, pvalue=pvalueCutoff(object),
-                   categorySize=NULL, htmlLinks=TRUE) {
+                   categorySize=NULL, htmlLinks=FALSE) {
               AMIGO_URL <- "http://www.godatabase.org/cgi-bin/amigo/go.cgi?view=details&search_constraint=terms&depth=0&query=%s"
               df <- callNextMethod(object=object, pvalue=pvalue,
                                    categorySize=categorySize)
@@ -147,4 +147,18 @@ setMethod("summary", signature(object="GOHyperGResult"),
               }
               df$Term <- goTerms
               df
+          })
+
+setMethod("htmlReport", signature(r="GOHyperGResult"),
+          function(r, file="", append=FALSE, label="",
+                   htmlLinks=TRUE, ...)
+          {
+              ## We define a method here to pass htmlLinks=TRUE via
+              ## ... as the default.
+
+              ## NB: it "should" be enough to call callNextMethod() with
+              ## no arguments, but it doesn't work.
+              callNextMethod(r=r, file=file, append=append,
+                             label=label, htmlLinks=htmlLinks,
+                             ...)
           })
