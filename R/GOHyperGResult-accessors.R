@@ -105,45 +105,98 @@ sigCategories <- function(res, p) {
 }
 
 
-plotTermGraphs <- function(r, pvalue=NULL, use.terms=TRUE,
-                           dev="x11", ...) {
+inducedTermGraph <- function(r, id, children=TRUE, parents=TRUE,
+                             ...) {
+    if (!children && !parents)
+      stop("children and parents can't both be FALSE")
+    ## XXX: should use more structure here
+    goName <- paste(testName(r), collapse="")
+    goKidsEnv <- get(paste(goName, "CHILDREN", sep=""))
+    goParentsEnv <- get(paste(goName, "PARENTS", sep=""))
+    goIds <- character(0)
+
+    wantedNodes <- id
+    ## children
+    if (children) {
+        wantedNodes <- c(wantedNodes,
+                         unlist(edges(goDag(r))[id], use.names=FALSE))
+    }
+    ## parents
+    g <- reverseEdgeDirections(goDag(r))
+    if (parents) {
+        wantedNodes <- c(wantedNodes,
+                         unlist(edges(g)[id], use.names=FALSE))
+    }
+    wantedNodes <- unique(wantedNodes)
+    g <- subGraph(wantedNodes, g)
+
+    ## expand
+    if (children) {
+        for (goid in id) {
+            kids <- unique(goKidsEnv[[goid]])
+            for (k in kids) {
+                if (!(k %in% nodes(g))) {
+                    g <- addNode(k, g)
+                    g <- addEdge(k, goid, g)
+                }
+            }
+        }
+    }
+    if (parents) {
+        for (goid in id) {
+            elders <- unique(goKidsEnv[[goid]])
+            for (p in elders) {
+                if (!(p %in% nodes(g))) {
+                    g <- addNode(p, g)
+                    g <- addEdge(goid, p, g)
+                }
+            }
+        }
+    }
+    g
+}
+
+
+plotGOTermGraph <- function(g, r=NULL, add.counts=TRUE,
+                            max.nchar=20,...) {
+    n <- nodes(g)
+    termLab <- substr(sapply(mget(n, GOTERM), Term), 0, max.nchar)
+    ncolors <- rep("red", length(n))
+    if (!is.null(r) && add.counts) {
+        resultTerms <- names(pvalues(r))
+        ncolors <- ifelse(n %in% resultTerms, "lightgray", "white")
+        counts <- sapply(n, function(x) {
+            if (x %in% resultTerms) {
+                paste(geneCounts(r)[x], "/",
+                      universeCounts(r)[x],
+                      sep="")
+            } else {
+                ""
+            }
+        })
+        nlab <- paste(termLab, counts)
+    } else {
+        nlab <- termLab
+    }
+    nattr <- makeNodeAttrs(g,
+                           label=nlab,
+                           shape="ellipse",
+                           fillcolor=ncolors,
+                           fixedsize=FALSE)
+    plot(g, ..., nodeAttrs=nattr)
+}
+
+
+termGraphs <- function(r, id=NULL, pvalue=NULL, use.terms=TRUE) {
+    if (!is.null(id) && !is.null(pvalue))
+      warning("ignoring pvalue arg since GO IDs where specified")
     if (missing(pvalue) || is.null(pvalue))
       pvalue <- pvalueCutoff(r)
-    goids <- sigCategories(r, pvalue)
+    if (is.null(id))
+      goids <- sigCategories(r, pvalue)
+    else
+      goids <- id
     g <-  reverseEdgeDirections(subGraph(goids, goDag(r)))
     cc <- connectedComp(g)
-    if (!interactive())
-      dev <- getOption("device")
-    openMany <- TRUE
-    if (!(dev %in% c("x11", "X11", "quartz", "windows", "win.graph")))
-      openMany <- FALSE
-    theDev <- get(dev)
-    if (!openMany)
-      theDev(...)
-    for (n in cc) {
-        sg <- subGraph(n, g)
-        if (use.terms) {
-            termLab <- sapply(mget(nodes(sg), GOTERM), Term)
-        } else {
-            termLab <- sub("^GO:", "", nodes(sg))
-        }
-        nlab <- paste(termLab, " (",
-                      geneCounts(r)[n], "/",
-                      universeCounts(r)[n],
-                      ")", sep="")
-        if (length(n) == 1) {
-            message("Skipping singleton component: ",
-                    nlab)
-            next
-        }
-        nattr <- makeNodeAttrs(sg,
-                               label=nlab,
-                               shape="ellipse",
-                               fixedsize=FALSE)
-        if (openMany) 
-          theDev(...)
-        plot(sg, nodeAttrs=nattr)
-    }
-    if (!openMany)
-      dev.off()
+    sapply(cc, subGraph, g)
 }
