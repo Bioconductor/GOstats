@@ -157,21 +157,30 @@ inducedTermGraph <- function(r, id, children=TRUE, parents=TRUE,
 }
 
 
+## FIXME: perhpas it doesn't make sense to exclude the untestable GO terms.
+## maybe it would be better to keep them in as it will be less confusing?
 plotGOTermGraph <- function(g, r=NULL, add.counts=TRUE,
-                            max.nchar=20,...) {
+                            max.nchar=20,
+                            node.colors=c(sig="lightgray", not="white"),
+                            ...) {
     n <- nodes(g)
     termLab <- substr(sapply(mget(n, GOTERM), Term), 0, max.nchar)
     ncolors <- rep("red", length(n))
     if (!is.null(r) && add.counts) {
+        if (is.null(names(node.colors)) ||
+            !all(c("sig", "not") %in% names(node.colors)))
+          stop(paste("invalid node.colors arg:",
+                     "must have named elements 'sig' and 'not'"))
         resultTerms <- names(pvalues(r))
-        ncolors <- ifelse(n %in% resultTerms, "lightgray", "white")
+        ncolors <- ifelse(n %in% sigCategories(r), node.colors["sig"],
+                          node.colors["not"])
         counts <- sapply(n, function(x) {
             if (x %in% resultTerms) {
                 paste(geneCounts(r)[x], "/",
                       universeCounts(r)[x],
                       sep="")
             } else {
-                ""
+                "0/??"
             }
         })
         nlab <- paste(termLab, counts)
