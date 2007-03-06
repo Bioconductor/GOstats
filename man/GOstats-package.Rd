@@ -49,7 +49,7 @@ notConn                 Find genes that are not connected to the
 oneGOGraph              Construct the GO graph given a set of leaves.
 shortestPath            Shortest Path Analysis
 simLL                   Functions to compute similarities between GO
-                        graphs and also between LocusLink IDs based on
+                        graphs and also between Entrez Gene IDs based on
                         their induced GO graphs.
 triadCensus             Triad Functions
 }

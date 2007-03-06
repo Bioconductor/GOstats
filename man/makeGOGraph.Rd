@@ -3,7 +3,7 @@
 \title{ Construct a GO Graph }
 \description{
   The directed acyclic graph (DAG) based on finding the most specific
-  terms for the supplied LocusLink IDs is constructed and returned. The
+  terms for the supplied Entrez Gene IDs is constructed and returned. The
   constructuion is per GO ontology (there are three, MF, BP and CC) and
   once the most specific terms have been identified then all less
   specific terms are found (these are the parents of the terms) and then
@@ -13,13 +13,13 @@
 makeGOGraph(x, Ontology="MF", removeRoot = TRUE)
 }
 \arguments{
-  \item{x}{A vector of LocusLink IDs. }
+  \item{x}{A vector of Entrez Gene IDs. }
   \item{Ontology}{Which of the GO ontologies to use. }
   \item{removeRoot}{A logical value indicating whether the GO root nood
   should be removed or not.}
 }
 \details{
-  For each supplied LocusLink identifier all the GO annotations (in the
+  For each supplied Entrez Gene identifier all the GO annotations (in the
   specified ontology) are found.
   
   The mappings are different for the different ontologies. Typically a

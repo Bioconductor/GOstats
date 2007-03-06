@@ -3,7 +3,7 @@
 \alias{simUI}
 \alias{simLP}
 \title{Functions to compute similarities between GO graphs and also
-between LocusLink IDs based on their induced GO graphs.}
+between Entrez Gene IDs based on their induced GO graphs.}
 \description{
   Both \code{simUI} and \code{simLP} compute a similarity measure
   between two GO graphs. For \code{simLL}, first the induced GO graph
@@ -17,8 +17,8 @@ simLP(g1, g2)
 }
 
 \arguments{
-  \item{ll1}{A LocusLink ID as a character vector. }
-  \item{ll2}{A LocusLink ID as a character vector.}
+  \item{ll1}{A Entrez Gene ID as a character vector. }
+  \item{ll2}{A Entrez Gene ID as a character vector.}
   \item{Ontology}{Which ontology to use ("MF", "BP", "CC"). }
   \item{measure}{ Which measure to use ("LP", "UI"). }
   \item{dropCodes}{ A set of evidence codes to be ignored in

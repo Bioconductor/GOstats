@@ -4,7 +4,7 @@
 \description{
  The shortest path analysis was proposed by Zhou et. al. The basic
  computation is to find the shortest path in a supplied graph between
- two LocusLink IDs. Zhou et al claim that other genes annotated along
+ two Entrez Gene IDs. Zhou et al claim that other genes annotated along
  that path are likely to have the same GO annotation as the two end
  points.
 }
@@ -17,7 +17,7 @@ shortestPath(g, GOnode)
     interest. }
 }
 \details{
-  The algorithm implemented here is quite simple. All LocusLink
+  The algorithm implemented here is quite simple. All Entrez Gene 
   identifiers that are annotated at the GO node of interest are
   obtained. Those that are found as nodes in the graph are retained and
   used for the computation. For every pair of nodes at the GO term the
@@ -33,10 +33,10 @@ shortestPath(g, GOnode)
   The return values is a list with the following components:
   \item{shortestpaths }{A list of the ouput from \code{sp.between}. The
     names are the names of the nodes used as the two endpoints}
-  \item{nodesUsed }{A vector of the LocusLink IDs that were both found
+  \item{nodesUsed }{A vector of the Entrez Gene IDs that were both found
     at the GO term of interest and were nodes in the supplied graph,
     \code{g}. These were used to compute the shortest paths.}
-  \item{nodesNotUsed}{A vector of LocusLink IDs that were annotated at
+  \item{nodesNotUsed}{A vector of Entrez Gene IDs that were annotated at
     the GO term, but were not found in the graph \code{g}.}
 }
 \references{Transitive functional annotation by shortest-path analysis
