@@ -68,11 +68,6 @@ GOHyperG(x, lib, what="MF", universe=NULL)
   probes on a microarray map to a unique Entrez Gene identifer.  In
   \code{GOHyperG} every attempt to appropriately correct for
   non-uniqueness of mappings has been made.
-
-
-  In the return value, the LLs refer to Locus Link which has been
-  superceded by Entrez Gene.  For backwards compatibility, the names of
-  the returned elements have not been changed.
 }
 
 \value{
