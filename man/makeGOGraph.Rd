@@ -15,7 +15,7 @@ makeGOGraph(x, Ontology="MF", removeRoot = TRUE)
 \arguments{
   \item{x}{A vector of Entrez Gene IDs. }
   \item{Ontology}{Which of the GO ontologies to use. }
-  \item{removeRoot}{A logical value indicating whether the GO root nood
+  \item{removeRoot}{A logical value indicating whether the GO root node
   should be removed or not.}
 }
 \details{
