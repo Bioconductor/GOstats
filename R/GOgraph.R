@@ -130,6 +130,7 @@ oneGOGraph <- function(x, dataenv) {
     if(!is(g1, "graph") || !is(g2, "graph") )
          stop("only works for graphs")
     ig <- intersection(g1, g2)
+    if( numNodes(ig) < 2 ) return(0)
     lfi <- GOLeaves(ig)
     degs = degree(ig)
     root = names(degs$outDegree)[degs$outDegree == 0]
