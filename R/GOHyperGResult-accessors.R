@@ -87,21 +87,9 @@ setMethod("description", signature(object="GOHyperGResult"),
           })
 
 
-selectedGenes <- function(r, id) {
-    ## FIXME: make me a method!
-    ans <- geneIdUniverse(r)[id]
-    ans <- lapply(ans, intersect, geneIds(r))
-    ans
-}
-
-
-sigCategories <- function(res, p) {
-    ## FIXME: make me a method!
-    if (missing(p))
-      p <- pvalueCutoff(res)
-    pv <- pvalues(res)
-    goIds <- names(pv[pv < p])
-    goIds
+selectedGenes <- function(r, id=NULL) {
+    .Deprecated("geneIdsByCategory", package="Category")
+    geneIdsByCategory(r, id)
 }
 
 
