@@ -30,6 +30,8 @@
 \alias{description,GOHyperGResult-method}
 \alias{isConditional,GOHyperGResult-method}
 
+\alias{selectedGenes}
+
 \title{Class "GOHyperGResult"}
 
 \description{	
@@ -37,6 +39,10 @@
   This class represents the results of a test for overrepresentation
   of GO categories among genes in a selected gene set based upon the
   Hypergeometric distribution.
+
+  For details on extracting information from this object, be sure to
+  read the accessor documentation in the Category package:
+  \link[Category]{HyperGResult-accessors}.
 
 }
 
