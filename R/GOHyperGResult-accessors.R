@@ -93,8 +93,7 @@ selectedGenes <- function(r, id=NULL) {
 }
 
 
-inducedTermGraph <- function(r, id, children=TRUE, parents=TRUE,
-                             ...) {
+inducedTermGraph <- function(r, id, children=TRUE, parents=TRUE) {
     if (!children && !parents)
       stop("children and parents can't both be FALSE")
     ## XXX: should use more structure here
@@ -151,9 +150,8 @@ plotGOTermGraph <- function(g, r=NULL, add.counts=TRUE,
                             max.nchar=20,
                             node.colors=c(sig="lightgray", not="white"),
                             ...) {
-    n <- nodes(g)
-    termLab <- substr(sapply(mget(n, GOTERM), Term), 0, max.nchar)
-    ncolors <- rep("red", length(n))
+    termLab <- n <- nodes(g)
+    ncolors <- rep(node.colors["not"], length(n))
     if (!is.null(r) && add.counts) {
         if (is.null(names(node.colors)) ||
             !all(c("sig", "not") %in% names(node.colors)))
@@ -194,6 +192,8 @@ termGraphs <- function(r, id=NULL, pvalue=NULL, use.terms=TRUE) {
     else
       goids <- id
     g <-  reverseEdgeDirections(subGraph(goids, goDag(r)))
+    if (use.terms)
+      nodes(g) <- as.character(sapply(mget(nodes(g), GOTERM), Term))
     cc <- connectedComp(g)
     sapply(cc, subGraph, g)
 }
