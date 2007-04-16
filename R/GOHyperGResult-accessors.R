@@ -150,7 +150,11 @@ plotGOTermGraph <- function(g, r=NULL, add.counts=TRUE,
                             max.nchar=20,
                             node.colors=c(sig="lightgray", not="white"),
                             ...) {
+    if (!require("Rgraphviz", quietly=TRUE))
+      stop("The Rgraphviz package is required for this feature")
     termLab <- n <- nodes(g)
+    if (!is.null(max.nchar))
+      termLab <- sapply(termLab, substr, 1L, max.nchar, USE.NAMES=FALSE)
     ncolors <- rep(node.colors["not"], length(n))
     if (!is.null(r) && add.counts) {
         if (is.null(names(node.colors)) ||
