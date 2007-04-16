@@ -74,43 +74,11 @@ Class \code{"HyperGResultBase"}, directly.
 }
 \section{Methods}{
   \describe{
-  \item{geneCounts}{\code{signature(r =
-        "GOHyperGResult")}: return an \code{"integer"}
-      vector: for each category term tested, the number of genes from
-      the gene set that are annotated at the term.}
-
     \item{goDag}{\code{signature(r = "GOHyperGResult")}:
         return the \code{graph} instance representing the DAG of the
         GO terms that were tested.}
 
-    \item{pvalues}{\code{signature(r =
-          "GOHyperGResult")}: return a \code{"numeric"}
-        vector: the ordered p-values for each category term tested.}
-
-    \item{oddsRatios}{\code{signature(r =
-          "GOHyperGResult")}: return a \code{"numeric"}
-        vector: the odds ratio for each category term tested.}
-
-    \item{expectedCounts}{\code{signature(r =
-          "GOHyperGResult")}: return a \code{"numeric"}
-        vector: the expected number of genes for each GO term tested.}
-
-  \item{universeCounts}{\code{signature(r =
-        "GOHyperGResult")}: return an \code{"integer"}
-      vector: for each category term tested, the number of genes from
-      the gene universe that are annotated at the term.}
-
-  \item{universeMappedCount}{\code{signature(r =
-        "GOHyperGResult")}: return an \code{"integer"}
-      vector of length one giving the size of the gene universe set. }
-
-  \item{geneIdUniverse}{\code{signature(r =
-        "GOHyperGResult")}: return a list named by the
-      tested GO terms.  Each element of the list is a vector of gene
-      identifiers (from the gene universe) annotated at the
-      corresponding GO term.}
-
-  \item{condGeneIdUniverse}{\code{signature(r =
+      \item{condGeneIdUniverse}{\code{signature(r =
         "GOHyperGResult")}: return a list named by the
       tested GO terms.  Each element of the list is a vector of the
       remaining gene identifiers (from the gene universe) annotated at
@@ -142,10 +110,6 @@ Class \code{"HyperGResultBase"}, directly.
 
   \item{description}{\code{signature(object = "GOHyperGResult")}:
       Return a string giving a one-line description of the result.}
-
-    \item{isConditional}{\code{signature(r = "GOHyperGResult")}:
-        Return a \code{TRUE} if the result was created using a
-        conditional algorithm and \code{FALSE} otherwise.}
 
   }
 
