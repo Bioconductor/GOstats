@@ -39,20 +39,20 @@ shortestPath <- function(g, GOnode)
 }
 
 compGdist <- function(g, whNodes, verbose=FALSE) {
-    rval <- NULL
     nNodes = length(whNodes)
+    if(nNodes <= 1) 
+        stop("can only compute distances between two or more nodes")
+    if( any( !(whNodes %in% nodes(g))) )
+        stop("specified nodes are not in the graph")
+    tfmatrix <- matrix(0, nr= nNodes, nc=nNodes)
     for(i in 1:nNodes) {
         vvX <- dijkstra.sp(g, whNodes[i])
-        rval[[i]] <- vvX$distance[whNodes[-i]]
+        tfmatrix[i,] <- vvX$distance[whNodes]
         if( verbose)
             print(paste("Processing node", i, "of", nNodes))
     }
-    tfmatrix <- matrix(0, nr= nNodes, nc=nNodes)
     dimnames(tfmatrix) <- list(whNodes, whNodes)
-    for(i in 1:nNodes){
-        tfmatrix[i,names(rval[[i]])] <- rval[[i]]
-    }
-    return(tfmatrix)
+    tfmatrix
 }
 
 compCorrGraph <- function(eSet, k=1, tau=0.6) {
