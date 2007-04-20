@@ -1,8 +1,10 @@
 \name{hyperG2Affy}
 \alias{hyperG2Affy}
 %- Also NEED an '\alias' for EACH other topic documented here.
-\title{A List of Affymetrix IDs from GOIDs}
+\title{(DEPRECATED) A List of Affymetrix IDs from GOIDs}
 \description{
+  Use \code{probeSetSummary} instead.
+  
   Output a list of Affymetrix IDs associated with each significant GOID,
   based on the output from hyperGtable.
 }
@@ -44,9 +46,11 @@ universe = NULL)
 }
 \author{ James W. MacDonald <jmacdon@med.umich.edu>}
 \examples{
+\dontrun{
 library("hgu95av2")
 probids <- ls(hgu95av2GENENAME)[1:10]
 hyperG2Affy(probids, "hgu95av2")
+}
 }
 \keyword{ manip }% __ONLY ONE__ keyword per line
 \keyword{htest}

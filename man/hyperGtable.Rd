@@ -1,8 +1,10 @@
 \name{hyperGtable}
 \alias{hyperGtable}
 %- Also NEED an '\alias' for EACH other topic documented here.
-\title{Table from GOHyperG }
+\title{(DEPRECATED) Table from GOHyperG }
 \description{
+  Use the \code{summary} method on a \code{GOHyperGResult} object.
+  
   Output a table from a call to \code{\link[GOstats]{GOHyperG}}.
 }
 \usage{
@@ -55,9 +57,11 @@ save = FALSE, output = TRUE, filename = NULL, universe = NULL)
 }
 \author{ James W. MacDonald <jmacdon@med.umich.edu>}
 \examples{
+\dontrun{
 library("hgu95av2")
 probids <- ls(hgu95av2GENENAME)[1:10]
 hyperGtable(probids, "hgu95av2", save = TRUE, output = FALSE)
+}
 }
 \keyword{ manip }% __ONLY ONE__ keyword per line
 \keyword{htest}
