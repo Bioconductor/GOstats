@@ -9,7 +9,7 @@
   significant GO term in the test result.
 }
 \usage{
-probeSetSummary(result, pvalue, categorySize)
+probeSetSummary(result, pvalue, categorySize, sigProbesets)
 }
 
 \arguments{
@@ -23,6 +23,8 @@ probeSetSummary(result, pvalue, categorySize)
       for the GO terms.  Only results for GO terms with
       \code{categorySize} or more annotations will be returned.  If
       omitted, no category size criteria will be used.}
+  \item{sigProbesets}{Optional vector of probeset IDs. See details for
+      more information.}
 }
 
 \details{
@@ -43,6 +45,14 @@ probeSetSummary(result, pvalue, categorySize)
   probeset actually interrogates the intended transcript, so it might be
   useful to be able to check to see what other similar probesets are
   doing.
+
+  Because one of the first steps before running \code{hyperGTest} is to
+  subset the input vectors of geneIds and universeGeneIds, any
+  information about probeset IDs that interrogate the same gene
+  transcript is lost. In order to recover this information, one can pass
+  a vector of probeset IDs that were considered significant. This vector
+  will then be used to indicate which of the probesets that map to a
+  given GO term were significant in the original analysis.
 }
   
 
@@ -52,7 +62,12 @@ probeSetSummary(result, pvalue, categorySize)
   of the element).  Each \code{data.frame} has three columns:
   the Entrez Gene ID (\code{EntrezID}), the probe set ID
   (\code{ProbeSetID}), and a 0/1 indicator of whether the probe set ID
-  was provided as part of the initial input (\code{selected}).
+  was provided as part of the initial input (\code{selected})
+
+  Note that this 0/1 indicator will only be correct if the 'geneId'
+  vector used to construct the \code{GOHyperGParams} object was a named
+  vector (where the names are probeset IDs), or if a vector of
+  'sigProbesets' was passed to this function.
 }
 
 \author{S. Falcon and J. MacDonald}

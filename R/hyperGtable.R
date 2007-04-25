@@ -69,7 +69,7 @@ hyperG2Affy <- function(probids, lib, type="MF", pvalue=0.05,
 }
 
 
-probeSetSummary <- function(result, pvalue, categorySize) {
+probeSetSummary <- function(result, pvalue, categorySize, sigProbesets) {
     if (!is(result, "GOHyperGResult"))
       stop("result must be a GOHyperGResult instance (or subclass)")
     ## build reverse map
@@ -95,11 +95,8 @@ probeSetSummary <- function(result, pvalue, categorySize) {
     ## XXX FIXME:
     summary <- Category:::XXX_getSummaryGeneric_XXX()
     goids <- summary(result, pvalue, categorySize)[,1]
-    ## XXX: these are unconditional, not sure if we want the
-    ##      condGeneIdUniverse here if the calculation used
-    ##      the conditional calculation.
     sigegids <- geneIds(result)
-    egids <- geneIdUniverse(result)[goids]
+    egids <- condGeneIdUniverse(result)[goids]
     psetids <- lapply(egids, function(ids) {
         ids <- as.character(ids)
         have <- ids %in% sigegids
@@ -111,7 +108,18 @@ probeSetSummary <- function(result, pvalue, categorySize) {
     })
     psetidsNULL <- sapply(psetids, is.null)
     psetids <- psetids[!psetidsNULL]
-    selectedProbeSetIDs <- names(geneIds(result))
+    if(missing(sigProbesets)){
+        selectedProbeSetIDs <- names(geneIds(result))
+        if(is.null(selectedProbeSetIDs))
+            warning(paste("The vector of geneIds used to create the GOHyperGParams",
+                          "object was not a named vector.\nIf you want to know the",
+                          "probesets that contributed to this result\neither use",
+                          "a named vector for geneIds, or pass a vector of probeset IDs\n",
+                          "via sigProbesets.\n", sep=""),
+                    call.=FALSE)
+    }else{
+        selectedProbeSetIDs <- sigProbesets
+    }
     selectedInd <- lapply(psetids, function(ids) {
         ids %in% selectedProbeSetIDs
     })
