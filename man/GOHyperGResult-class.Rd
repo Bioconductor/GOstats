@@ -6,28 +6,20 @@
 \alias{goDag}
 \alias{goDag,GOHyperGResult-method}
 
-\alias{oddsRatios}
 \alias{oddsRatios,GOHyperGResult-method}
 
-\alias{expectedCounts}
 \alias{expectedCounts,GOHyperGResult-method}
 
 \alias{pvalues,GOHyperGResult-method}
-\alias{universeCounts,GOHyperGResult-method}
-\alias{universeMappedCount,GOHyperGResult-method}
 
-\alias{geneIdUniverse}
 \alias{geneIdUniverse,GOHyperGResult-method}
 
-\alias{condGeneIdUniverse}
 \alias{condGeneIdUniverse,GOHyperGResult-method}
-
 
 \alias{htmlReport,GOHyperGResult-method}
 
 \alias{summary,GOHyperGResult-method}
 
-\alias{description,GOHyperGResult-method}
 \alias{isConditional,GOHyperGResult-method}
 
 \alias{selectedGenes}

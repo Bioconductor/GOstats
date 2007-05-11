@@ -1,23 +1,18 @@
 setMethod("goDag", signature(r="GOHyperGResult"),
           function(r) r@goDag)
 
+orderedAttr <- function(r, attr) {
+    unlist(nodeData(r@goDag, attr=attr))[r@pvalue.order]
+}
 
 setMethod("pvalues", signature(r="GOHyperGResult"),
-          function(r) {
-              unlist(nodeData(r@goDag, attr="pvalue"))[r@pvalue.order]
-              })
-
+          function(r) orderedAttr(r, "pvalue"))
 
 setMethod("oddsRatios", signature(r="GOHyperGResult"),
-          function(r) {
-              unlist(nodeData(r@goDag, attr="oddsRatio"))[r@pvalue.order]
-              })
-
+          function(r) orderedAttr(r, "oddsRatio"))
 
 setMethod("expectedCounts", signature(r="GOHyperGResult"),
-          function(r) {
-              unlist(nodeData(r@goDag, attr="expCount"))[r@pvalue.order]
-              })
+          function(r) orderedAttr(r, "expCount"))
 
 
 entrezGeneUniverse <- function(r) {
@@ -25,12 +20,10 @@ entrezGeneUniverse <- function(r) {
              attr="geneIds")
 }
 
-
 setMethod("geneIdUniverse", signature(r="GOHyperGResult"),
           function(r) {
               entrezGeneUniverse(r)
           })
-
 
 setMethod("condGeneIdUniverse", signature(r="GOHyperGResult"),
           function(r) {
@@ -41,50 +34,8 @@ setMethod("condGeneIdUniverse", signature(r="GOHyperGResult"),
                 geneIdUniverse(r)
           })
 
-
-setMethod("geneCounts", signature(r="GOHyperGResult"),
-          function(r) {
-              sapply(condGeneIdUniverse(r), function(x) {
-                  sum(r@geneIds %in% x)
-              })
-          })
-
-
-## setMethod("condGeneCounts", signature(r="GOHyperGResult"),
-##           function(r) {
-##               sapply(condGeneIdUniverse(r), function(x) {
-##                   sum(r@geneIds %in% x)
-##               })
-##           })
-
-
-setMethod("universeCounts", signature(r="GOHyperGResult"),
-          function(r) {
-              sapply(entrezGeneUniverse(r), length)
-          })
-
-
-setMethod("universeMappedCount", signature(r="GOHyperGResult"),
-          function(r) {
-              length(unique(unlist(entrezGeneUniverse(r))))
-          })
-
-
 setMethod("isConditional", signature(r="GOHyperGResult"),
           function(r) r@conditional)
-
-
-setMethod("description", signature(object="GOHyperGResult"),
-          function(object) {
-              cond <- "Conditional"
-              if (!isConditional(object))
-                cond <- ""
-              desc <- paste("Gene to %s", cond, "test for %s-representation")
-              desc <- sprintf(desc,
-                              paste(testName(object), collapse=" "),
-                              testDirection(object))
-              desc
-          })
 
 
 selectedGenes <- function(r, id=NULL) {
