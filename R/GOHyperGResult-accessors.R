@@ -68,11 +68,13 @@ inducedTermGraph <- function(r, id, children=TRUE, parents=TRUE) {
     wantedNodes <- unique(wantedNodes)
     g <- subGraph(wantedNodes, g)
 
-    ## expand
+    ## expand; add children and/or parents that are not present in g,
+    ## but are definedin the GO data.
     if (children) {
         for (goid in id) {
             kids <- unique(goKidsEnv[[goid]])
             for (k in kids) {
+                if (is.na(k)) next
                 if (!(k %in% nodes(g))) {
                     g <- addNode(k, g)
                     g <- addEdge(k, goid, g)
@@ -82,8 +84,9 @@ inducedTermGraph <- function(r, id, children=TRUE, parents=TRUE) {
     }
     if (parents) {
         for (goid in id) {
-            elders <- unique(goKidsEnv[[goid]])
+            elders <- unique(goParentsEnv[[goid]])
             for (p in elders) {
+                if (is.na(p)) next
                 if (!(p %in% nodes(g))) {
                     g <- addNode(p, g)
                     g <- addEdge(goid, p, g)
