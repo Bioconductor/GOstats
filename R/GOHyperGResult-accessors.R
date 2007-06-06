@@ -149,9 +149,10 @@ termGraphs <- function(r, id=NULL, pvalue=NULL, use.terms=TRUE) {
       goids <- sigCategories(r, pvalue)
     else
       goids <- id
-    g <-  reverseEdgeDirections(subGraph(goids, goDag(r)))
+    g <- subGraph(goids, goDag(r))
     if (use.terms)
       nodes(g) <- as.character(sapply(mget(nodes(g), GOTERM), Term))
+    g <-  reverseEdgeDirections(g)
     cc <- connectedComp(g)
     sapply(cc, subGraph, g)
 }
