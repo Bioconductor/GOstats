@@ -103,10 +103,16 @@ inducedTermGraph <- function(r, id, children=TRUE, parents=TRUE) {
 plotGOTermGraph <- function(g, r=NULL, add.counts=TRUE,
                             max.nchar=20,
                             node.colors=c(sig="lightgray", not="white"),
+                            node.shape="plaintext",
                             ...) {
     if (!require("Rgraphviz", quietly=TRUE))
       stop("The Rgraphviz package is required for this feature")
-    termLab <- n <- nodes(g)
+    n <- nodes(g)
+    termLab <-
+      if ("term" %in% names(nodeDataDefaults(g))) {
+          unlist(nodeData(g, attr="term"))
+      } else n
+
     if (!is.null(max.nchar))
       termLab <- sapply(termLab, substr, 1L, max.nchar, USE.NAMES=FALSE)
     ncolors <- rep(node.colors["not"], length(n))
@@ -133,7 +139,7 @@ plotGOTermGraph <- function(g, r=NULL, add.counts=TRUE,
     }
     nattr <- makeNodeAttrs(g,
                            label=nlab,
-                           shape="ellipse",
+                           shape=node.shape,
                            fillcolor=ncolors,
                            fixedsize=FALSE)
     plot(g, ..., nodeAttrs=nattr)
@@ -150,8 +156,11 @@ termGraphs <- function(r, id=NULL, pvalue=NULL, use.terms=TRUE) {
     else
       goids <- id
     g <- subGraph(goids, goDag(r))
-    if (use.terms)
-      nodes(g) <- as.character(sapply(mget(nodes(g), GOTERM), Term))
+    if (use.terms) {
+        nodeDataDefaults(g) <- list(term=as.character(NA))
+        nodeData(g, attr="term") <-
+          as.character(sapply(mget(nodes(g), GOTERM), Term))
+    }
     g <-  reverseEdgeDirections(g)
     cc <- connectedComp(g)
     sapply(cc, subGraph, g)

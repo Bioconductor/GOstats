@@ -12,7 +12,8 @@
 termGraphs(r, id = NULL, pvalue = NULL, use.terms = TRUE)
 inducedTermGraph(r, id, children = TRUE, parents = TRUE)
 plotGOTermGraph(g, r = NULL, add.counts = TRUE, max.nchar = 20,
-                node.colors=c(sig="lightgray", not="white"), ...)
+                node.colors=c(sig="lightgray", not="white"),
+                node.shape="plaintext", ...)
 }
 
 \arguments{
@@ -27,9 +28,9 @@ plotGOTermGraph(g, r = NULL, add.counts = TRUE, max.nchar = 20,
   \item{pvalue}{Numeric p-value cutoff to use for selecting category
     terms to include.  Will be ignored if \code{id} is present.}
 
-  \item{use.terms}{Logical value indicating whether the nodes of the
-    returned graph should be GO IDs (\code{FALSE}) or more descriptive,
-    but possibly much longer, GO Terms (\code{TRUE}).}
+  \item{use.terms}{Logical value indicating whether a \code{"term"} node
+    attribute should be added to the returned graph providing the more
+    descriptive, but possibly much longer, GO Terms.}
 
   \item{children}{A logical value indicating whether to include direct
     child terms of the terms specified by \code{id}.}
@@ -49,6 +50,9 @@ plotGOTermGraph(g, r = NULL, add.counts = TRUE, max.nchar = 20,
     compoents \code{sig} and \code{not}, giving color names for the
     significant and non-significant nodes, respectively.}
 
+  \item{node.shape}{This argument controls the shape of the plotted
+    nodes and must take on a value allowed by Rgraphviz.}
+
   \item{...}{For \code{plotGOTermGraph}, extra arguments are passed to
     the \code{plot} function.}
 
@@ -62,7 +66,8 @@ plotGOTermGraph(g, r = NULL, add.counts = TRUE, max.nchar = 20,
       the GO ontology induced by selecting the specified GO IDs (if
       \code{id} is present) or by selecting the GO IDs that have a
       p-value less that \code{pvalue}.  If \code{use.terms} is
-      \code{TRUE} the GO IDs will be translated into GO Term names.
+      \code{TRUE} the GO IDs will be translated into GO Term names and
+      attached to the nodes as node attributes (see \code{nodeData}).
       Edges in the graphs go from child (more specific) to parent (less
       specific).}
 
