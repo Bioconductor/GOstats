@@ -111,7 +111,7 @@ Class \code{"HyperGResultBase"}, directly.
 \author{Seth Falcon}
 
 \seealso{
-  \code{\link[Category]{GeneCategoryHyperGeoTestResult}}
+  \link[Category]{HyperGResult-accessors}
 }
 
 \keyword{classes}
