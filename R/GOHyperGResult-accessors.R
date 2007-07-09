@@ -21,17 +21,17 @@ entrezGeneUniverse <- function(r) {
 }
 
 setMethod("geneIdUniverse", signature(r="GOHyperGResult"),
-          function(r) {
-              entrezGeneUniverse(r)
+          function(r, cond=TRUE) {
+              if (cond && isConditional(r))
+                nodeData(r@goDag, n=nodes(r@goDag)[r@pvalue.order],
+                         attr="condGeneIds")
+              else
+                entrezGeneUniverse(r)
           })
 
 setMethod("condGeneIdUniverse", signature(r="GOHyperGResult"),
           function(r) {
-              if (isConditional(r))
-                nodeData(r@goDag, n=nodes(r@goDag)[r@pvalue.order],
-                         attr="condGeneIds")
-              else
-                geneIdUniverse(r)
+              geneIdUniverse(r)
           })
 
 setMethod("isConditional", signature(r="GOHyperGResult"),

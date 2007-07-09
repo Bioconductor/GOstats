@@ -96,7 +96,7 @@ probeSetSummary <- function(result, pvalue, categorySize, sigProbesets) {
     summary <- Category:::XXX_getSummaryGeneric_XXX()
     goids <- summary(result, pvalue, categorySize)[,1]
     sigegids <- geneIds(result)
-    egids <- condGeneIdUniverse(result)[goids]
+    egids <- geneIdUniverse(result)[goids]
     psetids <- lapply(egids, function(ids) {
         ids <- as.character(ids)
         have <- ids %in% sigegids
