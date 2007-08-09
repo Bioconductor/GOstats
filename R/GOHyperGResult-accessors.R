@@ -22,7 +22,7 @@ entrezGeneUniverse <- function(r) {
 
 setMethod("geneIdUniverse", signature(r="GOHyperGResult"),
           function(r, cond=TRUE) {
-              if (cond && isConditional(r))
+              if (cond && conditional(r))
                 nodeData(r@goDag, n=nodes(r@goDag)[r@pvalue.order],
                          attr="condGeneIds")
               else
@@ -34,9 +34,11 @@ setMethod("condGeneIdUniverse", signature(r="GOHyperGResult"),
               geneIdUniverse(r)
           })
 
-setMethod("isConditional", signature(r="GOHyperGResult"),
+setMethod("conditional", signature(r="GOHyperGResult"),
           function(r) r@conditional)
 
+setMethod("isConditional", signature(r="GOHyperGResult"),
+          function(r) conditional(r))
 
 selectedGenes <- function(r, id=NULL) {
     .Deprecated("geneIdsByCategory", package="Category")

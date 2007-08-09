@@ -467,7 +467,7 @@ goDag(hgOver)
 geneMappedCount(hgOver)
 universeMappedCount(hgOver)
 
-isConditional(hgOver)
+conditional(hgOver)
 testDirection(hgOver)
 testName(hgOver)
 

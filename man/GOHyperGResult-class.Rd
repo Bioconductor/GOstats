@@ -20,6 +20,7 @@
 
 \alias{summary,GOHyperGResult-method}
 
+\alias{conditional,GOHyperGResult-method}
 \alias{isConditional,GOHyperGResult-method}
 
 \alias{selectedGenes}
