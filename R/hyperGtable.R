@@ -159,6 +159,52 @@ setMethod("summary", signature(object="GOHyperGResult"),
               df
           })
 
+setMethod("summary", signature(object="KEGGHyperGResult"),
+          function(object, pvalue=pvalueCutoff(object),
+                   categorySize=NULL, htmlLinks=FALSE){
+              KEGG_URL <- "http://www.genome.jp/dbget-bin/www_bget?path:hsa%s"
+              df <- callNextMethod(object=object, pvalue=pvalue,
+                                   categorySize=categorySize)
+              if(nrow(df) == 0){
+                  df$Term <- character(0)
+                  return(df)
+              }
+              keggIds <- df[[1]]
+              keggTerms <- unlist(mget(keggIds, KEGGPATHID2NAME, ifnotfound=NA))
+              if(htmlLinks){
+                  keggIdUrls <- sapply(keggIds,
+                                       function(x) sprintf(KEGG_URL, x))
+                  keggTerms <- paste('<a href="', keggIdUrls, '">', keggTerms,
+                                     '</a>', sep="")
+              }
+              df$Term <- keggTerms
+              df
+          })
+
+setMethod("summary", signature(object="PFAMHyperGResult"),
+          function(object,pvalue=pvalueCutoff(object),
+                   categorySize=NULL, htmlLinks=FALSE){
+              PFAM_URL <- "http://www.sanger.ac.uk/cgi-bin/Pfam/getacc?%s"
+              df <- callNextMethod(object=object, pvalue=pvalue,
+                                   categorySize=categorySize)
+              if(nrow(df) == 0){
+                  df$Term <- character(0)
+                  return(df)
+              }
+              pfamIds <- df[[1]]
+              if(htmlLinks){
+                  pfamIdUrls <- sapply(pfamIds,
+                                       function(x) sprintf(PFAM_URL, x))
+                  pfamTerms <- paste('<a href="', pfamIdUrls, '">', pfamIds,
+                                     '</a>', sep="")
+              }else{
+                  pfamTerms <- pfamIds
+              }
+              df$Term <- pfamTerms
+              df
+          })
+
+
 setMethod("htmlReport", signature(r="GOHyperGResult"),
           function(r, file="", append=FALSE, label="",
                    htmlLinks=TRUE, ...)
@@ -172,3 +218,20 @@ setMethod("htmlReport", signature(r="GOHyperGResult"),
                              label=label, htmlLinks=htmlLinks,
                              ...)
           })
+
+setMethod("htmlReport", signature(r="KEGGHyperGResult"),
+          function(r, file="", append=FALSE, label="",
+                   htmlLinks=TRUE, ...){
+              callNextMethod(r=r, file=file, append=append,
+                             label=label, htmlLinks=htmlLinks,
+                             ...)
+          })
+
+setMethod("htmlReport", signature(r="PFAMHyperGResult"),
+          function(r, file="", append=FALSE, label="",
+                   htmlLinks=TRUE, ...){
+              callNextMethod(r=r, file=file, append=append,
+                             label=label, htmlLinks=htmlLinks,
+                             ...)
+          })
+

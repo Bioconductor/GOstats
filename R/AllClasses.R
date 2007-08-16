@@ -9,4 +9,10 @@ setClass("GOHyperGResult",
            pvalueCutoff=0.01,
            goDag=new("graphNEL")))
 
+setClass("KEGGHyperGResult",
+         contains="HyperGResult")
+
+setClass("PFAMHyperGResult",
+         contains="HyperGResult")
+
 
