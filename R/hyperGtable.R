@@ -207,16 +207,15 @@ setMethod("summary", signature(object="PFAMHyperGResult"),
 
 setMethod("htmlReport", signature(r="GOHyperGResult"),
           function(r, file="", append=FALSE, label="",
-                   htmlLinks=TRUE, ...)
+                   digits=3, summary.args=list(htmlLinks=TRUE))
           {
               ## We define a method here to pass htmlLinks=TRUE via
               ## ... as the default.
 
               ## NB: it "should" be enough to call callNextMethod() with
               ## no arguments, but it doesn't work.
-              callNextMethod(r=r, file=file, append=append,
-                             label=label, htmlLinks=htmlLinks,
-                             ...)
+              callNextMethod(r=r, file=file, append=append, label=label,
+                             digits=digits, summary.args=summary.args)
           })
 
 setMethod("htmlReport", signature(r="KEGGHyperGResult"),
