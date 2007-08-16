@@ -15,8 +15,7 @@ export(combGOGraph, compCorrGraph, compGdist,
        GOHyperG,
        probeSetSummary)
 
-exportClasses("GOHyperGResult", "KEGGHyperGResult",
-              "PFAMHyperGResult")
+exportClasses("GOHyperGResult")
 exportMethods("hyperGTest", "getGoGraph",
               "pvalues",
               "isConditional",
