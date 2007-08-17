@@ -10,11 +10,14 @@
   their parents and so on, until the root is encountered.  
 }
 \usage{
-makeGOGraph(x, Ontology="MF", removeRoot = TRUE)
+makeGOGraph(x, Ontology, eg2go.map, removeRoot = TRUE)
 }
 \arguments{
   \item{x}{A vector of Entrez Gene IDs. }
-  \item{Ontology}{Which of the GO ontologies to use. }
+  \item{Ontology}{Which GO ontology to use (CC, BP, or MF). }
+  \item{eg2go.map}{An object with an environment-like interface
+    with an \code{mget} method that provides a mapping from Entrez Gene
+    IDs to GO IDs.}
   \item{removeRoot}{A logical value indicating whether the GO root node
   should be removed or not.}
 }
@@ -39,8 +42,14 @@ makeGOGraph(x, Ontology="MF", removeRoot = TRUE)
 \seealso{\code{\link{oneGOGraph}}}
 
 \examples{
+ library("hgu95av2.db")
+ 
  gN <- c("71733","224019", "237928", "11308")
- gg1 <- makeGOGraph(gN, "BP")
+ probes <- unique(unlist(mget(gN, revmap(hgu95av2ENTREZID))))
+ goids <- mget(probes, hgu95av2GO)
+ names(goids) <- gN
+ eg2go <- l2e(goids)
+ gg1 <- makeGOGraph(gN, "BP", eg2go)
  
 }
 \keyword{manip}

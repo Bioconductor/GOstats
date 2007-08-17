@@ -2,12 +2,12 @@
 
 ##given a set of LOCUSLINK IDs obtain the GO graph that has all
 ##GO ids that those genes are annotated at, and
-makeGOGraph <- function (x, Ontology = "MF", removeRoot=TRUE)
+makeGOGraph <- function (x, Ontology, eg2go.map, removeRoot=TRUE)
 {
     match.arg(Ontology, c("MF", "BP", "CC"))
     wh <- paste(Ontology, "PARENTS", sep = "")
     dataenv = GOenv(wh)
-    newNodes <- mget(x, envir = GOenv("ENTREZID2GO"), ifnotfound=NA)
+    newNodes <- mget(x, envir = eg2go.map, ifnotfound=NA)
     if( length(newNodes) == 1)
        bd = is.na(newNodes[[1]])
     else
@@ -67,8 +67,6 @@ makeGOGraph <- function (x, Ontology = "MF", removeRoot=TRUE)
 ##we need to find edges for each of them
 ##we're going to build a graphNEL
 GOGraph = function(x, dataenv) {
-    if (!is.environment(dataenv))
-        stop("second argument must be an environment")
     ##this is the old oneGOGraph code - but it just works for
     ##multiple inputs
     oldEdges <- vector("list", length=0)
@@ -106,8 +104,6 @@ GOGraph = function(x, dataenv) {
 oneGOGraph <- function(x, dataenv) {
     if( length(x) > 1 )
         stop("wrong number of GO terms")
-    if (!is.environment(dataenv))
-        stop("second argument must be an environment")
     GOGraph(x, dataenv)
 }
  ##GOleaves: the leaves of the GO graph are those nodes that have no
@@ -139,31 +135,27 @@ oneGOGraph <- function(x, dataenv) {
     max(plens)
 }
 
- ##a helper function to get the right GOIDs
-GO.eg2go = GOenv("ENTREZID2GO")
- .getWHEC = function(llid, wh, eCodes) {
-     x = GO.eg2go[[llid]]
-     if( !is.null(eCodes) )
-         x = dropECode(x, eCodes)
-     unique(unlist(getOntology(x, wh)))
-  }
+simLL = function(ll1, ll2, Ontology, eg2go.map,
+                  measure="LP", dropCodes=NULL) {
+     ## helper function to get the right GOIDs
+     .getWHEC = function(llid, wh, eCodes) {
+         x = eg2go.map[[llid]]
+         if( !is.null(eCodes) )
+           x = dropECode(x, eCodes)
+         unique(unlist(getOntology(x, wh)))
+     }
 
- simLL = function(ll1, ll2, Ontology="MF", measure = "LP",
-                      dropCodes=NULL) {
     wh = match.arg(Ontology, c("MF", "BP", "CC"))
     ll1GO = .getWHEC(ll1, wh, dropCodes)
     ll2GO = .getWHEC(ll2, wh, dropCodes)
-    dataenv = get(paste("GO", wh, "PARENTS", sep=""),
-                    mode="environment")
+    dataenv = GOenv(paste(wh, "PARENTS", sep=""))
     g1 = GOGraph(ll1GO, dataenv)
     g2 = GOGraph(ll2GO, dataenv)
-    if( length(nodes(g1)) == 0 || length(nodes(g2)) == 0 )
+    if (length(nodes(g1)) == 0 || length(nodes(g2)) == 0)
       return(NA)
     sm = match.arg(measure, c("LP", "UI"))
     sim = switch(sm,
            LP = simLP(g1, g2),
            UI = simUI(g1, g2))
-    return(list(sim=sim, measure=measure, g1 = g1, g2 =g2))
+    return(list(sim=sim, measure=measure, g1=g1, g2=g2))
   }
-
-

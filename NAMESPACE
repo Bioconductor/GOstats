@@ -1,11 +1,10 @@
 import("methods")
 import("Category")
-
+import("AnnotationDbi")
 importMethodsFrom("Biobase", "annotation", "description")
 
 export(combGOGraph, compCorrGraph, compGdist,
        enumPairs, 
-       .getWHEC,
        GOGraph, GOLeaves,
        idx2dimnames, isTriad,
        makeGOGraph, notConn, oneGOGraph,

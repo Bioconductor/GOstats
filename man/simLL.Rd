@@ -11,7 +11,7 @@ between Entrez Gene IDs based on their induced GO graphs.}
   of \code{simUI} or \code{simLP}.
 }
 \usage{
-simLL(ll1, ll2, Ontology = "MF", measure = "LP", dropCodes = NULL)
+simLL(ll1, ll2, Ontology, eg2go.map, measure = "LP", dropCodes = NULL)
 simUI(g1, g2)
 simLP(g1, g2)
 }
@@ -20,6 +20,9 @@ simLP(g1, g2)
   \item{ll1}{A Entrez Gene ID as a character vector. }
   \item{ll2}{A Entrez Gene ID as a character vector.}
   \item{Ontology}{Which ontology to use ("MF", "BP", "CC"). }
+  \item{eg2go.map}{An object with an environment-like interface
+    with an \code{mget} method that provides a mapping from Entrez Gene
+    IDs to GO IDs.}
   \item{measure}{ Which measure to use ("LP", "UI"). }
   \item{dropCodes}{ A set of evidence codes to be ignored in
     constructing the induced GO graphs. }
@@ -59,8 +62,15 @@ then \code{NA} is returned.
 
 \seealso{\code{\link{makeGOGraph}} }
 \examples{
-  aa = simLL("111", "112")
-  bb = simLL("9184", "3547", "BP")
+  library("hgu95av2.db")
+  eg1 = c("9184", "3547")
+
+  probes <- unique(unlist(mget(eg1, revmap(hgu95av2ENTREZID))))
+  goids <- mget(probes, hgu95av2GO)
+  names(goids) <- eg1
+  eg2go <- l2e(goids)
+
+  bb = simLL(eg1[1], eg1[2], "BP", eg2go)
 }
 \keyword{manip}
 
