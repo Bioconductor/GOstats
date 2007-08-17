@@ -19,7 +19,7 @@ biocViews: \tab Statistics, Annotation, GO, MultipleComparisons\cr
 Depends: \tab graph (>= 1.9.25), GO, annotate, RBGL, xtable, Biobase,
 genefilter, multtest, Category (>= 1.3.7), methods\cr
 Imports: \tab methods, Category\cr
-Suggests: \tab hgu95av2 (>= 1.6.0)\cr
+Suggests: \tab hgu95av2.db (>= 1.6.0)\cr
 License: \tab Artistic\cr
 }
 

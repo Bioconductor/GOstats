@@ -1,6 +1,6 @@
 resultToGOHyperG <- function(res, origIds) {
     go2Affy <- mget(names(pvalues(res)),
-                    Category:::getDataEnv("GO2ALLPROBES", annotation(res)))
+                    getAnnMap("GO2ALLPROBES", annotation(res)))
     list(pvalues=pvalues(res),
          goCounts=universeCounts(res),
          intCounts=geneCounts(res),

@@ -14,7 +14,7 @@ save = FALSE, output = TRUE, filename = NULL, universe = NULL)
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{probids}{ A vector of Affymetrix probe IDs}
-  \item{lib}{ An annotation package (e.g., \code{hgu95av2})}
+  \item{lib}{ An annotation package (e.g., \code{hgu95av2.db})}
   \item{type}{One of "MF", "CC", "BP", indicating molecular function,
     cellular component, or biological process, respectively.}
   \item{pvalue}{The significance level used to choose GO terms}
@@ -58,9 +58,9 @@ save = FALSE, output = TRUE, filename = NULL, universe = NULL)
 \author{ James W. MacDonald <jmacdon@med.umich.edu>}
 \examples{
 \dontrun{
-library("hgu95av2")
+library("hgu95av2.db")
 probids <- ls(hgu95av2GENENAME)[1:10]
-hyperGtable(probids, "hgu95av2", save = TRUE, output = FALSE)
+hyperGtable(probids, "hgu95av2.db", save = TRUE, output = FALSE)
 }
 }
 \keyword{ manip }% __ONLY ONE__ keyword per line

@@ -103,14 +103,14 @@ GOHyperG(x, lib, what="MF", universe=NULL)
 
 \examples{
 \dontrun{
-library(hgu95av2)
+library(hgu95av2.db)
 library(GO)
 w1<-as.list(hgu95av2ENTREZID)
 w2<-unique(unlist(w1))
 set.seed(123)
 ## pick a 25 interesting genes
 myLL <- sample(w2, 25)
-xx <- GOHyperG(myLL, lib="hgu95av2", what="CC")
+xx <- GOHyperG(myLL, lib="hgu95av2.db", what="CC")
 xx$numLL
 xx$numInt
 sum(xx$pvalues < 0.01)

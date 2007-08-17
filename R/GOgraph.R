@@ -5,9 +5,9 @@
 makeGOGraph <- function (x, Ontology = "MF", removeRoot=TRUE)
 {
     match.arg(Ontology, c("MF", "BP", "CC"))
-    wh <- paste("GO", Ontology, "PARENTS", sep = "")
-    dataenv = get(wh, mode="environment")
-    newNodes <- mget(x, env = GOENTREZID2GO, ifnotfound=NA)
+    wh <- paste(Ontology, "PARENTS", sep = "")
+    dataenv = GOenv(wh)
+    newNodes <- mget(x, envir = GOenv("ENTREZID2GO"), ifnotfound=NA)
     if( length(newNodes) == 1)
        bd = is.na(newNodes[[1]])
     else
@@ -140,8 +140,9 @@ oneGOGraph <- function(x, dataenv) {
 }
 
  ##a helper function to get the right GOIDs
+GO.eg2go = GOenv("ENTREZID2GO")
  .getWHEC = function(llid, wh, eCodes) {
-     x = GOENTREZID2GO[[llid]]
+     x = GO.eg2go[[llid]]
      if( !is.null(eCodes) )
          x = dropECode(x, eCodes)
      unique(unlist(getOntology(x, wh)))

@@ -50,9 +50,9 @@ inducedTermGraph <- function(r, id, children=TRUE, parents=TRUE) {
     if (!children && !parents)
       stop("children and parents can't both be FALSE")
     ## XXX: should use more structure here
-    goName <- paste(testName(r), collapse="")
-    goKidsEnv <- get(paste(goName, "CHILDREN", sep=""))
-    goParentsEnv <- get(paste(goName, "PARENTS", sep=""))
+    goOnt <- testName(r)[2]
+    goKidsEnv <- GOenv(paste(goOnt, "CHILDREN", sep=""))
+    goParentsEnv <- GOenv(paste(goOnt, "PARENTS", sep=""))
     goIds <- character(0)
 
     wantedNodes <- id

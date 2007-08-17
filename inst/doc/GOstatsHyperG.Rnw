@@ -1,5 +1,5 @@
 %\VignetteIndexEntry{Hypergeometric Tests Using GOstats}
-%\VignetteDepends{ALL, hgu95av2, genefilter, RColorBrewer, xtable, Rgraphviz}
+%\VignetteDepends{ALL, hgu95av2.db, genefilter, RColorBrewer, xtable, Rgraphviz}
 %\VignetteKeywords{Hypergeometric, GO, ontology}
 %\VignettePackage{GOstats}
 \documentclass[11pt]{article}
@@ -63,9 +63,8 @@ To get started, load the packages needed for this analysis:
 
 <<Setup, echo=TRUE, results=hide>>=
 library("ALL")
-## coming soon
-##library("hgu95av2db")
-library("hgu95av2")
+library("hgu95av2.db")
+library("GO.db")
 library("annotate")
 library("genefilter")
 library("GOstats")

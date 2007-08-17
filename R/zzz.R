@@ -9,3 +9,8 @@
         addVigs2WinMenu("GOstats")
     }
 }
+
+GOenv <- function(what) {
+    getAnnMap(what, "GO", load=TRUE,
+              type=c("db", "env"))
+}

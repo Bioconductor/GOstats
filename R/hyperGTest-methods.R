@@ -80,9 +80,7 @@ removeLengthZero <- function(x) {
 getGoToChildGraph <- function(p, goIds) {
     ## We might want a method here so that we can dispatch on
     ## a SQLite-based GO package.
-    ## FIXME: ':::'
-    goEnv <- Category:::getDataEnv(paste(p@ontology,
-                                         "CHILDREN", sep=""), "GO")
+    goEnv <- GOenv(paste(p@ontology, "CHILDREN", sep=""))
     gobpkids <- eapply(goEnv, function(x) {
         intersect(x, goIds)
     })
@@ -96,8 +94,7 @@ setMethod("getGoGraph", signature(p="GOHyperGParams",
           function(p, goIds) {
               .Deprecated("GOGraph")
               ## FIXME: ':::'
-              goEnv <- Category:::getDataEnv(paste(p@ontology,
-                                                   "PARENTS", sep=""), "GO")
+              goEnv <- GOenv(paste(p@ontology, "PARENTS", sep=""))
               gobpkids <- eapply(goEnv, function(x) {
                   intersect(x, goIds)
               })

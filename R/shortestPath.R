@@ -14,7 +14,7 @@ shortestPath <- function(g, GOnode)
 
     ##obtain the LLIDs at the GO term
 
-    LLs <- unique(get(GOnode, GOENTREZID))
+    LLs <- unique(get(GOnode, GOenv("ENTREZID")))
 
     m1 <- match(LLs, nodes(g))
     notthere <- LLs[is.na(m1)]

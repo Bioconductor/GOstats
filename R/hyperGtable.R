@@ -31,7 +31,7 @@ hyperGtable <- function(probids, lib, type="MF", pvalue=0.05,
   if(sum(index) == 0)
     stop(paste("There are no significant GO terms using a p-value of ",pvalue,
                " and a minimum count of ",  min.count,".\n", sep = ""), call. = FALSE)
-  wh <- mget(names(tmp$pvalues[index]), GOTERM)
+  wh <- mget(names(tmp$pvalues[index]), GOenv("TERM"))
   tmp.terms <- sapply(wh, Term)
   out <- data.frame(names(tmp$pvalues[index]), tmp.terms, round(tmp$pvalues[index], 3), 
                        tmp$intCounts[index], tmp$goCounts[index])
@@ -60,7 +60,7 @@ hyperG2Affy <- function(probids, lib, type="MF", pvalue=0.05,
   if(sum(index) == 0)
     stop(paste("There are no significant GO terms using a p-value of ",pvalue,
                " and a minimum count of ",  min.count,".\n", sep = ""), call. = FALSE)
-  wh <- mget(names(tmp$pvalues[index]), GOTERM)
+  wh <- mget(names(tmp$pvalues[index]), GOenv("TERM"))
   tmp.terms <- sapply(wh, Term)
   index2 <- match(names(tmp.terms), names(tmp$go2Affy))
   out <- lapply(tmp$go2Affy[index2], function(x) x[x %in% probids])
@@ -73,7 +73,7 @@ probeSetSummary <- function(result, pvalue, categorySize, sigProbesets) {
     if (!is(result, "GOHyperGResult"))
       stop("result must be a GOHyperGResult instance (or subclass)")
     ## build reverse map
-    ps2egEnv <- Category:::getDataEnv("ENTREZID", annotation(result))
+    ps2egEnv <- getAnnMap("ENTREZID", annotation(result))
     psids <- ls(ps2egEnv)
     ## each psid maps to _exactly_ one egid
     ## Need to remove NAs.  This is where the database stuff
@@ -148,7 +148,7 @@ setMethod("summary", signature(object="GOHyperGResult"),
                   return(df)
               }
               goIds <- df[[1]]
-              goTerms <- sapply(mget(goIds, GOTERM), Term)
+              goTerms <- sapply(mget(goIds, GOenv("TERM")), Term)
               if (htmlLinks) {
                   goIdUrls <- sapply(goIds,
                                      function(x) sprintf(AMIGO_URL, x))
