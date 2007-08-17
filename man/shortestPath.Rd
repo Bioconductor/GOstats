@@ -9,12 +9,15 @@
  points.
 }
 \usage{
-shortestPath(g, GOnode)
+shortestPath(g, GOnode, go2eg.map)
 }
 \arguments{
   \item{g}{An instance of the \code{graph} class. }
   \item{GOnode}{A length one character vector specifying the GO node of
     interest. }
+  \item{go2eg.map}{An object with an environment like interface
+    providing the mapping from \code{GOnode} to its Entrez Gene ID
+    annotations.}
 }
 \details{
   The algorithm implemented here is quite simple. All Entrez Gene 
@@ -48,19 +51,27 @@ shortestPath(g, GOnode)
 \seealso{\code{\link[RBGL]{sp.between}}}
 
 \examples{
-library(GO)
-library(RBGL)
+library("hgu95av2.db")
+library("RBGL")
 
-tst <- unique(unlist(mget(c("GO:0005778"), GOENTREZID)))
-set.seed(123)
-v1 <- randomGraph(tst, 1:10, .3, weights=FALSE)
+set.seed(321)
+uniqun <- function(x) unique(unlist(x))
+
+goid <- "GO:0005779"
+egIds <- uniqun(mget(uniqun(hgu95av2GO2PROBE[[goid]]),
+                            hgu95av2ENTREZID))
+go2eg <- list(egIds)
+names(go2eg) <- goid
+go2eg <- l2e(go2eg)
+
+v1 <- randomGraph(egIds, 1:10, .3, weights=FALSE)
 ## Since v1 is random, it might be disconnected and we need a
 ## connected graph to guarantee the existence of a path.
 c1 <- connComp(v1)
 largestComp <- c1[[which.max(sapply(c1, length))]]
 v2 <- subGraph(largestComp, v1)
 
-a1 <- shortestPath(v2, "GO:0005779")
+a1 <- shortestPath(v2, goid, go2eg)
 
 }
 \keyword{ manip }

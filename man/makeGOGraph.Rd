@@ -43,9 +43,10 @@ makeGOGraph(x, Ontology, eg2go.map, removeRoot = TRUE)
 
 \examples{
  library("hgu95av2.db")
- 
- gN <- c("71733","224019", "237928", "11308")
- probes <- unique(unlist(mget(gN, revmap(hgu95av2ENTREZID))))
+ set.seed(321)
+ uniqun <- function(x) unique(unlist(x))
+ gN <- uniqun(sample(hgu95av2ENTREZID, 4))
+ probes <- uniqun(mget(gN, revmap(hgu95av2ENTREZID)))
  goids <- mget(probes, hgu95av2GO)
  names(goids) <- gN
  eg2go <- l2e(goids)
