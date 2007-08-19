@@ -68,7 +68,7 @@ library("annotate")
 library("GOstats")
 library("xtable")
 library("multtest")
-require("Rgraphviz", quietly=TRUE)
+library("Rgraphviz")
 library("hgu95av2.db")
 library("GO.db")
 library("genefilter")
@@ -196,11 +196,11 @@ than 100 units. Applying both of these transformations yielded
 
  eSet = esetSub[Fstats$index[Fstats$adjp<pvCutOff],]
 
- gN = geneNames(eSet)
+ gN = featureNames(eSet)
  lls = unlist(mget(gN, hgu95av2ENTREZID, ifnotfound=NA))
 
  eS = eSet[!duplicated(lls),]
- gN = geneNames(eS)
+ gN = featureNames(eS)
  lls = unlist(mget(gN, hgu95av2ENTREZID, ifnotfound=NA))
  lls = as.character(lls)
  syms = unlist(mget(gN, hgu95av2SYMBOL, ifnotfound=NA))
@@ -231,10 +231,14 @@ present these three different graphs. Of course one would like to add
 some of the experimental data and information to these plots.
 
 <<inducedGO, echo=FALSE, results=hide>>=
+## there will soon be a better way to obtain this eg => GO map
+eg2go = mget(gN, hgu95av2GO)
+names(eg2go) = lls
+eg2go = l2e(eg2go)
 
- gMF <- makeGOGraph(lls, "MF")
- gBP = makeGOGraph(lls, "BP")
- gCC = makeGOGraph(lls, "CC")
+ gMF <- makeGOGraph(lls, "MF", eg2go.map=eg2go)
+ gBP = makeGOGraph(lls, "BP", eg2go.map=eg2go)
+ gCC = makeGOGraph(lls, "CC", eg2go.map=eg2go)
 
 
  nMF = list()
@@ -540,19 +544,20 @@ respect to the BP ontology.
  igenes = igenes[!is.na(igenes)]
  igenes = as.character(igenes)
 
-
- GOs = mget(as.character(igenes), GOENTREZID2GO, ifnotfound=NA)
+ psets = mget(igenes, revmap(hgu95av2ENTREZID))
+ psets = sapply(psets, function(x) x[1])
+ GOs = mget(psets, hgu95av2GO, ifnotfound=NA)
  gBP = sapply(GOs, getOntology, "BP")
  ##how many terms
 
  sum(sapply(gBP, length))
 
  ##drop those with no BP annotations
- hasBP = sapply(gBP, function(x) length(x) > 0)
+ hasBP = sapply(gBP, function(x) length(x) > 0 && !is.na(x[1]))
 
  gBP = gBP[hasBP]
 
- ggs = lapply(igenes[hasBP], makeGOGraph, "BP")
+ ggs = lapply(igenes[hasBP], makeGOGraph, "BP", eg2go)
 
 ## you could also do ggx = lapply(gBP, GOGraph, GOBPPARENTS)
 ## and should get the same thing
