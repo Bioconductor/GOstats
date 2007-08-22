@@ -1,47 +1,5 @@
  combGOGraph = function(g1, g2) .Defunct("join", package = "GOstats")
 
-.get_eg_to_go_fun <- function(mapfun, chip) {
-    if (!is.null(chip) && is.character(chip)) {
-        if (!is.null(mapfun) && is.function(mapfun))
-          warning("ignoring 'chip' argument in favor of 'mapfun'")
-        else {
-            ## create mapfun from chip
-            mapfun <- tryCatch({
-                eg2go <- make_eg_to_go_map(chip)
-                function(x) mget(x, eg2go, ifnotfound=NA)
-            }, error=function(e) {
-                ## if only we had classed exceptions!  and we can't
-                ## reliable grep the condition message since it may be
-                ## localized.
-                msg <- paste(conditionMessage(e),
-                             "\nDB-based version of ", chip, " not found.",
-                             "\nReverting to use of environment-based GO")
-                warning(msg, call.=FALSE)
-                NULL
-            })
-        }
-    }
-
-    if (!is.function(mapfun)) {
-        ## create mapfun from env-based GO
-        haveGO.env <- suppressWarnings(require("GO",
-                                               character.only=TRUE,
-                                               quietly=TRUE,
-                                               warn.conflicts=FALSE))
-        if (!haveGO.env) {
-            msg <- strwrap(paste("This function requires the environment",
-                                 "based GO package if neither 'mapfun' nor",
-                                 "'chip' are specified.  Note that this",
-                                 "is a different package from GO.db"))
-            stop(paste("GO package not found\n",
-                       paste(msg, collapse="\n")))
-        }
-        mapfun <- function(x)
-          mget(x, GOENTREZID2GO, ifnotfound=NA)
-    }
-    mapfun
-}
-
 ## Given a set of Entrez IDs obtain the GO graph that has all
 ## GO ids that those genes are annotated at, and
 makeGOGraph <- function (x, Ontology="MF", removeRoot=TRUE,
