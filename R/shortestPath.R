@@ -1,7 +1,7 @@
 ##Copyright R. Gentleman 2004, all rights reserved
 ##some functions to do the shortest path analysis
 
-shortestPath <- function(g, GOnode, go2eg.map)
+shortestPath <- function(g, GOnode, mapfun=NULL, chip=NULL)
 {
     if( !is(g, "graph") )
         stop("first argument must be a graph")
@@ -13,8 +13,8 @@ shortestPath <- function(g, GOnode, go2eg.map)
         stop("bad GO node description")
 
     ##obtain the LLIDs at the GO term
-
-    LLs <- unique(get(GOnode, go2eg.map))
+    go2egfun <- .get_eg_to_go_fun(mapfun, chip, reverse=TRUE)
+    LLs <- unique(go2egfun(GOnode)[[1]])
 
     m1 <- match(LLs, nodes(g))
     notthere <- LLs[is.na(m1)]

@@ -9,15 +9,24 @@
  points.
 }
 \usage{
-shortestPath(g, GOnode, go2eg.map)
+shortestPath(g, GOnode, mapfun=NULL, chip=NULL)
 }
 \arguments{
   \item{g}{An instance of the \code{graph} class. }
   \item{GOnode}{A length one character vector specifying the GO node of
     interest. }
-  \item{go2eg.map}{An object with an environment like interface
-    providing the mapping from \code{GOnode} to its Entrez Gene ID
-    annotations.}
+
+    \item{mapfun}{A function taking a character vector of GO IDs as its
+    only argument and returning a list of character vectors of Enterz
+    Gene IDs annotated at each corresponding GO ID.  The function should
+    behave similarly to \code{mget(x, go2egmap, ifnotfound=NA)}, that
+    is, \code{NA} should be returned if a specified GO ID has no Entrez
+    ID mappings.  See details for the interaction of \code{mapfun} and
+    \code{chip}.}
+
+  \item{chip}{The name of a DB-based annotation data package (the name
+    will end in ".db").  This package will be used to generate an Entrez
+    ID to GO ID mapping instead of \code{mapfun}.}
 }
 \details{
   The algorithm implemented here is quite simple. All Entrez Gene 
@@ -30,6 +39,26 @@ shortestPath(g, GOnode, go2eg.map)
   There is a presumption that the graph is \code{undirected}. This
   restriction could probably be lifted if there was some reason for it -
   a patch would be gratefully accepted.
+
+  The mapping of GO node to Entrez ID is achieved in one of three ways:
+
+  \enumerate{
+    \item If \code{mapfun} is provided, it will be used to perform the
+      needed lookups.  In this case, \code{chip} will be ignored.
+
+    \item If \code{chip} is provided and \code{mapfun=NULL}, then the
+      needed lookups will be done based on the GO to Entrez mappings
+      encapsulated in the specified annotation data package.  This is
+      the recommended usage.
+
+    \item If \code{mapfun} and \code{chip} are \code{NULL} or missing,
+      then the function will attempt to load the GO package (the
+      environment-based package, distinct from GO.db).  This package
+      contains a legacy environment mapping GO IDs to Entrez IDs.  If
+      the GO package is not available, an error will be raised.
+      Omitting both \code{mapfun} and \code{chip} is not recommended as
+      it is not compatible with the DB-based annotation data packages.
+  }
   
 }
 \value{
@@ -57,12 +86,9 @@ library("RBGL")
 set.seed(321)
 uniqun <- function(x) unique(unlist(x))
 
-goid <- "GO:0005779"
+goid <- "GO:0005778"
 egIds <- uniqun(mget(uniqun(hgu95av2GO2PROBE[[goid]]),
                             hgu95av2ENTREZID))
-go2eg <- list(egIds)
-names(go2eg) <- goid
-go2eg <- l2e(go2eg)
 
 v1 <- randomGraph(egIds, 1:10, .3, weights=FALSE)
 ## Since v1 is random, it might be disconnected and we need a
@@ -71,7 +97,7 @@ c1 <- connComp(v1)
 largestComp <- c1[[which.max(sapply(c1, length))]]
 v2 <- subGraph(largestComp, v1)
 
-a1 <- shortestPath(v2, goid, go2eg)
+a1 <- shortestPath(v2, goid, chip="hgu95av2.db")
 
 }
 \keyword{ manip }
