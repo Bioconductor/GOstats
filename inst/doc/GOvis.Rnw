@@ -202,7 +202,7 @@ than 100 units. Applying both of these transformations yielded
  eS = eSet[!duplicated(lls),]
  gN = featureNames(eS)
  lls = unlist(mget(gN, hgu95av2ENTREZID, ifnotfound=NA))
- lls = as.character(lls)
+ lls = as.character(lls[!is.na(lls)])
  syms = unlist(mget(gN, hgu95av2SYMBOL, ifnotfound=NA))
 
 @
@@ -231,14 +231,9 @@ present these three different graphs. Of course one would like to add
 some of the experimental data and information to these plots.
 
 <<inducedGO, echo=FALSE, results=hide>>=
-## there will soon be a better way to obtain this eg => GO map
-eg2go = mget(gN, hgu95av2GO)
-names(eg2go) = lls
-eg2go = l2e(eg2go)
-
- gMF <- makeGOGraph(lls, "MF", eg2go.map=eg2go)
- gBP = makeGOGraph(lls, "BP", eg2go.map=eg2go)
- gCC = makeGOGraph(lls, "CC", eg2go.map=eg2go)
+ gMF = makeGOGraph(lls, "MF", chip="hgu95av2")
+ gBP = makeGOGraph(lls, "BP", chip="hgu95av2")
+ gCC = makeGOGraph(lls, "CC", chip="hgu95av2")
 
 
  nMF = list()
@@ -557,7 +552,7 @@ respect to the BP ontology.
 
  gBP = gBP[hasBP]
 
- ggs = lapply(igenes[hasBP], makeGOGraph, "BP", eg2go)
+ ggs = lapply(igenes[hasBP], makeGOGraph, "BP", chip="hgu95av2.db")
 
 ## you could also do ggx = lapply(gBP, GOGraph, GOBPPARENTS)
 ## and should get the same thing

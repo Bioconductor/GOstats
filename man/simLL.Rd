@@ -11,7 +11,8 @@ between Entrez Gene IDs based on their induced GO graphs.}
   of \code{simUI} or \code{simLP}.
 }
 \usage{
-simLL(ll1, ll2, Ontology, eg2go.map, measure = "LP", dropCodes = NULL)
+simLL(ll1, ll2, Ontology = "MF", measure = "LP", dropCodes = NULL,
+      mapfun = NULL, chip = NULL)
 simUI(g1, g2)
 simLP(g1, g2)
 }
@@ -20,20 +21,51 @@ simLP(g1, g2)
   \item{ll1}{A Entrez Gene ID as a character vector. }
   \item{ll2}{A Entrez Gene ID as a character vector.}
   \item{Ontology}{Which ontology to use ("MF", "BP", "CC"). }
-  \item{eg2go.map}{An object with an environment-like interface
-    with an \code{mget} method that provides a mapping from Entrez Gene
-    IDs to GO IDs.}
   \item{measure}{ Which measure to use ("LP", "UI"). }
   \item{dropCodes}{ A set of evidence codes to be ignored in
     constructing the induced GO graphs. }
+
+  \item{mapfun}{A function taking a character vector of Entrez Gene IDs
+    as its only argument and returning a list of "GO lists" matching the
+    structure of the lists in the GO maps of annotation data packages.
+    The function should behave similarly to \code{mget(x, eg2gomap,
+      ifnotfound=NA)}, that is, \code{NA} should be returned if a
+      specified
+    Entrez ID has no GO mapping.  See details for the interaction of
+    \code{mapfun} and \code{chip}.}
+
+  \item{chip}{The name of a DB-based annotation data package (the name
+    will end in ".db").  This package will be used to generate an Entrez
+    ID to GO ID mapping instead of \code{mapfun}.}
+
   \item{g1}{An instance of the \code{graph} class.}
   \item{g2}{An instance of the \code{graph} class.}
 }
 \details{
   For each of \code{ll1} and \code{ll2} the set of most specific GO
   terms within the ontology specified (\code{Ontology}) that are not
-  based on any excluded evidence code (\code{dropCodes}) are
-  found. Then the induced GO graphs are computed.
+  based on any excluded evidence code (\code{dropCodes}) are found.  The
+  mapping is achieved in one of three ways:
+
+  \enumerate{
+    \item If \code{mapfun} is provided, it will be used to perform the
+      needed lookups.  In this case, \code{chip} will be ignored.
+
+    \item If \code{chip} is provided and \code{mapfun=NULL}, then the
+      needed lookups will be done based on the Entrez to GO mappings
+      encapsulated in the specified annotation data package.  This is
+      the recommended usage.
+
+    \item If \code{mapfun} and \code{chip} are \code{NULL} or missing,
+      then the function will attempt to load the GO package (the
+      environment-based package, distinct from GO.db).  This package
+      contains a legacy environment mapping Entrez IDs to GO IDs.  If
+      the GO package is not available, an error will be raised.
+      Omitting both \code{mapfun} and \code{chip} is not recommended as
+      it is not compatible with the DB-based annotation data packages.
+  }
+
+  Next, the induced GO graphs are computed.
 
   Finally these graphs are passed to one of \code{simUI}, (union
   intersection), or \code{simLP} (longest path). For \code{simUI} the
@@ -65,12 +97,7 @@ then \code{NA} is returned.
   library("hgu95av2.db")
   eg1 = c("9184", "3547")
 
-  probes <- unique(unlist(mget(eg1, revmap(hgu95av2ENTREZID))))
-  goids <- mget(probes, hgu95av2GO)
-  names(goids) <- eg1
-  eg2go <- l2e(goids)
-
-  bb = simLL(eg1[1], eg1[2], "BP", eg2go)
+  bb = simLL(eg1[1], eg1[2], "BP", chip="hgu95av2.db")
 }
 \keyword{manip}
 
