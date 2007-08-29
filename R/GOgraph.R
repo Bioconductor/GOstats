@@ -24,7 +24,10 @@ makeGOGraph <- function (x, Ontology="MF", removeRoot=TRUE,
     oldEdges <- vector("list", length = 0)
     oldNodes <- vector("character", length = 0)
     for (i in 1:length(newNodes)) {
-        newN <- unique(sapply(newNodes[[i]], function(x) x$GOID))
+        newN <- newNodes[[i]]
+        if (!length(newN))
+          next
+        newN <- unique(subListExtract(newN, "GOID", simplify=TRUE))
         done <- FALSE
         while (!done) {
             newN <- newN[!(newN %in% oldNodes)]
@@ -133,7 +136,7 @@ oneGOGraph <- function(x, dataenv) {
     degs = degree(ig)
     root = names(degs$outDegree)[degs$outDegree == 0]
     paths = sp.between(ig, lfi, root)
-    plens = sapply(paths, function(x) x$length)
+    plens = subListExtract(paths, "length", simplify=TRUE)
     max(plens)
 }
 
