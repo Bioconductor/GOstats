@@ -114,6 +114,7 @@ oneGOGraph <- function(x, dataenv) {
  ##GOleaves: the leaves of the GO graph are those nodes that have no
  ##inedges
   GOLeaves <- function(inG) {
+    .Deprecated("leaves", package="graph")
       nG <- nodes(inG)
       iE <- inEdges(nG, inG)
       nG[sapply(iE, length) == 0]
@@ -132,7 +133,7 @@ oneGOGraph <- function(x, dataenv) {
          stop("only works for graphs")
     ig <- intersection(g1, g2)
     if( numNodes(ig) < 2 ) return(0)
-    lfi <- GOLeaves(ig)
+    lfi <- leaves(ig, "in")
     degs = degree(ig)
     root = names(degs$outDegree)[degs$outDegree == 0]
     paths = sp.between(ig, lfi, root)

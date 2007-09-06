@@ -1,7 +1,10 @@
 \name{GOLeaves}
 \alias{GOLeaves}
-\title{Identify the leaves in a GO Graph  }
+\title{DEPRECATED Identify the leaves in a GO Graph  }
 \description{
+  This function is DEPRECATED.  Use the \code{leaves} function in the
+  graph package instead.  See the example below.
+
   Given a GO graph this function returns the node labels for all leaves
   in the graph. A leaf is defined to be a node with only out-edges and
   no in-edges.
@@ -32,6 +35,6 @@ GOLeaves(inG)
  g1 <- oneGOGraph("GO:0003680", GOMFPARENTS)
  g2 <- oneGOGraph("GO:0003701", GOMFPARENTS)
  g3 <- join(g1, g2)
- GOLeaves(g3)
+ leaves(g3, "in")
 }
 \keyword{manip}

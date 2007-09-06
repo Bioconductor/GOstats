@@ -216,8 +216,8 @@ deem these to be the differentially expressed genes and will now turn
 our attention to using GO to gain a better understanding of the
 associated genes.  Before going further though, we note that these
 \Sexpr{sum(Fstats$adjp < pvCutOff)} probes map to
-\Sexpr{sum(!duplicated(lls))} distinct LocusLink identifiers and since
-our GO mappings are based on LocusLink we further reduce our attention
+\Sexpr{sum(!duplicated(lls))} distinct Entrez Gene identifiers and since
+our GO mappings are based on Entrez Gene we further reduce our attention
 to these. We kept the first (in index order) of each of the duplicated
 probes for any analyses or computations that require gene expression
 data and note that others may want to use different conventions.
@@ -508,12 +508,12 @@ with other methods is certainly warranted.
 
 To compare different genes with respect to their GO annotation you may
 use \Rfunction{simLL} which first computes the induced GO graph for each of
-its two, user supplied, LocusLink IDs and then calls either
+its two, user supplied, Entrez Gene IDs and then calls either
 \Rfunction{simLP} or \Rfunction{simUI}. Users can restrict the
-mappings from LocusLink IDs to GO IDs based on evidence codes.
+mappings from Entrez Gene IDs to GO IDs based on evidence codes.
 
 Some further work is needed to correctly address two outstanding
-issues. First, in some cases a LocusLink identifier is mapped to
+issues. First, in some cases an Entrez Gene identifier is mapped to
 several GO terms and in the current implementation these are merely
 combined into one large graph. However, there may be some benefits in
 considering the comparison of each induced graph separately. For
@@ -577,6 +577,19 @@ respect to the BP ontology.
 You can plot these two measures against each other and compare
 them. We hope that the two measures are somewhat positively
 correlated.
+
+\section{Operations on GO Graphs}
+
+You should refer to the documentation for the \Rpackage{graph} and
+\Rpackage{RBGL} packages for details on how to manipulate
+\Rclass{graph} instances.  Here we show how to identify the leaves of
+a GO graph.
+
+<<<leavesEx>>=
+gCC.leaves = leaves(gCC, "in")
+length(gCC.leaves)
+gCC.leaves[1:5]
+@
 
 
 
