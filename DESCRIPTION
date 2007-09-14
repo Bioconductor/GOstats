@@ -12,7 +12,7 @@ Imports: Biobase (>= 1.15.29), Category (>= 2.3.26), methods,
          AnnotationDbi (>= 0.0.89)
 Suggests: hgu95av2.db (>= 1.13.0), ALL, multtest, genefilter,
           RColorBrewer, Rgraphviz, xtable, SparseM, GO
-Maintainer: S. Falcon <sfalcon@fhcrc.org>
+Maintainer: Robert Gentleman <rgentlem@fhcrc.org>
 License: The Artistic License, Version 2.0
 Collate:
     zzz.R
