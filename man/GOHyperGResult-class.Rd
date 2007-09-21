@@ -83,7 +83,7 @@ Class \code{"HyperGResultBase"}, directly.
   \item{summary}{\code{signature(r = "GOHyperGResult")}: Returns a
       \code{data.frame} summarizing the test result.  Optional
       arguments \code{pvalue} and \code{categorySize} allow
-      specification of maximum p-value and minimum cateogyrSize,
+      specification of maximum p-value and minimum categorySize,
       respectively.  Optional argument \code{htmlLinks} is a logical
       value indicating whether to add HTML links (useful in
       conjunction with xtables print method with \code{type} set to
