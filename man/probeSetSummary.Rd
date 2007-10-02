@@ -72,5 +72,33 @@ probeSetSummary(result, pvalue, categorySize, sigProbesets)
 
 \author{S. Falcon and J. MacDonald}
 
+\examples{
+  ## Fake up some data
+  library(hgu95av2.db)
+  prbs <- ls(hgu95av2GO)[1:300]
+  ## Only those with GO ids
+  hasGO <- sapply(mget(prbs, hgu95av2GO), function(ids)
+  if(!is.na(ids) && length(ids) > 1) TRUE else FALSE)
+  prbs <- prbs[hasGO]
+  prbs <- getLL(prbs, "hgu95av2")
+  ## remove duplicates, but keep named vector
+  prbs <- prbs[!duplicated(prbs)]
+  ## do the same for universe
+  univ <- ls(hgu95av2GO)[1:5000]
+  hasUnivGO <- sapply(mget(univ, hgu95av2GO), function(ids)
+  if(!is.na(ids) && length(ids) > 1) TRUE else FALSE)
+  univ <- univ[hasUnivGO]
+  univ <- unique(getLL(univ, "hgu95av2"))
+
+  p <- new("GOHyperGParams", geneIds=prbs, universeGeneIds=univ,
+  ontology="BP", annotation="hgu95av2", conditional=TRUE)
+  ## this part takes time...
+  if(interactive()){
+    hyp <- hyperGTest(p)
+    ps <- probeSetSummary(hyp, 0.05, 10)
+  }
+}
+
+
 \keyword{manip}
 \keyword{htest}
