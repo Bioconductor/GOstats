@@ -5,6 +5,8 @@ setMethod("hyperGTest",
               p@universeGeneIds <- universeBuilder(p)
               ## preserve names on geneIds
               p@geneIds <- p@geneIds[p@geneIds %in% p@universeGeneIds]
+              ##FIXME: since the unique values in this list are the
+              ## the universe, it might be nice to have that somewhere
               cat2Entrez <- categoryToEntrezBuilder(p)
               ## build the GO graph for the relevant GO nodes
               goIds <- names(cat2Entrez)
