@@ -1,4 +1,4 @@
-library("hgu95av2")
+library("hgu95av2.db")
 
 makeSimpleGOHyperGParams <- function() {
     set.seed(344)

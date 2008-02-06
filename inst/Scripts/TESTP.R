@@ -2,8 +2,8 @@
 
 ##FIXME: just ran the first simulation set1 - need to do set2 again
 ##and start looking at the appropriate set of adjustments
- library(GOstats)
- library(hgu95av2)
+ library("GOstats")
+ library("hgu95av2.db")
 
  w1 <- as.list(hgu95av2LOCUSID)
 

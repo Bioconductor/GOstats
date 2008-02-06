@@ -76,9 +76,9 @@ library("ALL")
 @
 
 The results reported in this document are based on version
-\Sexpr{packageDescription("hgu95av2")[["Version"]]} of the
-\Rpackage{hgu95av2} data package and on
-\Sexpr{packageDescription("GO")[["Version"]]} of the \Rpackage{GO}
+\Sexpr{packageDescription("hgu95av2.db")[["Version"]]} of the
+\Rpackage{hgu95av2.db} data package and on
+\Sexpr{packageDescription("GO.db")[["Version"]]} of the \Rpackage{GO.db}
 package. If you have different versions your results will probably be
 different.
 

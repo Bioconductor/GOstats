@@ -1,7 +1,6 @@
 \name{GOHyperG}
 \alias{GOHyperG}
-
-\title{(DEPRECATED) Hypergeometric Tests for GO  }
+\title{(DEPRECATED) Hypergeometric Tests for GO}
 \description{
   Use \code{hyperGTest} instead.
   
@@ -54,7 +53,6 @@ GOHyperG(x, lib, what="MF", universe=NULL)
   not with respect to any microarray chip.  This will \bold{not} be the
   right thing to do if you are working with a yeast microarray.
 }
-
 \note{
   Typically, one has a set of interesting genes/probes obtained from a
   microarray experiment and is interested in determining whether there
@@ -62,7 +60,6 @@ GOHyperG(x, lib, what="MF", universe=NULL)
   \code{GOHyperG} carries out simple Hypergeometric tests to assess the
   overrepresentation of GO terms.
 
-  
   Two substantial issues arise.  First, it is not clear how to do any
   form of p-value correction.  The tests are not independent and the
   underlying structure of the GO graph presents certain problems that
@@ -71,10 +68,9 @@ GOHyperG(x, lib, what="MF", universe=NULL)
   \code{GOHyperG} every attempt to appropriately correct for
   non-uniqueness of mappings has been made.
 }
-
 \value{
   The returned value is a list with components:
-  \item{pvalues }{The ordered p-values.}
+  \item{pvalues}{The ordered p-values.}
   \item{goCounts}{The vector of counts of Entrez Gene ids from the
     universe at each node.}
   \item{intCounts}{The vector of counts of the supplied Entrez Gene ids
@@ -93,18 +89,16 @@ GOHyperG(x, lib, what="MF", universe=NULL)
     GO2ALLPROBES environment.}
 }
 \author{R. Gentleman}
-
 \seealso{
   \code{\link{hyperGTest}}
   \code{\link[Category]{geneKeggHyperGeoTest}}
   \code{\link[Category]{geneCategoryHyperGeoTest}}
   \code{\link{phyper}}
 }
-
 \examples{
 \dontrun{
-library(hgu95av2.db)
-library(GO)
+library("hgu95av2.db")
+library("GO.db")
 w1<-as.list(hgu95av2ENTREZID)
 w2<-unique(unlist(w1))
 set.seed(123)
@@ -116,4 +110,4 @@ xx$numInt
 sum(xx$pvalues < 0.01)
 }
 }
-\keyword{ htest }
+\keyword{htest}

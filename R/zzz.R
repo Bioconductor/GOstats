@@ -39,27 +39,10 @@ GOenv <- function(what) {
         }
     }
 
-    if (!is.function(mapfun)) {
-        ## create mapfun from env-based GO
-        haveGO.env <- suppressWarnings(require("GO",
-                                               character.only=TRUE,
-                                               quietly=TRUE,
-                                               warn.conflicts=FALSE))
-        if (!haveGO.env) {
-            msg <- strwrap(paste("This function requires the environment",
-                                 "based GO package if neither 'mapfun' nor",
-                                 "'chip' are specified.  Note that this",
-                                 "is a different package from GO.db"))
-            stop(paste("GO package not found\n",
-                       paste(msg, collapse="\n")))
-        }
-        mapfun <- if (!reverse)
-          function(x)
-            mget(x, GOENTREZID2GO, ifnotfound=NA)
-        else
-          function(x)
-            mget(x, GOENTREZID, ifnotfound=NA)
-    }
-    mapfun
+	if (!is.function(mapfun)) {
+		stop("either mapfun or chip must be specified")
+	}
+
+	mapfun
 }
 

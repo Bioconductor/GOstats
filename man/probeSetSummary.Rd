@@ -2,20 +2,21 @@
 \alias{probeSetSummary}
 
 \title{Summarize Probe Sets Associated with a hyperGTest Result}
+
 \description{
   Given the result of a \code{hyperGTest} run (an instance of
   \code{GOHyperGResult}), this function lists all Probe Set IDs
   associated with the selected Entrez IDs annotated at each
   significant GO term in the test result.
 }
+
 \usage{
 probeSetSummary(result, pvalue, categorySize, sigProbesets)
 }
 
 \arguments{
   \item{result}{A \code{GOHyperGResult} instance.  This is the output   
-      of the \code{hyperGTest} function when testing the GO category.} 
-
+      of the \code{hyperGTest} function when testing the GO category.}
   \item{pvalue}{Optional p-value cutoff.  Only results for GO terms
       with a p-value less than the specified value will be returned.
       If omitted, \code{pvalueCutoff(result)} is used.}
@@ -54,7 +55,6 @@ probeSetSummary(result, pvalue, categorySize, sigProbesets)
   will then be used to indicate which of the probesets that map to a
   given GO term were significant in the original analysis.
 }
-  
 
 \value{
   A \code{list} of \code{data.frame}.  Each element of the list
@@ -74,7 +74,7 @@ probeSetSummary(result, pvalue, categorySize, sigProbesets)
 
 \examples{
   ## Fake up some data
-  library(hgu95av2.db)
+  library("hgu95av2.db")
   prbs <- ls(hgu95av2GO)[1:300]
   ## Only those with GO ids
   hasGO <- sapply(mget(prbs, hgu95av2GO), function(ids)
@@ -98,7 +98,6 @@ probeSetSummary(result, pvalue, categorySize, sigProbesets)
     ps <- probeSetSummary(hyp, 0.05, 10)
   }
 }
-
 
 \keyword{manip}
 \keyword{htest}
