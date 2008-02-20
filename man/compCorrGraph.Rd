@@ -4,14 +4,14 @@
 Expression Data }
 \description{
   Given a set of gene expression data (an instance of the
-  \code{exprSet} class) this function computes a graph based on
+  \code{ExpressionSet} class) this function computes a graph based on
   correlations between the probes.
 }
 \usage{
 compCorrGraph(eSet, k = 1, tau = 0.6)
 }
 \arguments{
-  \item{eSet}{An instance of the \code{exprSet} class. }
+  \item{eSet}{An instance of the \code{ExpressionSet} class. }
   \item{k}{The power to raise the correlations to. }
   \item{tau}{The lower cutoff for absolute correlations. }
 }
