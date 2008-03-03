@@ -331,7 +331,7 @@ Here is a description of all the arguments needed to construct a
   differential expression among two sample groups.  For experiments
   using Affymetrix expression arrays, this should be a vector of
   Entrez Gene IDs.  If you are using the \Rpackage{YEAST} annotation
-  package, the vector will consist of FIXME.
+  package, the vector will consist of yeast systematic names.
 
 \item[\Robject{universeGeneIds}] A vector of gene identifiers that
   defines the universe of possible genes.  We recommend using the set
