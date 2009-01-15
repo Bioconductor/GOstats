@@ -7,11 +7,11 @@ Description: A set of tools for interacting with GO and microarray
         hypothesis testing and other simple calculations.
 biocViews: Statistics, Annotation, GO, MultipleComparisons
 Depends: Biobase (>= 1.15.29), Category (>= 2.3.26), graph
-Imports: AnnotationDbi (>= 0.0.89), Biobase (>= 1.15.29), 
-	 Category (>= 2.3.26), GO.db (>= 1.13.0), RBGL, annotate (>= 1.13.2), 
-	 graph (>= 1.15.15), graphics, methods, stats 
+Imports: AnnotationDbi (>= 0.0.89), Biobase (>= 1.15.29),
+         Category (>= 2.3.26), GO.db (>= 1.13.0), RBGL, annotate (>= 1.13.2), 
+         graph (>= 1.15.15), graphics, methods, stats 
 Suggests: hgu95av2.db (>= 1.13.0), ALL, GO.db (>= 1.13.0), annotate, multtest,
-          genefilter, RColorBrewer, Rgraphviz, xtable, SparseM, methods
+          genefilter, RColorBrewer, Rgraphviz, xtable, SparseM
 Maintainer: Robert Gentleman <rgentlem@fhcrc.org>
 License: Artistic-2.0
 Collate:

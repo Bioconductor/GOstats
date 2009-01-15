@@ -18,7 +18,6 @@ importMethodsFrom(AnnotationDbi,
 
 importMethodsFrom(Biobase,
                   annotation,
-		  description,
                   exprs,
                   featureNames)
 
