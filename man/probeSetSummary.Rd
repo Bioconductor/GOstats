@@ -75,6 +75,7 @@ probeSetSummary(result, pvalue, categorySize, sigProbesets)
 \examples{
   ## Fake up some data
   library("hgu95av2.db")
+  library("annotate")
   prbs <- ls(hgu95av2GO)[1:300]
   ## Only those with GO ids
   hasGO <- sapply(mget(prbs, hgu95av2GO), function(ids)

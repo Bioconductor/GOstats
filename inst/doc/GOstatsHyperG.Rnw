@@ -1,5 +1,6 @@
 %\VignetteIndexEntry{Hypergeometric Tests Using GOstats}
-%\VignetteDepends{ALL, hgu95av2.db, genefilter, RColorBrewer, xtable, Rgraphviz}
+%\VignetteDepends{ALL, GO.db, annotate, hgu95av2.db, genefilter, RColorBrewer,
+%xtable, Rgraphviz} 
 %\VignetteKeywords{Hypergeometric, GO, ontology}
 %\VignettePackage{GOstats}
 \documentclass[11pt]{article}

@@ -1,7 +1,59 @@
-import("methods")
-import("Category")
-import("AnnotationDbi")
-importMethodsFrom("Biobase", "annotation", "description")
+import(Category)
+import(graph)
+
+importClassesFrom(methods,
+                  ANY,
+                  character,
+                  integer,
+                  logical,
+                  numeric)
+
+importMethodsFrom(AnnotationDbi,
+                  Term,
+                  eapply,
+                  ls,
+                  mget,
+                  nrow,
+                  revmap)
+
+importMethodsFrom(Biobase,
+                  annotation,
+		  description,
+                  exprs,
+                  featureNames)
+
+importFrom(AnnotationDbi,
+           make_eg_to_go_map)
+
+importFrom(Biobase,
+           addVigs2WinMenu,
+           l2e,
+           subListExtract)
+
+importFrom(RBGL,
+           connectedComp,
+           dijkstra.sp,
+           sp.between)
+
+importFrom(annotate,
+           dropECode,
+           getAnnMap,
+           getOntology)
+
+importFrom(graphics,
+           plot)
+
+importFrom(methods,
+           "@<-",
+           callNextMethod,
+           is,
+           new)
+
+importFrom(stats,
+           cor)
+
+importFrom(GO.db,
+           GOTERM)
 
 export(combGOGraph, compCorrGraph, compGdist,
        enumPairs, 
@@ -14,7 +66,8 @@ export(combGOGraph, compCorrGraph, compGdist,
        GOHyperG,
        probeSetSummary)
 
-exportClasses("GOHyperGResult")
+exportClasses(GOHyperGResult)
+
 exportMethods("hyperGTest", "getGoGraph",
               "pvalues",
               "isConditional",
@@ -34,5 +87,7 @@ exportMethods("hyperGTest", "getGoGraph",
               "testName",
               "summary")
 
-export(termGraphs, inducedTermGraph, plotGOTermGraph,
+export(termGraphs, 
+       inducedTermGraph, 
+       plotGOTermGraph,
        selectedGenes)

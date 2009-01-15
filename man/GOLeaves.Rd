@@ -32,6 +32,8 @@ GOLeaves(inG)
 \seealso{\code{\link{makeGOGraph}}}
 
 \examples{
+
+ library("GO.db")
  g1 <- oneGOGraph("GO:0003680", GOMFPARENTS)
  g2 <- oneGOGraph("GO:0003701", GOMFPARENTS)
  g3 <- join(g1, g2)
