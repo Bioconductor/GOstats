@@ -39,9 +39,6 @@ importFrom(annotate,
            getAnnMap,
            getOntology)
 
-importFrom(graphics,
-           plot)
-
 importFrom(methods,
            "@<-",
            callNextMethod,
