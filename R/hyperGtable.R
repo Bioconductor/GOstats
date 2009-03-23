@@ -28,7 +28,7 @@ hyperGtable <- function(probids, lib, type="MF", pvalue=0.05,
                                           "for more information.\n\n"))
 }
 
-##     .Deprecated("summary")
+##     .Defunct("summary")
 ##     message("use summary(result) where result is the output of hyperGTest")
 ##   require(lib, quietly = TRUE, character.only = TRUE) || stop(paste("The ", lib, " package is required"))
 ##   lls <- getLL(probids, lib)
@@ -61,7 +61,7 @@ hyperGtable <- function(probids, lib, type="MF", pvalue=0.05,
      .Defunct("probeSetSummary", "GOstats", paste("\n\nThe hyperG2Affy function is defunct as of BioC 2.1.\n",
                                                   "Please use probeSetSummary instead.\n\n"))
  }
-##     .Deprecated("probeSetSummary")
+##     .Defunct("probeSetSummary")
 ##   require(lib, quietly = TRUE, character.only = TRUE) || stop(paste("The ", lib, " package is required"))
 ##   lls <- getLL(probids, lib)
 ##   lls <- unique(lls)

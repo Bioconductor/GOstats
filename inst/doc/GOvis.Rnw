@@ -335,7 +335,7 @@ code to deal with the other two ontologies.
 <<genesToGO>>=
 
  CCnodes = nodes(gCC)
- nodes2affy = mget(CCnodes, hgu95av2GO2ALLPROBES)
+ nodes2affy = mget(CCnodes, hgu95av2GO2ALLPROBES, ifnotfound=NA)
 
  cts = sapply(nodes2affy, function(x) {
        wh = names(whismax) %in% x

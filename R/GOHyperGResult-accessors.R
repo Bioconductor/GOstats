@@ -41,7 +41,7 @@ setMethod("isConditional", signature(r="GOHyperGResult"),
           function(r) conditional(r))
 
 selectedGenes <- function(r, id=NULL) {
-    .Deprecated("geneIdsByCategory", package="Category")
+    .Defunct("geneIdsByCategory", package="Category")
     geneIdsByCategory(r, id)
 }
 

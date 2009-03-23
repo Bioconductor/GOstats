@@ -114,7 +114,7 @@ oneGOGraph <- function(x, dataenv) {
  ##GOleaves: the leaves of the GO graph are those nodes that have no
  ##inedges
   GOLeaves <- function(inG) {
-    .Deprecated("leaves", package="graph")
+    .Defunct("leaves", package="graph")
       nG <- nodes(inG)
       iE <- inEdges(nG, inG)
       nG[sapply(iE, length) == 0]

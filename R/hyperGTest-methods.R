@@ -94,7 +94,7 @@ getGoToChildGraph <- function(p, goIds) {
 setMethod("getGoGraph", signature(p="GOHyperGParams",
                                   goIds="character"),
           function(p, goIds) {
-              .Deprecated("GOGraph")
+              .Defunct("GOGraph")
               ## FIXME: ':::'
               goEnv <- GOenv(paste(p@ontology, "PARENTS", sep=""))
               gobpkids <- eapply(goEnv, function(x) {
