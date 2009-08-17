@@ -59,9 +59,11 @@ Objects can be created by calls of the form \code{new("GOHyperGResult", ...)}.
     \item{\code{pvalueCutoff}:}{Object of class \code{"numeric"}.
         The cutoff for significance used for some testing methods.
         Also used for pretty display in the \code{show} method.}
-
+    \item{\code{conditional}:}{A logical indicating whether the
+      calculation should condition on the GO structure.}
   }
 }
+
 \section{Extends}{
 Class \code{"HyperGResultBase"}, directly.
 }
