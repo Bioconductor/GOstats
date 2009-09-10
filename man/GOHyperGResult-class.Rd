@@ -61,6 +61,9 @@ Objects can be created by calls of the form \code{new("GOHyperGResult", ...)}.
         Also used for pretty display in the \code{show} method.}
     \item{\code{conditional}:}{A logical indicating whether the
       calculation should condition on the GO structure.}
+    \item{\code{testDirection}:}{A string which can be either "over"
+      or "under". This determines whether the test performed detects
+      over or under represented GO terms.}
   }
 }
 
