@@ -39,9 +39,9 @@
 
 \author{Seth Falcon}
 \seealso{
-  \code{\link{GOHyperGResult-class}}
-  \code{\link[Category]{geneCategoryHyperGeoTest}}
-  \code{\link[Category]{geneGoHyperGeoTest}}
+  \code{\link{GOHyperGResult-class}},
+  %\code{\link[Category]{geneCategoryHyperGeoTest}},
+  \code{\link[Category]{geneGoHyperGeoTest}},
   \code{\link[Category]{geneKeggHyperGeoTest}}
 }
 \keyword{models}
