@@ -25,7 +25,7 @@ idx2dimnames(x, idx)
 
 \author{R. Gentleman}
 
-\seealso{\code{\link{dimnames}} }
+\seealso{\code{\link[base:dimnames]{dimnames}} }
 \examples{
  data(Ndists)
  ltInf = is.finite(Ndists)

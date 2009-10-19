@@ -93,7 +93,7 @@ GOHyperG(x, lib, what="MF", universe=NULL)
   \code{\link{hyperGTest}},
   \code{\link[Category]{geneKeggHyperGeoTest}},
   %-does not exist \code{\link[Category]{geneCategoryHyperGeoTest}}
-  \code{\link{phyper}}
+  \code{\link[stats:Hypergeometric]{phyper}}
 }
 \examples{
 \dontrun{
