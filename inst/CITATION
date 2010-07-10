@@ -1,13 +1,13 @@
 citHeader("To cite GOstats in publications use:")
 
-citEntry(entry="ARTICLE",
-  AUTHOR = "S Falcon and  R Gentleman",
-  TITLE = "Using {G}{O}stats to test gene lists for {G}{O} term association.",
-  JOURNAL = "Bioinformatics",
-  YEAR = "2007",
-  VOLUME = "23",
-  NUMBER = "2",
-  PAGES = "257-8",
+citEntry(entry="Article",
+  author = "S Falcon and  R Gentleman",
+  title = "Using {G}{O}stats to test gene lists for {G}{O} term association.",
+  journal = "Bioinformatics",
+  year = "2007",
+  volume = "23",
+  number = "2",
+  pages = "257-8",
   textVersion = paste("S Falcon and R Gentleman.",
       "Using GOstats to test gene lists for GO term association.",
       "Bioinformatics, 23(2):257-8, 2007.")
