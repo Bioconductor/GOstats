@@ -12,7 +12,7 @@ Imports: AnnotationDbi (>= 0.0.89), Biobase (>= 1.15.29),
          graph (>= 1.15.15), methods, stats 
 Suggests: hgu95av2.db (>= 1.13.0), ALL, GO.db (>= 1.13.0), annotate, multtest,
           genefilter, RColorBrewer, Rgraphviz, xtable, SparseM
-Maintainer: Robert Gentleman <rgentlem@fhcrc.org>
+Maintainer: Biocore Team c/o BioC user list <bioconductor@stat.math.ethz.ch>
 License: Artistic-2.0
 Collate:
     zzz.R
