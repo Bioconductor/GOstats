@@ -96,7 +96,7 @@ getGoToChildGraph <- function(p, goIds) {
     gobpkids <- eapply(goEnv, function(x) {
         intersect(x, goIds)
     })
-    gobpkids <- l2e(gobpkids)
+    gobpkids <- list2env(gobpkids)
     GOGraph(goIds, gobpkids)
 }
 
@@ -110,7 +110,7 @@ setMethod("getGoGraph", signature(p="GOHyperGParams",
               gobpkids <- eapply(goEnv, function(x) {
                   intersect(x, goIds)
               })
-              gobpkids <- l2e(gobpkids)
+              gobpkids <- list2env(gobpkids)
               GOGraph(goIds, gobpkids)
           })
 
