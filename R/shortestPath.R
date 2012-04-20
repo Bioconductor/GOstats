@@ -44,7 +44,7 @@ compGdist <- function(g, whNodes, verbose=FALSE) {
         stop("can only compute distances between two or more nodes")
     if( any( !(whNodes %in% nodes(g))) )
         stop("specified nodes are not in the graph")
-    tfmatrix <- matrix(0, nr= nNodes, nc=nNodes)
+    tfmatrix <- matrix(0, nrow= nNodes, ncol=nNodes)
     for(i in 1:nNodes) {
         vvX <- dijkstra.sp(g, whNodes[i])
         tfmatrix[i,] <- vvX$distance[whNodes]
@@ -66,7 +66,7 @@ compCorrGraph <- function(eSet, k=1, tau=0.6) {
     ##set diag to zero, since we do not want self-edges
     diag(cB) = 0
     require("SparseM", quietly=TRUE) || stop("need SparseM package")
-    v1<-as.matrix.csr(cB, nr=dim(cB)[1], nc=dim(cB)[2])
+    v1<-as.matrix.csr(cB, nrow=dim(cB)[1], ncol=dim(cB)[2])
     sparseM2Graph(v1, featureNames(eSet))
 }
 

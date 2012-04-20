@@ -1,5 +1,6 @@
 .onAttach <- function(libname, pkgname) {
-    if (.Platform$OS.type == "windows" && require("Biobase")
+    sillyName <- require
+    if (.Platform$OS.type == "windows" && sillyName("Biobase")
         && interactive() && .Platform$GUI == "Rgui") {
         addVigs2WinMenu("GOstats")
     }

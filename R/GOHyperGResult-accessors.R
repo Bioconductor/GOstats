@@ -29,22 +29,6 @@ setMethod("geneIdUniverse", signature(r="GOHyperGResult"),
                 entrezGeneUniverse(r)
           })
 
-setMethod("condGeneIdUniverse", signature(r="GOHyperGResult"),
-          function(r) {
-              geneIdUniverse(r)
-          })
-
-setMethod("conditional", signature(r="GOHyperGResult"),
-          function(r) r@conditional)
-
-setMethod("isConditional", signature(r="GOHyperGResult"),
-          function(r) conditional(r))
-
-selectedGenes <- function(r, id=NULL) {
-    .Defunct("geneIdsByCategory", package="Category")
-    geneIdsByCategory(r, id)
-}
-
 
 inducedTermGraph <- function(r, id, children=TRUE, parents=TRUE) {
     if (!children && !parents)

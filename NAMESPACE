@@ -51,22 +51,19 @@ importFrom(stats,
 importFrom(GO.db,
            GOTERM)
 
-export(combGOGraph, compCorrGraph, compGdist,
+export(compCorrGraph, compGdist,
        enumPairs, 
-       GOGraph, GOLeaves,
+       GOGraph,
        idx2dimnames, isTriad,
        makeGOGraph, notConn, oneGOGraph,
        reduce2Degreek, shortestPath, simLL,
        simLP, simUI, triadCensus,
-       hyperGtable, hyperG2Affy,
-       GOHyperG,
        probeSetSummary)
 
 exportClasses(GOHyperGResult)
 
-exportMethods("hyperGTest", "getGoGraph",
+exportMethods("hyperGTest",
               "pvalues",
-              "isConditional",
               "description",
               "oddsRatios",
               "expectedCounts",
@@ -76,7 +73,6 @@ exportMethods("hyperGTest", "getGoGraph",
               "universeCounts",
               "geneIds",
               "geneIdUniverse",
-              "condGeneIdUniverse",
               "universeMappedCount",
               "geneMappedCount",
               "annotation",
@@ -85,5 +81,4 @@ exportMethods("hyperGTest", "getGoGraph",
 
 export(termGraphs, 
        inducedTermGraph, 
-       plotGOTermGraph,
-       selectedGenes)
+       plotGOTermGraph)

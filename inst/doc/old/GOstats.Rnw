@@ -567,7 +567,7 @@ is the probability that $X \geq q$ where $X$ is a Hypergeometric
 random variable with parameters as we have described. This probability
 constitutes a $p$-value since it is the probability of seeing
 something as extreme or more extreme than what was observed. This
-functionality is provided in the function \Rfunction{GOHyperG}
+functionality is provided in the function \Rfunction{hyperGTest}
 available in the \Rpackage{GOstats} package.
 
 There are some issues that arise in the interpretation of these
@@ -598,7 +598,7 @@ reasonable number of genes (10 or more) and small $p$-values.
 deGenes_entrez <- mget(deGenes, env=hgu95av2ENTREZID, ifnotfound=NA)
 stopifnot(!any(duplicated(deGenes_entrez)))
 stopifnot(!any(is.na(deGenes_entrez)))
-gGhyp <- GOHyperG(deGenes_entrez, lib="hgu95av2")
+gGhyp <- hyperGTest(deGenes_entrez, lib="hgu95av2")
 gGhyp.pv <- gGhyp$pv[nodes(gGO)]
 hyperG_pval <- 0.01
 
@@ -792,7 +792,7 @@ warranted.
 
 <<getTFs, hide=TRUE, echo=FALSE>>=
 TF2 <- get("GO:0003700", hgu95av2GO2PROBE)
-LLs <- getLL(TF2, "hgu95av2")
+LLs <- getEG(TF2, "hgu95av2")
 gN <- geneNames(esetSub)
 
 hv <- gN %in% TF2
@@ -802,7 +802,7 @@ oTF2 <- gN[hv]
 ## Because we've taken care of unique probe => Entrez mapping
 ## in the non-specific filtering, we don't have to worry
 ## about duplicates here.
-LL2 <- getLL(oTF2, "hgu95av2")
+LL2 <- getEG(oTF2, "hgu95av2")
 stopifnot(!any(duplicated(LL2)))
 
 @

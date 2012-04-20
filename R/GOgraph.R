@@ -1,5 +1,3 @@
- combGOGraph = function(g1, g2) .Defunct("join", package = "GOstats")
-
 ## Given a set of Entrez IDs obtain the GO graph that has all
 ## GO ids that those genes are annotated at, and
 makeGOGraph <- function (x, Ontology="MF", removeRoot=TRUE,
@@ -36,7 +34,7 @@ makeGOGraph <- function (x, Ontology="MF", removeRoot=TRUE,
             else {
                 oldNodes <- c(oldNodes, newN)
                 numE <- length(newN)
-                nedges <- mget(newN, env = dataenv, ifnotfound=NA)
+                nedges <- mget(newN, envir = dataenv, ifnotfound=NA)
                 nedges <- nedges[!is.na(nedges)]
                 oldEdges <- c(oldEdges, nedges)
                 if (length(nedges) > 0)
@@ -85,7 +83,7 @@ GOGraph = function(x, dataenv) {
         else {
             oldNodes <- c(oldNodes, newN)
             numE <- length(newN)
-            nedges <- mget(newN, env=dataenv, ifnotfound=NA)
+            nedges <- mget(newN, envir=dataenv, ifnotfound=NA)
             nedges <- nedges[!is.na(nedges)]
             oldEdges <- c(oldEdges, nedges)
             if( length(nedges) > 0 )
@@ -111,14 +109,6 @@ oneGOGraph <- function(x, dataenv) {
         stop("wrong number of GO terms")
     GOGraph(x, dataenv)
 }
- ##GOleaves: the leaves of the GO graph are those nodes that have no
- ##inedges
-  GOLeaves <- function(inG) {
-    .Defunct("leaves", package="graph")
-      nG <- nodes(inG)
-      iE <- inEdges(nG, inG)
-      nG[sapply(iE, length) == 0]
-  }
 
  ##similarity functions - based on graphs
  simUI = function(g1, g2) {

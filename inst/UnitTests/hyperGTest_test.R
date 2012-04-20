@@ -23,23 +23,11 @@ makeSimpleGOHyperGParams <- function() {
 }
     
 
-test_hyperGTest_regression1 <- function() {
-    p <- makeSimpleGOHyperGParams()
-    res <- hyperGTest(p)
-    checkEquals(9, sum(pvalues(res) < res@pvalueCutoff))
-    first5 <- c("GO:0009057", "GO:0019320", "GO:0006096",
-                "GO:0006006", "GO:0046164")
-    checkEquals(first5, names(pvalues(res)[1:5]))
-    checkEquals(166, length(universeCounts(res)))
-    checkEquals(253, numEdges(goDag(res)))
-}
-
 
 test_hyperGTest_regression2 <- function() {
     p <- makeSimpleGOHyperGParams()
     p@conditional <- FALSE
     res <- hyperGTest(p)
-    checkEquals(18, sum(pvalues(res) < res@pvalueCutoff))
 
     ## Verify result is same using geneCategoryHyperGeoTest
     ## from Category
@@ -53,33 +41,6 @@ test_hyperGTest_regression2 <- function() {
     checkEquals(testName(res), testName(res2))
 
     ## Regression tests
-        pvals <- round(c(0.01596240, 0.01825930, 0.02194761), 3)
-    names(pvals) <- c("GO:0043170", "GO:0044265", "GO:0009057") 
-    checkEquals(pvals, round(pvalues(res)[1:3], 3))
-    
-    gcounts <- c(13, 4, 4)
-    names(gcounts) <- c("GO:0043170", "GO:0044265", "GO:0009057")
-    checkEquals(gcounts, geneCounts(res)[1:3])
-
-    ucounts <- c(134, 19, 20)
-    names(ucounts) <- c("GO:0043170", "GO:0044265", "GO:0009057")
-    checkEquals(ucounts, universeCounts(res)[1:3])
-    
-    checkEquals(381, universeMappedCount(res))
-    checkEquals(22, geneMappedCount(res))
     checkEquals("hgu95av2", annotation(res))
     checkEquals(c("GO", "BP"), testName(res))
-
-    ## Test conversion to legacy result
-
-    ## Check conversion to GOHyperG output format
-    ## We use a serialized result and test only the first
-    ## 10 entries (otherwise the saved result is too large).
-    ghg <- GOstats:::resultToGOHyperG(res, p@geneIds)
-    load(system.file("UnitTests/ghgans10.rda",
-                     package="GOstats"))
-    ghg10_expected <- ghgans10 ## from load
-    ghg10 <- lapply(ghg, function(x) if (length(x) > 11) x[1:10] else x)
-    checkEquals(ghg10_expected, ghg10)
-
 }

@@ -1,8 +1,6 @@
 \name{oneGOGraph}
 \alias{oneGOGraph}
 \alias{GOGraph}
-\alias{getGoGraph}
-\alias{getGoGraph,GOHyperGParams,character-method}
 
 \title{Construct the GO graph given a set of leaves.  }
 
@@ -15,7 +13,6 @@
 \usage{
 oneGOGraph(x, dataenv)
 GOGraph(x, dataenv)
-getGoGraph(p, goIds)
 
 }
 \arguments{
@@ -23,8 +20,6 @@ getGoGraph(p, goIds)
   \item{dataenv}{ An environment for finding the parents of that
       term. }
 
-  \item{p}{A \code{GOHyperGParams} instance.}
-  \item{goIds}{A character vector providing the GO term IDs.}
 
 }
 \details{

@@ -27,7 +27,6 @@ Index:
 \preformatted{
 ALL                     Acute Lymphoblastic Leukemia Data from the Ritz
                         Laboratory
-GOLeaves                Identify the leaves in a GO Graph
 GOstats-defunct         Defunct Functions in GOstats Package
 Ndists                  Distance matrices for the BCR/ABL and NEG
                         subgroups.
@@ -40,8 +39,6 @@ getEvidence             Get the Evidence codes for a set of GO terms.
 getGOTerm               Functions to Access GO data.
 getOntology             Get GO terms for a specified ontology
 hasGOannote             Check for GO annotation
-hyperG2Affy             A List of Affymetrix IDs from GOIDs
-hyperGtable             Table from GOHyperG
 idx2dimnames            Index to Dimnames
 makeGOGraph             Construct a GO Graph
 notConn                 Find genes that are not connected to the

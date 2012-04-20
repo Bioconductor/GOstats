@@ -14,16 +14,11 @@
 
 \alias{geneIdUniverse,GOHyperGResult-method}
 
-\alias{condGeneIdUniverse,GOHyperGResult-method}
-
 \alias{htmlReport,GOHyperGResult-method}
 
 \alias{summary,GOHyperGResult-method}
 
 \alias{conditional,GOHyperGResult-method}
-\alias{isConditional,GOHyperGResult-method}
-
-\alias{selectedGenes}
 
 \title{Class "GOHyperGResult"}
 
@@ -76,14 +71,6 @@ Class \code{"HyperGResultBase"}, directly.
         return the \code{graph} instance representing the DAG of the
         GO terms that were tested.}
 
-      \item{condGeneIdUniverse}{\code{signature(r =
-        "GOHyperGResult")}: return a list named by the
-      tested GO terms.  Each element of the list is a vector of the
-      remaining gene identifiers (from the gene universe) annotated at
-      the corresponding GO term after the identifiers from significant
-      children were removed.  This is only available when the
-      calculation performed used the conditional Hypergeometric
-      algorithm.}
 
   \item{summary}{\code{signature(r = "GOHyperGResult")}: Returns a
       \code{data.frame} summarizing the test result.  Optional

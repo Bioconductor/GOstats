@@ -101,20 +101,6 @@ getGoToChildGraph <- function(p, goIds) {
 }
 
 
-setMethod("getGoGraph", signature(p="GOHyperGParams",
-                                  goIds="character"),
-          function(p, goIds) {
-              .Defunct("GOGraph")
-              ## FIXME: ':::'
-              goEnv <- GOenv(paste(p@ontology, "PARENTS", sep=""))
-              gobpkids <- eapply(goEnv, function(x) {
-                  intersect(x, goIds)
-              })
-              gobpkids <- list2env(gobpkids)
-              GOGraph(goIds, gobpkids)
-          })
-
-
 removeSigKidGenes <- function(curCatKids, goDag, curCat2Entrez, SIGNIF,
                               cat2Entrez) {
     if (length(curCatKids)) {

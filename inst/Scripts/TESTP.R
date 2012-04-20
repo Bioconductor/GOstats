@@ -13,7 +13,7 @@
 
  myLL <- sample(w2, 100)
 
- xx <- GOHyperG(myLL)
+ xx <- hyperGTest(myLL)
 
  xx$numLL
 
@@ -26,7 +26,7 @@
  rval = NULL
  for(i in 1:10) {
      mx = sample(w2, 100)
-     xx = GOHyperG(mx)
+     xx = hyperGTest(mx)
      rval[[i]] = list(nI = xx$numInt,gC= xx$goCounts,pV= xx$pvalues)
  }
 
@@ -85,7 +85,7 @@ set3 = genPVs(500, 75)
       rval = NULL
       for(i in 1:nsim) {
           mx = sample(w2, nsamp)
-          rval[[i]] = GOHyperG(mx)
+          rval[[i]] = hyperGTest(mx)
           if( verbose )
               print(paste("finished", i, "of", nsim))
       }

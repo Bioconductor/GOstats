@@ -10,27 +10,3 @@ resultToGOHyperG <- function(res, origIds) {
          intLLs=origIds,
          go2Affy=go2Affy)
 }
-
-
-GOHyperG <- function(x, lib, what="MF", universe=NULL)
-{
-    .Defunct("hyperGTest")
-    if (missing(universe) || is.null(universe))
-      universe <- character(0)
-    params <- new("GOHyperGParams",
-                  geneIds=x,
-                  universeGeneIds=universe,
-                  annotation=lib,
-                  ontology=what)
-    if (missing(lib) || !is.character(lib))
-      stop("argument ", sQuote("lib"), " must be character")
-
-    res <- hyperGTest(params)
-    resultToGOHyperG(res, origIds=x)
-}
-
-
-GOKEGGHyperG <- function (x, lib = "hgu95av2", what = "MF", universe=NULL)
-{
-    .Defunct("hyperGTest", "Category")
-}
