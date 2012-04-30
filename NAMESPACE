@@ -26,7 +26,6 @@ importFrom(AnnotationDbi,
 
 importFrom(Biobase,
            addVigs2WinMenu,
-           l2e,
            subListExtract)
 
 importFrom(RBGL,
