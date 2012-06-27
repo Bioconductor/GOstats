@@ -39,12 +39,12 @@ GOstatsHyperG.pdf vignette.  It is intended to explain how a user can
 run hypergeometric testing on GO terms or KEGG terms when the organism
 in question is not supported by an annotation package.  The 1st thing
 for a user to determine then is whether or not their organism is
-supported by an organism package through AnnotationDbi.  In order to
+supported by an organism package through AnnotationForge.  In order to
 do that, they need only to call the available.dbschemas() method from
-AnnotationDbi.
+AnnotationForge.
 
 <<available Schemas>>=
-library("AnnotationDbi")
+library("AnnotationForge")
 available.dbschemas()
 @ 
 

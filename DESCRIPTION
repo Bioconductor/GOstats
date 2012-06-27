@@ -1,6 +1,6 @@
 Package: GOstats
 Title: Tools for manipulating GO and microarrays.
-Version: 2.23.2
+Version: 2.23.3
 Author: R. Gentleman and S. Falcon
 Description: A set of tools for interacting with GO and microarray
         data. A variety of basic manipulation tools for graphs,
@@ -9,7 +9,7 @@ biocViews: Bioinformatics, Annotation, GO, MultipleComparisons
 Depends: R (>= 2.10), Biobase (>= 1.15.29), Category (>= 2.3.26), graph
 Imports: AnnotationDbi (>= 0.0.89), Biobase (>= 1.15.29),
          Category (>= 2.3.26), GO.db (>= 1.13.0), RBGL, annotate (>= 1.13.2), 
-         graph (>= 1.15.15), methods, stats 
+         graph (>= 1.15.15), methods, stats , AnnotationForge
 Suggests: hgu95av2.db (>= 1.13.0), ALL, GO.db (>= 1.13.0), annotate, multtest,
           genefilter, RColorBrewer, Rgraphviz, xtable, SparseM,
           GSEABase, geneplotter, org.Hs.eg.db

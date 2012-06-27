@@ -24,6 +24,8 @@ importMethodsFrom(Biobase,
 importFrom(AnnotationDbi,
            make_eg_to_go_map)
 
+importFrom(AnnotationForge,
+           available.dbschemas)
 importFrom(Biobase,
            addVigs2WinMenu,
            subListExtract)
