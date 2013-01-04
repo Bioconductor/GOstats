@@ -41,7 +41,6 @@ importFrom(annotate,
            getOntology)
 
 importFrom(methods,
-           "@<-",
            callNextMethod,
            is,
            new)
