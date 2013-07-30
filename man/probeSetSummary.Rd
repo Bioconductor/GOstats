@@ -11,7 +11,7 @@
 }
 
 \usage{
-probeSetSummary(result, pvalue, categorySize, sigProbesets)
+probeSetSummary(result, pvalue, categorySize, sigProbesets, ids = "ENTREZID")
 }
 
 \arguments{
@@ -25,7 +25,10 @@ probeSetSummary(result, pvalue, categorySize, sigProbesets)
       \code{categorySize} or more annotations will be returned.  If
       omitted, no category size criteria will be used.}
   \item{sigProbesets}{Optional vector of probeset IDs. See details for
-      more information.}
+    more information.}
+  \item{ids}{Character. The type of IDs used in creating the
+  \code{GOHyperGResult} object. Usually 'ENTREZID', but may be e.g.,
+  'ACCNUM' if using A. thaliana chip.}
 }
 
 \details{

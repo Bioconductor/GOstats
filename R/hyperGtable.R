@@ -19,11 +19,12 @@
 ## Made hyperGtable and hyperG3Affy defunct 10-2-07
 ###########################################
 
-probeSetSummary <- function(result, pvalue, categorySize, sigProbesets) {
+probeSetSummary <- function(result, pvalue, categorySize, sigProbesets,
+                            ids = "ENTREZID") {
     if (!is(result, "GOHyperGResult"))
       stop("result must be a GOHyperGResult instance (or subclass)")
     ## build reverse map
-    ps2egEnv <- getAnnMap("ENTREZID", annotation(result))
+    ps2egEnv <- getAnnMap(ids, annotation(result))
     psids <- ls(ps2egEnv)
     ## each psid maps to _exactly_ one egid
     ## Need to remove NAs.  This is where the database stuff
