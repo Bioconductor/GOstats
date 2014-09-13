@@ -1,12 +1,9 @@
+import(methods)
+importFrom(stats, cor)
+importFrom(stats4, summary)
+
 import(Category)
 import(graph)
-
-importClassesFrom(methods,
-                  ANY,
-                  character,
-                  integer,
-                  logical,
-                  numeric)
 
 importMethodsFrom(AnnotationDbi,
                   Term,
@@ -39,14 +36,6 @@ importFrom(annotate,
            dropECode,
            getAnnMap,
            getOntology)
-
-importFrom(methods,
-           callNextMethod,
-           is,
-           new)
-
-importFrom(stats,
-           cor)
 
 importFrom(GO.db,
            GOTERM)
