@@ -76,8 +76,7 @@ makeGOGraph(x, Ontology = "MF", removeRoot = TRUE, mapfun = NULL,
 \examples{
  library("hgu95av2.db")
  set.seed(321)
- uniqun <- function(x) unique(unlist(x))
- gN <- uniqun(sample(hgu95av2ENTREZID, 4))
+ gN <- unique(sample(keys(hgu95av2.db, 'ENTREZID'), 4))
  gg1 <- makeGOGraph(gN, "BP", chip="hgu95av2.db")
 
 }
