@@ -91,7 +91,7 @@ probeSetSummary <- function(result, pvalue, categorySize, sigProbesets,
 setMethod("summary", signature(object="GOHyperGResult"),
           function(object, pvalue=pvalueCutoff(object),
                    categorySize=NULL, htmlLinks=FALSE) {
-              AMIGO_URL <- "http://www.godatabase.org/cgi-bin/amigo/go.cgi?view=details&search_constraint=terms&depth=0&query=%s"
+              AMIGO_URL <- "http://amigo.geneontology.org/amigo/term/%s"
               df <- callNextMethod(object=object, pvalue=pvalue,
                                    categorySize=categorySize)
               if (nrow(df) == 0)  {
