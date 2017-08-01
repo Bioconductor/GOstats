@@ -1,5 +1,5 @@
 import(methods)
-importFrom(stats, cor)
+importFrom(stats, cor, setNames)
 importFrom(stats4, summary)
 
 import(Category)
@@ -23,6 +23,7 @@ importFrom(AnnotationDbi,
 
 importFrom(AnnotationForge,
            available.dbschemas)
+
 importFrom(Biobase,
            addVigs2WinMenu,
            subListExtract)
@@ -39,6 +40,12 @@ importFrom(annotate,
 
 importFrom(GO.db,
            GOTERM)
+
+importFrom(Rgraphviz,
+           makeNodeAttrs)
+
+importMethodsFrom(Rgraphviz,
+                  plot)
 
 export(compCorrGraph, compGdist,
        enumPairs, 

@@ -65,8 +65,8 @@ compCorrGraph <- function(eSet, k=1, tau=0.6) {
     cB[whE] <- ((1-cB)[whE])^k
     ##set diag to zero, since we do not want self-edges
     diag(cB) = 0
-    require("SparseM", quietly=TRUE) || stop("need SparseM package")
-    v1<-as.matrix.csr(cB, nrow=dim(cB)[1], ncol=dim(cB)[2])
+    requireNamespace("SparseM", quietly=TRUE) || stop("need SparseM package")
+    v1<-SparseM::as.matrix.csr(cB, nrow=dim(cB)[1], ncol=dim(cB)[2])
     sparseM2Graph(v1, featureNames(eSet))
 }
 

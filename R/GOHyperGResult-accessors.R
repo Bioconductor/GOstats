@@ -91,8 +91,8 @@ plotGOTermGraph <- function(g, r=NULL, add.counts=TRUE,
                             node.colors=c(sig="lightgray", not="white"),
                             node.shape="plaintext",
                             ...) {
-    if (!require("Rgraphviz", quietly=TRUE))
-      stop("The Rgraphviz package is required for this feature")
+    requireNamespace("Rgraphviz") || stop("'Rgraphviz' package needed")
+    makeNodeAttrs <- Rgraphviz::makeNodeAttrs
     n <- nodes(g)
     termLab <-
       if ("term" %in% names(nodeDataDefaults(g))) {

@@ -1,7 +1,12 @@
-setMethod("hyperGTest", signature(p="GOHyperGParams"),
-          function(p) .hyperGTestInternal(p) )
+setMethod("hyperGTest", "GOHyperGParams", function(p) {
+    .hyperGTestInternal(p, "GOHyperGResult", getGoToChildGraph)
+})
 
-.hyperGTestInternal <- function(p) {
+setMethod("hyperGTest", "OBOHyperGParams", function(p) {
+    .hyperGTestInternal(p, "OBOHyperGResult", getGoToChildOBOgraph)
+})
+
+.hyperGTestInternal <- function(p, resultsClassName, childGraphFun) {
   p <- makeValidParams(p)
   p@universeGeneIds <- universeBuilder(p)
   ## preserve names on geneIds
@@ -11,11 +16,11 @@ setMethod("hyperGTest", signature(p="GOHyperGParams"),
   cat2Entrez <- categoryToEntrezBuilder(p)
   ## build the GO graph for the relevant GO nodes
   goIds <- names(cat2Entrez)
-  goDag <- getGoToChildGraph(p, goIds)
+  goDag <- childGraphFun(p, goIds)
   nodeDataDefaults(goDag, "pvalue") <- 1
   nodeDataDefaults(goDag, "geneIds") <- numeric(0)
   nodeDataDefaults(goDag, "condGeneIds") <- numeric(0)
-  nodeDataDefaults(goDag, "oddsRatio") <- numeric(0)
+  nodeDataDefaults(goDag, "oddsRatio") <- 1
   nodeDataDefaults(goDag, "expCount") <- numeric(0)
   ## store the Entrez Gene IDs as attrs on the GO DAG.
   nodeData(goDag, n=names(cat2Entrez),
@@ -26,6 +31,9 @@ setMethod("hyperGTest", signature(p="GOHyperGParams"),
   needsProc <- goDag
   complete <- character(0)
   SIGNIF <- p@pvalueCutoff
+  SIGODD <- p@orCutoff
+  MINSIGSZE <- p@minSizeCutoff
+  MAXSIGSZE <- p@maxSizeCutoff
   while (length(nodes(needsProc))) {
     numKids <- sapply(edges(needsProc), length)
     noKids <- names(numKids[numKids == 0])
@@ -39,7 +47,8 @@ setMethod("hyperGTest", signature(p="GOHyperGParams"),
       }
       curCat2Entrez <- removeSigKidGenes(curCatKids, goDag,
                                          curCat2Entrez,
-                                         SIGNIF, cat2Entrez)
+                                         SIGNIF, SIGODD, MINSIGSZE, MAXSIGSZE,
+                                         cat2Entrez)
       ## Store the conditioned cat => entrez map
       nodeData(goDag, n=names(curCat2Entrez),
                attr="condGeneIds") <- curCat2Entrez
@@ -68,15 +77,20 @@ setMethod("hyperGTest", signature(p="GOHyperGParams"),
   }else if(class(p@datPkg)=="GeneSetCollectionDatPkg"){
     annotation = "Based on a GeneSetCollection Object"
   }
-  new("GOHyperGResult",
-      goDag=goDag,
-      annotation=annotation,
-      geneIds=p@geneIds,
-      testName=categoryName(p),
-      testDirection=p@testDirection,
-      pvalueCutoff=p@pvalueCutoff,
-      pvalue.order=order(pvals),
-      conditional=p@conditional)
+  objparams <- list(Class=resultsClassName,
+                    goDag=goDag,
+                    annotation=annotation,
+                    geneIds=p@geneIds,
+                    testName=categoryName(p),
+                    testDirection=p@testDirection,
+                    pvalueCutoff=p@pvalueCutoff,
+                    pvalue.order=order(pvals),
+                    conditional=p@conditional)
+  if (resultsClassName == "OBOHyperGResult") {
+      desc <- sapply(p@datPkg@geneSetCollection[nodes(goDag)], description)
+      objparams$gscDescriptions <- setNames(desc, nodes(goDag))
+  }
+  do.call("new", objparams)
 }
 
 
@@ -100,14 +114,32 @@ getGoToChildGraph <- function(p, goIds) {
     GOGraph(goIds, gobpkids)
 }
 
+## this is for OBO
+getGoToChildOBOgraph <- function(p, goIds) {
+  childrenEdges <- edges(as(t(as(p@datPkg@oboGraph, "matrix")), "graphNEL"))
+  childrenEdges <- lapply(childrenEdges, intersect, goIds)
+  childrenEdges <- list2env(childrenEdges)
+  GOGraph(goIds, childrenEdges)
+}
 
+
+## ROBERT 30.7.2017. Added arguments SIGODD, MINSIGSZE, MAXSIGSZE
+## to consider odds ratio and gene set size (minimum and maximum)
+## when removing children from significant terms. Thus the notion
+## of a "significant" term is extended to those meeting also these
+## parameters, when given.
 removeSigKidGenes <- function(curCatKids, goDag, curCat2Entrez, SIGNIF,
-                              cat2Entrez) {
+                              SIGODD, MINSIGSZE, MAXSIGSZE, cat2Entrez) {
     if (length(curCatKids)) {
         ## keep only those kids with SIGNIF pvalue
+        ## SIGODD odds ratio, MINSIGSZE minimum gene set size
+        ## and MAXSIGSZE maximum gene set size
         curCatKids <- lapply(curCatKids, function(x) {
             pvKids <- nodeData(goDag, n=x, attr="pvalue")
-            idx <- which(pvKids < SIGNIF)
+            orKids <- nodeData(goDag, n=x, attr="oddsRatio")
+            szeKids <- lengths(nodeData(goDag, n=x, attr="geneIds"))
+            idx <- which(pvKids < SIGNIF & orKids >= SIGODD &
+                         szeKids >= MINSIGSZE & szeKids <= MAXSIGSZE)
             if (length(idx))
               x[idx]
             else
@@ -116,7 +148,7 @@ removeSigKidGenes <- function(curCatKids, goDag, curCat2Entrez, SIGNIF,
         curCat2EntrezCond <- list()
         for (goid in names(curCat2Entrez)) {
             ## remove entrez ids that came from 
-            ## SIGNIF children
+            ## SIGNIF/SIGODD/MINSIGSZE/MAXSIGSZE children
             kids <- curCatKids[[goid]]
             if (length(kids)) {
                 kidEgs <- unlist(cat2Entrez[kids])

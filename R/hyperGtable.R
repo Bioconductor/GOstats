@@ -110,7 +110,19 @@ setMethod("summary", signature(object="GOHyperGResult"),
               df
           })
 
-
+setMethod("summary", signature(object="OBOHyperGResult"),
+    function(object, pvalue=pvalueCutoff(object), categorySize=NULL)
+{
+    df <- callNextMethod(object=object, pvalue=pvalue,
+                         categorySize=categorySize)
+    if (nrow(df) == 0) {
+        df$Term <- character(0)
+        return(df)
+    }
+    oboIds <- df[[1]]
+    df$Term <- object@gscDescriptions[oboIds]
+    df
+})
 
 setMethod("htmlReport", signature(r="GOHyperGResult"),
           function(r, file="", append=FALSE, label="",

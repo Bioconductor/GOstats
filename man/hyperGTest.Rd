@@ -1,6 +1,7 @@
 \name{hyperGTest}
 \alias{hyperGTest}
 \alias{hyperGTest,GOHyperGParams-method}
+\alias{hyperGTest,OBOHyperGParams-method}
 
 \title{Hypergeometric Tests for GO term association}
 
@@ -14,7 +15,7 @@
 
 
 \arguments{
-  \item{p}{A \code{GOHyperGParams} instance }
+  \item{p}{A \code{GOHyperGParams} or \code{OBOHyperGParams} instance }
 }
 
 \details{
@@ -25,14 +26,16 @@
   children to call the term in question statistically overrepresented.
 
   The algorithm conditions on all child terms that are themselves
-  significant at the specified p-value cutoff.  Given a subgraph of
-  one of the three GO ontologies, the terms with no child categories
+  significant at the specified p-value, odds ratio, minimum or
+  maximum gene set size cutoff.  Given a subgraph of
+  one of the three GO ontologies, or the ontology given in the
+  \code{OBOHyperGParams} instance, the terms with no child categories
   are tested first.  Next the nodes whose children have already been
   tested are tested.  If any of a given node's children tested
   significant, the appropriate conditioning is performed.
 }
 \value{
-  A \code{GOHyperGResult} instance.
+  A \code{GOHyperGResult} or \code{OBOHyperGResult} instance.
 }
 
 \references{FIXME}
