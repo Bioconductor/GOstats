@@ -81,16 +81,14 @@ probeSetSummary(result, pvalue, categorySize, sigProbesets, ids = "ENTREZID")
   library("annotate")
   prbs <- ls(hgu95av2GO)[1:300]
   ## Only those with GO ids
-  hasGO <- sapply(mget(prbs, hgu95av2GO), function(ids)
-  if(!is.na(ids) && length(ids) > 1) TRUE else FALSE)
+  hasGO <- lengths(lapply(mget(prbs, hgu95av2GO), names)) != 0
   prbs <- prbs[hasGO]
   prbs <- getEG(prbs, "hgu95av2")
   ## remove duplicates, but keep named vector
   prbs <- prbs[!duplicated(prbs)]
   ## do the same for universe
   univ <- ls(hgu95av2GO)[1:5000]
-  hasUnivGO <- sapply(mget(univ, hgu95av2GO), function(ids)
-  if(!is.na(ids) && length(ids) > 1) TRUE else FALSE)
+  hasUnivGO <- lengths(lapply(mget(univ, hgu95av2GO), names)) != 0
   univ <- univ[hasUnivGO]
   univ <- unique(getEG(univ, "hgu95av2"))
 
