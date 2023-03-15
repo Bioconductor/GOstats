@@ -2,11 +2,12 @@ Package: GOstats
 Title: Tools for manipulating GO and microarrays
 Version: 2.65.0
 Authors@R: c(
-    person("Robert", "Gentleman", role="aut"),
-    person("Seth", "Falcon", role="ctb"),
-    person("Robert", "Castelo", role="ctb"),
+    person("First Name", "Last Name", role = "aut"),
+    person("First Name", "Last Name", role = "ctb"),
+    person("Dennis", "Ndubi", role = "ctb",
+        comment = "Converted GOstatsHyperG vignette from Sweave to RMarkdown / HTML."),
     person("Bioconductor Package Maintainer",
-        email = "maintainer@bioconductor.org", role="cre"))
+        email = "maintainer@bioconductor.org", role = "cre"))
 Description: A set of tools for interacting with GO and microarray
         data. A variety of basic manipulation tools for graphs,
         hypothesis testing and other simple calculations.
@@ -17,10 +18,11 @@ Imports: methods, stats, stats4, AnnotationDbi (>= 0.0.89),
         Rgraphviz
 Suggests: hgu95av2.db (>= 1.13.0), ALL,
         multtest, genefilter, RColorBrewer, xtable, SparseM,
-        GSEABase, geneplotter, org.Hs.eg.db, RUnit, BiocGenerics
+        GSEABase, geneplotter, org.Hs.eg.db, RUnit, BiocGenerics, BiocStyle, knitr
 License: Artistic-2.0
 Collate: zzz.R AllClasses.R AllGenerics.R hyperGTest-methods.R
         GOHyperGResult-accessors.R GOgraph.R GOhyptest.R hyperGtable.R
         shortestPath.R triad.R OBOHyperGResult-accessors.R
 biocViews: Annotation, GO, MultipleComparison, GeneExpression, Microarray, 
          Pathways, GeneSetEnrichment, GraphAndNetwork
+VignetteBuilder: knitr
