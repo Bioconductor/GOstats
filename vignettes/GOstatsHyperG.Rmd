@@ -34,7 +34,7 @@ group with ALL1/AF4 to those with no observed cytogenetic abnormalities.
 
 To get started, load the packages needed for this analysis:
 
-```{r Setup, echo=TRUE, results='asis'}
+```{r Setup, echo=TRUE, results='hide'}
 library("ALL")
 library("hgu95av2.db")
 library("GO.db") 
