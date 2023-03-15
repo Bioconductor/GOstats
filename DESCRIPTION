@@ -2,7 +2,7 @@ Package: GOstats
 Title: Tools for manipulating GO and microarrays
 Version: 2.65.0
 Authors@R: c(
-    person("First Name", "Last Name", role = "aut"),
+    person("First ", "Last Name", role = "aut"),
     person("First Name", "Last Name", role = "ctb"),
     person("Dennis", "Ndubi", role = "ctb",
         comment = "Converted GOstatsHyperG vignette from Sweave to RMarkdown / HTML."),
