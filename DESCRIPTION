@@ -2,10 +2,11 @@ Package: GOstats
 Title: Tools for manipulating GO and microarrays
 Version: 2.65.0
 Authors@R: c(
-    person("Robert", "Gentleman", role = "aut"),
-    person("Seth", "Falcon, role = "ctb"),
-    Person(" Robert", "Castelo", role="ctb"),
-    person("Dennis", "Ndubi", role = "ctb"),
+Authors@R: c(
+    person("Robert", "Gentleman", role="aut"),
+    person("Seth", "Falcon", role="ctb"),
+    person("Robert", "Castelo", role="ctb"),
+    person("Dennis", "Ndubi", role ="ctb"),
         comment = "Converted GOstatsHyperG vignette from Sweave to RMarkdown / HTML."),
     person("Bioconductor Package Maintainer",
         email = "maintainer@bioconductor.org", role = "cre"))
