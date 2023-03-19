@@ -5,7 +5,7 @@ Authors@R: c(
     person("Robert", "Gentleman", role="aut"),
     person("Seth", "Falcon", role="ctb"),
     person("Robert", "Castelo", role="ctb"),
-    person("Dennis", "Ndubi", role ="ctb"),
+    person("Dennis", "Ndubi", role ="ctb",
         comment = "Converted GOstatsHyperG vignette from Sweave to RMarkdown / HTML."),
     person("Bioconductor Package Maintainer",
         email = "maintainer@bioconductor.org", role = "cre"))
