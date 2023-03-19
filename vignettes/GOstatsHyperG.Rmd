@@ -1,7 +1,8 @@
 ---
 title: "How To Use GOstats Testing Gene Lists for GO Term Association"
 author:
-  - name: S. Falcon and R. Gentleman
+  - name: S. Falcon 
+  - name: R. Gentleman
   - name: Dennis Ndubi
     affiliation: "Vignette translation from Sweave to R Markdown / HTML"
 date: March 15, 2022
@@ -21,7 +22,7 @@ the association of Gene Ontology (GO) @GO terms to genes in a gene
 list. You can test for both over and under representation of GO terms
 using either the standard Hypergeometric test or a conditional
 Hypergeometric test that uses the relationships among the GO terms for
-conditioning (similar to that presented in @Alexa06).
+conditioning (similar to that presented in -@Alexa06).
 
 In this vignette we describe the preprocessing required to construct
 inputs for the main testing function, `hyperGTest`, the algorithms used,
