@@ -17,7 +17,7 @@ output:
 ---
 # Introduction
 
-The [GOstats](https://bioconductor.org/packages/release/bioc/html/GOstats.html) package has extensive facilities for testing
+The `r Biocpkg("GOstats")` package has extensive facilities for testing
 the association of Gene Ontology (GO) @GO terms to genes in a gene
 list. You can test for both over and under representation of GO terms
 using either the standard Hypergeometric test or a conditional
@@ -250,7 +250,7 @@ different sets of parameters and to facilitate this pattern of usage the
 main interface to the Hypergeometric tests, `hyperGTest`, takes a single
 parameter object as its argument. This argument is an instance of class
 *GOHyperGParams*. There are also parameter classes *KEGGHyperGParams*
-and *PFAMHyperGParams* defined in the **`Category`{.sans-serif}** package
+and *PFAMHyperGParams* defined in the `r Biocpkg("Category")` package
 that allow for testing for association with KEGG pathways and PFAM
 protein domains, respectively.
 
