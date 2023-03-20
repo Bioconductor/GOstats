@@ -17,12 +17,12 @@ output:
 ---
 # Introduction
 
-The`GOstats`{.sans-serif} package has extensive facilities for testing
+The [GOstats](https://bioconductor.org/packages/release/bioc/html/GOstats.html) package has extensive facilities for testing
 the association of Gene Ontology (GO) @GO terms to genes in a gene
 list. You can test for both over and under representation of GO terms
 using either the standard Hypergeometric test or a conditional
 Hypergeometric test that uses the relationships among the GO terms for
-conditioning (similar to that presented in -@Alexa06).
+conditioning (similar to that presented in  @Alexa06).
 
 In this vignette we describe the preprocessing required to construct
 inputs for the main testing function, `hyperGTest`, the algorithms used,
