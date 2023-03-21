@@ -13,18 +13,20 @@ vignette: >
   %\VignettePackage{GOstats}
 output:
   BiocStyle::html_document
+bibliography: GOstats.bib
 ---
 
 # Introduction 
 
-The basic characteristics of the GO [(The Gene Ontology Consortium, 2000)](#GO)
+The basic characteristics of the GO [@GO]
 data are described in [@GentGO2004a] and the
 interested reader is referred there for more details. In this paper we assume
 that readers are familiar with the basic DAG structure of GO and with the
-mappings of genes to GO terms that are provide by GOA [(Camon et al., 2004)](#GOA). We examine some of the different visualization problems and data
+mappings of genes to GO terms that are provide by GOA [@GOA]. We examine some
+of the different visualization problems and data
 analytic problems that can be addressed using these data. To make some of the
 concepts concrete and to provide extensive, but related examples we will make
-use of a microarray data set [(Chiaretti et al., 2004)](#Chiaretti2004).
+use of a microarray data set [@Chiaretti2004].
 
 We begin with brief descriptions and reminders of some of the important
 concepts, as well as of our example data. Once that has been done we will then
@@ -57,7 +59,7 @@ specific term (child) to all less specific terms (each is a parent). The
 *induced* GO graph is the graph that obtains from taking a set of GO
 terms and finding all parents of those terms, and so on until the root
 node has been obtained. Given any set of genes one may use the mappings
-provided by GOA [(Camon et al., 2004)](#GOA) to find the most specific set of GO terms
+provided by GOA [@GOA] to find the most specific set of GO terms
 associated with those genes and hence, from those, to the induced GO
 graph. Thus we can speak of the induced GO graph either from the
 perspective of selected genes or from the perspective of selected terms.
@@ -100,9 +102,9 @@ they have a GO annotation for the ontology of interest.
 To demonstrate some of the tools that are included in the `r Biocpkg("GOstats")`
 package we consider expression data from 79 samples from patients with
 acute lymphoblastic leukemia (ALL) that were investigated using HGU95AV2
-Affymetrix GeneChip arrays [(Chiaretti et al., 2004)](#Chiaretti2004). The data were normalized
+Affymetrix GeneChip arrays [@Chiaretti2004]. The data were normalized
 using quantile normalization and expression estimates were computed
-using RMA [Irizarry et al., 2003](#Irizarry2003). We will consider the subset of these patients
+using RMA [@Irizarry2003]. We will consider the subset of these patients
 that have B-cell ALL and within those we will further restrict our
 interest to comparing three groups. Those with BCR/ABL (this is a
 translocation between chromosomes 9 and 22), those with ALL1/AF4 (this
@@ -115,7 +117,7 @@ different phenotypes and then make use of GO and other meta-data
 resources to help understand the genes that were selected. The actual
 method of determining differentially expressed genes is in some sense
 irrelevant to the subsequent analysis using GO and readers can easily
-substitute their own favorite methods. We refer readers to [von Heydebreck et al. (2004)](#WileyEncy)
+substitute their own favorite methods. We refer readers to [@WileyEncy]
 for a general discussion of some of the issues involved in gene
 filtering.
 
@@ -149,7 +151,6 @@ than 100 units. Applying both of these transformations yielded
 `r {sum(selected)}` probes that were differentially expressed.
 
 ```{r mtFstats, results='hide', echo=FALSE}
-
  pvCutOff = 0.05
 
  Fstats = mt.maxT(exprs(esetSub), as.numeric(MB)-1,
@@ -168,7 +169,7 @@ than 100 units. Applying both of these transformations yielded
 ```
 
 Next restricting attention to just these `r {sum(selected)}`
-probes we use the `mt.maxT` function from the
+probes we use the `r Rpackage("mt.maxT")` function from the
 `r Biocpkg("multtest")` package to compute adjusted $p$-values for F-test
 comparisons.  We found `r {sum(Fstats$adjp < pvCutOff)}` of these to
 have adjusted $p$-values less than `r {round(pvCutOff, 2)}`. We will
@@ -237,11 +238,11 @@ if( require("Rgraphviz") ) {
 ```
 
 The nodes in these different graphs can be colored according to
-different criteria. In [Storch et al. (2002)](#Storch) they considered using color for the
+different criteria. In [@Storch] they considered using color for the
 nodes. The studied differences in gene expression between heart and
 liver in mice. Their Figure 2 presents data that were assembled in
 roughly the following manner. Genes of interest were mapped to terms in
-the Biological Process arm of GO [(The Gene Ontology Consortium, 2000)](#GO). They then colored the nodes in
+the Biological Process arm of GO [@GO]. They then colored the nodes in
 this tree red if the associated genes were expressed in heart, green if
 they were expressed in liver and yellow if they were expressed in both.
 The figure itself is quite helpful and clearly displays the data
@@ -307,7 +308,7 @@ this. We first do a layout to get the node positions and then write a
 function that will draw each node as a piechart and color the components
 the requested colors.
 
-```{r layoutandrender, warning=FALSE}
+```{r layoutandrender, warning=FALSE, results="hide"}
 if( require(Rgraphviz) ) {
 opar = par(xpd = NA)
 plotPieChart <- function(curPlot, counts, main) {
@@ -347,7 +348,7 @@ investigate these and see what cellular components they are related to.
 We can make use of the `imageMap` function to provide tool tips for our
 graph.
 
-```{r imageMap}
+```{r imageMap, message=FALSE, results='hide'}
 
  getNodeBB = function(ingraph) {
      xypos = getNodeXY(ingraph)
@@ -419,7 +420,7 @@ is to make use of the graph structure that is associated with each pair
 of genes. If the two graphs are very similar then the two genes are
 presumed to also be quite similar. The second general strategy is to use
 the information content in GO as a basis for assigning similarity.
-Readers should consult [P.W.Lord et al. (2003)](#Lordetal) for a general review of the area and
+Readers should consult [@Lordetal] for a general review of the area and
 for some suggestions. Code contributions that implement some of their
 methods would be most welcome.
 
@@ -520,34 +521,3 @@ gCC.leaves[1:5]
 ```
 
 # References
-
-<a id="GOA" ></a>
-E. Camon, M. Magrane, D. Barrell, V. Lee, E. Dimmer, D. Binns J. Maslen, N. Harte,
-R. Lopez, and R. Apweiler. The Gene Ontology annotation (GOA) database: sharing knowledge in Uniprot with Gene Ontology. Nucleic Acids Research, 32:D262–D266, 2004.
-
-<a id="Chiaretti2004" ></a>
-S. Chiaretti, X Li, R Gentleman, A Vitale, M. Vignetti, F. Mandelli, J. Ritz, , and R. Foa. Gene
-expression profile of adult t-cell acute lymphocytic leukemia identifies distinct subsets of
-patients with different response to therapy and survival. Blood, 103:2771–2778, 2004.
-
-<a id="Irizarry2003" ></a> 
-R. A. Irizarry, B. Hobbs, F. Collin, Y. D. Beazer-Barclay, K. J. Antonellis, U. Scherf, and T. P.
-Speed. Exploration, normalization, and summaries of high density oligonucleotide array
-probe level data. Biostatistics, 4:249–264, 2003.
-
-<a id="Lordetal" ></a>
-P.W.Lord, R.D. Stevens, A. Brass, and C.A.Goble. Investigating semantic similarity measures
-across the Gene Ontology: the relationship between sequence and annotation. Bioinformatics, 19(10):1275–83, 2003.
-
-<a id="Storch" ></a>
-K-F Storch, O. Lipan, I. Leykin, N. Viswanathan, F. C. Davis, W. H. Wong, and C. J. Weitz.
-Extensive and divergent circadian gene expression in liver and heart. Nature, 417:79–82,
-2002.
-
-<a id="GO" ></a>
-The Gene Ontology Consortium. Gene Ontology: tool for the unification of biology. Nature
-Genetics, 25:25–29, 2000.
-
-<a id="WileyEncy" ></a>
-A. von Heydebreck, W. Huber, and R. Gentleman. Differential expression with the bioconductor project. In Encyclopedia of Genetics, Genomics, Proteomics and Bioinformatics. John
-Wiley and Sons, 2004.
