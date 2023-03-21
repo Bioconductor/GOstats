@@ -295,8 +295,7 @@ Here is a description of all the arguments needed to construct a
 | **geneIds** A vector of gene identifiers that defines the selected list of genes. This is often the output
 |           of a test for differential expression among two sample groups. For experiments using Affymetrix
 |           expression arrays, this should be a vector of Entrez Gene IDs. If you are using the
-|           [YEAST]{.sans-serif} annotation package, the vector will consist of yeast systematic names.
-
+|           **YEAST** annotation package, the vector will consist of yeast systematic names.
 | **universeGeneIds** A vector of gene identifiers that defines the universe of possible 
 |           genes. We recommend using the set of gene IDs that result from non-specific filtering. 
 |           The identifiers should be of the same type as the `geneIds`; for Affymetrix arrays, these will
