@@ -7,7 +7,7 @@ authors:
 date: "`r format(Sys.time(), '%B %d , %Y')`"
 vignette: >
   %\VignetteIndexEntry{Visualizing Data Using GOstats}
-  %\VignetteDepends{Biobase,genefilter,graph,GO.db,hgu95av2.db,xtable,mult   test}
+  %\VignetteDepends{Biobase,genefilter,graph,GO.db,hgu95av2.db,xtable,multtest}
   %\VignetteSuggests{Rgraphviz}
   %\VignetteKeywords{EDA, graphs, ontology, visualization}
   %\VignettePackage{GOstats}
@@ -20,18 +20,27 @@ bibliography: GOstats.bib
 
 The basic characteristics of the GO [@GO]
 data are described in [@GO] and the
-interested reader is referred there for more details. In this paper we assume
-that readers are familiar with the basic DAG structure of GO and with the
-mappings of genes to GO terms that are provide by GOA [@GOA]. We examine 
+interested reader is referred there for more details. In this
+paper we assume
+that readers are familiar with the basic DAG structure of GO
+and with the
+mappings of genes to GO terms that are provide by GOA [@GOA].
+We examine 
 some of the different visualization problems and data
-analytic problems that can be addressed using these data. To make some of the
-concepts concrete and to provide extensive, but related examples we will make
+analytic problems that can be addressed using these data. To
+make some of the
+concepts concrete and to provide extensive, but related
+examples we will make
 use of a microarray data set [@Chiaretti2004].
 
-We begin with brief descriptions and reminders of some of the important
-concepts, as well as of our example data. Once that has been done we will then
-consider several different bioinformatic tasks that are of interest and show how
-these tasks can be carried out using software from the Bioconductor Project.
+We begin with brief descriptions and reminders of some of the
+important
+concepts, as well as of our example data. Once that has been done
+we will then
+consider several different bioinformatic tasks that are of interest
+and show how
+these tasks can be carried out using software from the Bioconductor
+Project.
 
 ```{r Setup, echo=FALSE, results='hide', message=FALSE}
 library("Biobase")
@@ -46,8 +55,11 @@ library("genefilter")
 library("ALL")
 ```
 
-The results reported in this document are based on `r {packageDescription("hgu95av2.db")[["Version"]]}` version of the
-`r Biocpkg("hgu95av2.db")` data package and on `r {packageDescription("GO.db")[["Version"]]}` of the `r Biocpkg("GO.db")` package. If you have
+The results reported in this document are based on
+`r {packageDescription("hgu95av2.db")[["Version"]]}` version of the
+`r Biocpkg("hgu95av2.db")` data package and on
+`r {packageDescription("GO.db")[["Version"]]}` of the `r Biocpkg("GO.db")` package.
+If you have
 different versions your results will probably be different.
 
 ## Graphs
@@ -101,15 +113,24 @@ they have a GO annotation for the ontology of interest.
 
 To demonstrate some of the tools that are included in the 
 `r Biocpkg("GOstats")`
-package we consider expression data from 79 samples from patients with acute
-lymphoblastic leukemia (ALL) that were investigated using HGU95AV2 Affymetrix
-GeneChip arrays [@Chiaretti2004]. The data were normalized using quantile
-normalization and expression estimates were computed using RMA [@Irizarry2003].
-We will consider the subset of these patients that have B-cell ALL and within
-those we will further restrict our interest to comparing three groups. Those
-with BCR/ABL (this is a translocation between chromosomes 9 and 22), those with
-ALL1/AF4 (this is a translocation between chromosomes 4 and 11) and those with
-no detected cytogenetic abnormalities (labeled NEG). There are 37 patients with
+package we consider expression data from 79 samples from patients
+with acute
+lymphoblastic leukemia (ALL) that were investigated using HGU95AV2
+Affymetrix
+GeneChip arrays [@Chiaretti2004]. The data were normalized using
+quantile
+normalization and expression estimates were computed using 
+RMA [@Irizarry2003].
+We will consider the subset of these patients that have B-cell
+ALL and within
+those we will further restrict our interest to comparing three
+groups. Those
+with BCR/ABL (this is a translocation between chromosomes 9 and 22),
+those with
+ALL1/AF4 (this is a translocation between chromosomes 4 and 11)
+and those with
+no detected cytogenetic abnormalities (labeled NEG).
+There are 37 patients with
 BCR/ABL, 10 with ALL1/AF4 and 42 from the NEG group.
 
 We will examine genes that are differentially expressed between these
@@ -185,56 +206,38 @@ data and note that others may want to use different conventions.
 
 # Visualization
 
-Using the genes selected in Section [1.3](#sec:example) we can
-construct the induced GO graph for any one of the three different
-Ontologies. In Figures [1](#fig1), [2](#fig2) and [3](#fig3) we
-present these three different graphs. Of course one would like to add
-some of the experimental data and information to these plots.
+Using the genes selected in Section [0.3](#sec:example) we can construct the
+induced GO graph for any one of the three different Ontologies. In Figures
+[1](#fig1), [2](#fig2) and [3](#fig3) we present these three different graphs.
+Of course one would like to add some of the experimental data and information to
+these plots.
 
 ```{r inducedGO, echo=FALSE, results='hide'}
-gMF = makeGOGraph(lls, "MF", chip="hgu95av2")
-gBP = makeGOGraph(lls, "BP", chip="hgu95av2")
-gCC = makeGOGraph(lls, "CC", chip="hgu95av2")
+ gMF = makeGOGraph(lls, "MF", chip="hgu95av2")
+ gBP = makeGOGraph(lls, "BP", chip="hgu95av2")
+ gCC = makeGOGraph(lls, "CC", chip="hgu95av2")
 
 
-nMF = list()
-lbs = rep("", length(nodes(gMF)))
-names(lbs) = nodes(gMF)
-nMF$label = lbs
+ nMF = list()
+ lbs = rep("", length(nodes(gMF)))
+ names(lbs) = nodes(gMF)
+ nMF$label = lbs
 
-nBP = list()
-lbs = rep("", length(nodes(gBP)))
-names(lbs) = nodes(gBP)
-nBP$label = lbs
+ nBP = list()
+ lbs = rep("", length(nodes(gBP)))
+ names(lbs) = nodes(gBP)
+ nBP$label = lbs
 
-nCC = list()
-lbs = rep("", length(nodes(gCC)))
-names(lbs) = nodes(gCC)
-nCC$label = lbs
+ nCC = list()
+ lbs = rep("", length(nodes(gCC)))
+ names(lbs) = nodes(gCC)
+ nCC$label = lbs
 
 if( require("Rgraphviz") ) {
   gMFlo = agopen(gMF, "gMF")
   gBPlo = agopen(gBP, "gBP")
   gCClo = agopen(gCC, "gCC")
 }
-```
-
-<a id="fig1" ></a>
-```{r fig1, echo=FALSE, warning=FALSE, fig.cap = " The induced MF GO graph for the selected genes."}
-if (require("Rgraphviz"))
-     plot(gMFlo, nodeAttrs=nMF, main="Molecular Function")
-```
-
-<a id="fig2" ></a>
-```{r fig2, fig=TRUE, echo=FALSE, warning=FALSE, fig.cap = " The induced BP GO graph for the selected genes."}
-if (require("Rgraphviz"))
-    plot(gBPlo, nodeAttrs=nBP, main="Biological Process")
-```
-
-<a id="fig3" ></a>
-```{r fig3, echo=FALSE, fig.cap = "The induced CC GO graph for the selected genes.", warning=FALSE, fig=TRUE}
-if (require("Rgraphviz"))
-    plot(gCClo, nodeAttrs=nCC, main="Cellular Component")
 ```
 
 The nodes in these different graphs can be colored according to
@@ -258,6 +261,24 @@ there is more than one gene then we might use the multiplicity of
 highest means). Or, possibly of more interest would be to categorize the
 genes (again we could use which phenotype had the highest mean) and
 render the nodes using pie charts.
+
+<a id="fig1" ></a>
+```{r fig1, echo=FALSE, warning=FALSE, fig.cap = " The induced MF GO graph for the selected genes."}
+  if (require("Rgraphviz"))
+     plot(gMFlo, nodeAttrs=nMF, main="Molecular Function")
+```
+
+<a id="fig2" ></a>
+```{r fig2, fig=TRUE, echo=FALSE, warning=FALSE, fig.cap = " The induced BP GO graph for the selected genes."}
+  if (require("Rgraphviz"))
+    plot(gBPlo, nodeAttrs=nBP, main="Biological Process")
+```
+
+<a id="fig3" ></a>
+```{r fig3, echo=FALSE, fig.cap = "The induced CC GO graph for the selected genes.", warning=FALSE, fig=TRUE}
+  if (require("Rgraphviz"))
+    plot(gCClo, nodeAttrs=nCC, main="Cellular Component")
+```
 
 The computations are quite straightforward. First we find the maximum
 mean for each gene. We see that BCR/ABL has the most maxima, followed by
