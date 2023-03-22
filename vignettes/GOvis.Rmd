@@ -308,7 +308,7 @@ this. We first do a layout to get the node positions and then write a
 function that will draw each node as a piechart and color the components
 the requested colors.
 
-```{r layoutandrender, warning=FALSE, results="hide"}
+```{r layoutandrender, eval=FALSE, warning=FALSE, results="hide"}
 if( require(Rgraphviz) ) {
 opar = par(xpd = NA)
 plotPieChart <- function(curPlot, counts, main) {
