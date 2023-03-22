@@ -20,7 +20,7 @@ link-citations: yes
 # Introduction {#introduction .unnumbered}
 
 The basic characteristics of the GO [@GO]
-data are described in [@GO] and the
+data are described in @GO and the
 interested reader is referred there for more details. In this
 paper we assume
 that readers are familiar with the basic DAG structure of GO
@@ -139,7 +139,7 @@ different phenotypes and then make use of GO and other meta-data
 resources to help understand the genes that were selected. The actual
 method of determining differentially expressed genes is in some sense
 irrelevant to the subsequent analysis using GO and readers can easily
-substitute their own favorite methods. We refer readers to [@WileyEncy]
+substitute their own favorite methods. We refer readers to @WileyEncy
 for a general discussion of some of the issues involved in gene
 filtering.
 
@@ -242,11 +242,11 @@ if( require("Rgraphviz") ) {
 ```
 
 The nodes in these different graphs can be colored according to
-different criteria. In [@Storch] they considered using color for the
+different criteria. In @Storch they considered using color for the
 nodes. The studied differences in gene expression between heart and
 liver in mice. Their Figure 2 presents data that were assembled in
 roughly the following manner. Genes of interest were mapped to terms in
-the Biological Process arm of GO [@GO]. They then colored the nodes in
+the Biological Process arm of GO @GO. They then colored the nodes in
 this tree red if the associated genes were expressed in heart, green if
 they were expressed in liver and yellow if they were expressed in both.
 The figure itself is quite helpful and clearly displays the data
@@ -441,7 +441,7 @@ is to make use of the graph structure that is associated with each pair
 of genes. If the two graphs are very similar then the two genes are
 presumed to also be quite similar. The second general strategy is to use
 the information content in GO as a basis for assigning similarity.
-Readers should consult [@Lordetal] for a general review of the area and
+Readers should consult @Lordetal for a general review of the area and
 for some suggestions. Code contributions that implement some of their
 methods would be most welcome.
 
