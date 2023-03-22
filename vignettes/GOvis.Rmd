@@ -14,6 +14,7 @@ vignette: >
 output:
   BiocStyle::html_document
 bibliography: GOstats.bib
+link-citations: yes
 ---
 
 # Introduction {#introduction .unnumbered}
