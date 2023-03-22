@@ -292,6 +292,7 @@ selectedEntrezIds <-unlist(mget(featureNames(pvalFiltered),
 Here is a description of all the arguments needed to construct a
 *GOHyperGParams* instance.
 
+:::{.description}
 | **geneIds** A vector of gene identifiers that defines the selected list of genes. This is often the output
 |           of a test for differential expression among two sample groups. For experiments using Affymetrix
 |           expression arrays, this should be a vector of Entrez Gene IDs. If you are using the
@@ -325,6 +326,7 @@ Here is a description of all the arguments needed to construct a
 
 | **testDirection** A string which can be either "over" or "under". This determines whether the test
 |         performed detects over or under represented GO terms.
+:::
 
 ```{r standardHyperGeo, echo=TRUE, results='hide', cache=TRUE}
 hgCutoff<- 0.001 
