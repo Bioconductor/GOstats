@@ -16,7 +16,7 @@ output:
 bibliography: GOstats.bib
 ---
 
-# Introduction 
+# Introduction {#introduction .unnumbered}
 
 The basic characteristics of the GO [@GO]
 data are described in [@GO] and the
