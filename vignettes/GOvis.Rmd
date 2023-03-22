@@ -19,11 +19,11 @@ bibliography: GOstats.bib
 # Introduction 
 
 The basic characteristics of the GO [@GO]
-data are described in [@GentGO2004a] and the
+data are described in [@GO] and the
 interested reader is referred there for more details. In this paper we assume
 that readers are familiar with the basic DAG structure of GO and with the
-mappings of genes to GO terms that are provide by GOA [@GOA]. We examine some
-of the different visualization problems and data
+mappings of genes to GO terms that are provide by GOA [@GOA]. We examine 
+some of the different visualization problems and data
 analytic problems that can be addressed using these data. To make some of the
 concepts concrete and to provide extensive, but related examples we will make
 use of a microarray data set [@Chiaretti2004].
@@ -99,18 +99,18 @@ they have a GO annotation for the ontology of interest.
 
 ## An Example 
 
-To demonstrate some of the tools that are included in the `r Biocpkg("GOstats")`
-package we consider expression data from 79 samples from patients with
-acute lymphoblastic leukemia (ALL) that were investigated using HGU95AV2
-Affymetrix GeneChip arrays [@Chiaretti2004]. The data were normalized
-using quantile normalization and expression estimates were computed
-using RMA [@Irizarry2003]. We will consider the subset of these patients
-that have B-cell ALL and within those we will further restrict our
-interest to comparing three groups. Those with BCR/ABL (this is a
-translocation between chromosomes 9 and 22), those with ALL1/AF4 (this
-is a translocation between chromosomes 4 and 11) and those with no
-detected cytogenetic abnormalities (labeled NEG). There are 37 patients
-with BCR/ABL, 10 with ALL1/AF4 and 42 from the NEG group.
+To demonstrate some of the tools that are included in the 
+`r Biocpkg("GOstats")`
+package we consider expression data from 79 samples from patients with acute
+lymphoblastic leukemia (ALL) that were investigated using HGU95AV2 Affymetrix
+GeneChip arrays [@Chiaretti2004]. The data were normalized using quantile
+normalization and expression estimates were computed using RMA [@Irizarry2003].
+We will consider the subset of these patients that have B-cell ALL and within
+those we will further restrict our interest to comparing three groups. Those
+with BCR/ABL (this is a translocation between chromosomes 9 and 22), those with
+ALL1/AF4 (this is a translocation between chromosomes 4 and 11) and those with
+no detected cytogenetic abnormalities (labeled NEG). There are 37 patients with
+BCR/ABL, 10 with ALL1/AF4 and 42 from the NEG group.
 
 We will examine genes that are differentially expressed between these
 different phenotypes and then make use of GO and other meta-data
@@ -151,21 +151,21 @@ than 100 units. Applying both of these transformations yielded
 `r {sum(selected)}` probes that were differentially expressed.
 
 ```{r mtFstats, results='hide', echo=FALSE}
- pvCutOff = 0.05
+pvCutOff = 0.05
 
- Fstats = mt.maxT(exprs(esetSub), as.numeric(MB)-1,
-                   B=1000, test="f")
+Fstats = mt.maxT(exprs(esetSub), as.numeric(MB)-1,
+                  B=1000, test="f")
 
- eSet = esetSub[Fstats$index[Fstats$adjp<pvCutOff],]
+eSet = esetSub[Fstats$index[Fstats$adjp<pvCutOff],]
 
- gN = featureNames(eSet)
- lls = unlist(mget(gN, hgu95av2ENTREZID, ifnotfound=NA))
+gN = featureNames(eSet)
+lls = unlist(mget(gN, hgu95av2ENTREZID, ifnotfound=NA))
 
- eS = eSet[!duplicated(lls),]
- gN = featureNames(eS)
- lls = unlist(mget(gN, hgu95av2ENTREZID, ifnotfound=NA))
- lls = as.character(lls[!is.na(lls)])
- syms = unlist(mget(gN, hgu95av2SYMBOL, ifnotfound=NA))
+eS = eSet[!duplicated(lls),]
+gN = featureNames(eS)
+lls = unlist(mget(gN, hgu95av2ENTREZID, ifnotfound=NA))
+lls = as.character(lls[!is.na(lls)])
+syms = unlist(mget(gN, hgu95av2SYMBOL, ifnotfound=NA))
 ```
 
 Next restricting attention to just these `r {sum(selected)}`
@@ -192,25 +192,25 @@ present these three different graphs. Of course one would like to add
 some of the experimental data and information to these plots.
 
 ```{r inducedGO, echo=FALSE, results='hide'}
- gMF = makeGOGraph(lls, "MF", chip="hgu95av2")
- gBP = makeGOGraph(lls, "BP", chip="hgu95av2")
- gCC = makeGOGraph(lls, "CC", chip="hgu95av2")
+gMF = makeGOGraph(lls, "MF", chip="hgu95av2")
+gBP = makeGOGraph(lls, "BP", chip="hgu95av2")
+gCC = makeGOGraph(lls, "CC", chip="hgu95av2")
 
 
- nMF = list()
- lbs = rep("", length(nodes(gMF)))
- names(lbs) = nodes(gMF)
- nMF$label = lbs
+nMF = list()
+lbs = rep("", length(nodes(gMF)))
+names(lbs) = nodes(gMF)
+nMF$label = lbs
 
- nBP = list()
- lbs = rep("", length(nodes(gBP)))
- names(lbs) = nodes(gBP)
- nBP$label = lbs
+nBP = list()
+lbs = rep("", length(nodes(gBP)))
+names(lbs) = nodes(gBP)
+nBP$label = lbs
 
- nCC = list()
- lbs = rep("", length(nodes(gCC)))
- names(lbs) = nodes(gCC)
- nCC$label = lbs
+nCC = list()
+lbs = rep("", length(nodes(gCC)))
+names(lbs) = nodes(gCC)
+nCC$label = lbs
 
 if( require("Rgraphviz") ) {
   gMFlo = agopen(gMF, "gMF")
@@ -221,19 +221,19 @@ if( require("Rgraphviz") ) {
 
 <a id="fig1" ></a>
 ```{r fig1, echo=FALSE, warning=FALSE, fig.cap = " The induced MF GO graph for the selected genes."}
-  if (require("Rgraphviz"))
+if (require("Rgraphviz"))
      plot(gMFlo, nodeAttrs=nMF, main="Molecular Function")
 ```
 
 <a id="fig2" ></a>
 ```{r fig2, fig=TRUE, echo=FALSE, warning=FALSE, fig.cap = " The induced BP GO graph for the selected genes."}
-  if (require("Rgraphviz"))
+if (require("Rgraphviz"))
     plot(gBPlo, nodeAttrs=nBP, main="Biological Process")
 ```
 
 <a id="fig3" ></a>
 ```{r fig3, echo=FALSE, fig.cap = "The induced CC GO graph for the selected genes.", warning=FALSE, fig=TRUE}
-  if (require("Rgraphviz"))
+if (require("Rgraphviz"))
     plot(gCClo, nodeAttrs=nCC, main="Cellular Component")
 ```
 
@@ -278,28 +278,28 @@ for the examples here -- the reader may want to adapt the code to deal
 with the other two ontologies.
 
 ```{r genesToGO}
- CCnodes = nodes(gCC)
- nodes2affy = mget(CCnodes, hgu95av2GO2ALLPROBES, ifnotfound=NA)
+CCnodes = nodes(gCC)
+nodes2affy = mget(CCnodes, hgu95av2GO2ALLPROBES, ifnotfound=NA)
 
- cts = sapply(nodes2affy, function(x) {
-       wh = names(whismax) %in% x
-       table(maxNames[wh])
-   })
+cts = sapply(nodes2affy, function(x) {
+      wh = names(whismax) %in% x
+      table(maxNames[wh])
+  })
 
- all1cts = sapply(cts, function(x) x["ALL1/AF4"])
- all1cts = ifelse(is.na(all1cts), 0, all1cts)
- ##put nice names on
- names(all1cts) = names(cts)
+all1cts = sapply(cts, function(x) x["ALL1/AF4"])
+all1cts = ifelse(is.na(all1cts), 0, all1cts)
+##put nice names on
+names(all1cts) = names(cts)
 
- bcrcts = sapply(cts, function(x) x["BCR/ABL"])
- bcrcts = ifelse(is.na(bcrcts), 0, bcrcts)
- names(bcrcts) = names(cts)
+bcrcts = sapply(cts, function(x) x["BCR/ABL"])
+bcrcts = ifelse(is.na(bcrcts), 0, bcrcts)
+names(bcrcts) = names(cts)
 
- negcts = sapply(cts, function(x) x["NEG"])
- negcts = ifelse(is.na(negcts), 0, negcts)
- names(negcts) = names(cts)
+negcts = sapply(cts, function(x) x["NEG"])
+negcts = ifelse(is.na(negcts), 0, negcts)
+names(negcts) = names(cts)
 
- ctmat = cbind(all1cts, bcrcts, negcts)
+ctmat = cbind(all1cts, bcrcts, negcts)
 ```
 
 Now that we have assembled the requisite counts we are now ready to
@@ -349,7 +349,6 @@ We can make use of the `imageMap` function to provide tool tips for our
 graph.
 
 ```{r imageMap, message=FALSE, results='hide'}
-
  getNodeBB = function(ingraph) {
      xypos = getNodeXY(ingraph)
      hts = getNodeHeight(ingraph)
@@ -424,7 +423,8 @@ Readers should consult [@Lordetal] for a general review of the area and
 for some suggestions. Code contributions that implement some of their
 methods would be most welcome.
 
-Two methods based on graph similarity have been implemented in `r Biocpkg("GOstats")`
+Two methods based on graph similarity have been implemented in
+`r Biocpkg("GOstats")`
 they are `simUI` and `simLP`. The first uses the number of nodes that
 the two graphs have in common divided by the number of nodes in the
 union of the two node sets. Hence these similarities are bounded between
@@ -466,43 +466,43 @@ the BP ontology.
 
 ```{r multip}
 
- igenes = unlist(mget(gN[1:10], hgu95av2ENTREZID))
+igenes = unlist(mget(gN[1:10], hgu95av2ENTREZID))
 
- igenes = igenes[!is.na(igenes)]
- igenes = as.character(igenes)
+igenes = igenes[!is.na(igenes)]
+igenes = as.character(igenes)
 
- psets = mget(igenes, revmap(hgu95av2ENTREZID))
- psets = sapply(psets, function(x) x[1])
- GOs = mget(psets, hgu95av2GO, ifnotfound=NA)
- gBP = sapply(GOs, getOntology, "BP")
- ##how many terms
+psets = mget(igenes, revmap(hgu95av2ENTREZID))
+psets = sapply(psets, function(x) x[1])
+GOs = mget(psets, hgu95av2GO, ifnotfound=NA)
+gBP = sapply(GOs, getOntology, "BP")
+##how many terms
 
- sum(sapply(gBP, length))
+sum(sapply(gBP, length))
 
- ##drop those with no BP annotations
- hasBP = sapply(gBP, function(x) length(x) > 0 && !is.na(x[1]))
+##drop those with no BP annotations
+hasBP = sapply(gBP, function(x) length(x) > 0 && !is.na(x[1]))
 
  gBP = gBP[hasBP]
 
- ggs = lapply(igenes[hasBP], makeGOGraph, "BP", chip="hgu95av2.db")
+ggs = lapply(igenes[hasBP], makeGOGraph, "BP", chip="hgu95av2.db")
 
 ## you could also do ggx = lapply(gBP, GOGraph, GOBPPARENTS)
 ## and should get the same thing
 
- simatM1 = matrix(1, nr=sum(hasBP), nc=sum(hasBP))
- for(i in 1:sum(hasBP))
-    for( j in 1:sum(hasBP) )
-        if( i== j ) next else
-          simatM1[i,j] = simUI(ggs[[i]], ggs[[j]])
+simatM1 = matrix(1, nr=sum(hasBP), nc=sum(hasBP))
+for(i in 1:sum(hasBP))
+   for( j in 1:sum(hasBP) )
+       if( i== j ) next else
+         simatM1[i,j] = simUI(ggs[[i]], ggs[[j]])
 
- library("RBGL")
+library("RBGL")
 
- simatM2 = matrix(1, nr=sum(hasBP), nc=sum(hasBP))
- for(i in 1:sum(hasBP))
-    for( j in 1:sum(hasBP) )
-        if( i== j ) next else {
-          simatM2[i,j] = simLP(ggs[[i]], ggs[[j]])
-      }
+simatM2 = matrix(1, nr=sum(hasBP), nc=sum(hasBP))
+for(i in 1:sum(hasBP))
+   for( j in 1:sum(hasBP) )
+       if( i== j ) next else {
+         simatM2[i,j] = simLP(ggs[[i]], ggs[[j]])
+     }
 ```
 
 You can plot these two measures against each other and compare them. We
@@ -510,7 +510,8 @@ hope that the two measures are somewhat positively correlated.
 
 # Operations on GO Graphs
 
-You should refer to the documentation for the `r Biocpkg("graph")` and `r Biocpkg("RBGL")`
+You should refer to the documentation for the `r Biocpkg("graph")` and
+`r Biocpkg("RBGL")`
 packages for details on how to manipulate *graph* instances. Here we
 show how to identify the leaves of a GO graph.
 
