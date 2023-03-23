@@ -57,9 +57,9 @@ library("ALL")
 ```
 
 The results reported in this document are based on
-`r {packageDescription("hgu95av2.db")[["Version"]]}` version of the
+`r packageDescription("hgu95av2.db")[["Version"]]` version of the
 `r Biocpkg("hgu95av2.db")` data package and on
-`r {packageDescription("GO.db")[["Version"]]}` of the `r Biocpkg("GO.db")` package.
+`r packageDescription("GO.db")[["Version"]]` of the `r Biocpkg("GO.db")` package.
 If you have
 different versions your results will probably be different.
 
@@ -170,7 +170,7 @@ greater than 100. We also introduce a second selection criteria that
 is based on differences between the group means. We require that the
 difference between the smallest group mean and the largest be larger
 than 100 units. Applying both of these transformations yielded
-`r {sum(selected)}` probes that were differentially expressed.
+`r sum(selected)` probes that were differentially expressed.
 
 ```{r mtFstats, results='hide', echo=FALSE}
 pvCutOff = 0.05
@@ -190,16 +190,16 @@ lls = as.character(lls[!is.na(lls)])
 syms = unlist(mget(gN, hgu95av2SYMBOL, ifnotfound=NA))
 ```
 
-Next restricting attention to just these `r {sum(selected)}`
+Next restricting attention to just these `r sum(selected)`
 probes we use the `r Rpackage("mt.maxT")` function from the
 `r Biocpkg("multtest")` package to compute adjusted $p$-values for F-test
-comparisons.  We found `r {sum(Fstats$adjp < pvCutOff)}` of these to
-have adjusted $p$-values less than `r {round(pvCutOff, 2)}`. We will
+comparisons.  We found `r sum(Fstats$adjp < pvCutOff)` of these to
+have adjusted $p$-values less than `r round(pvCutOff, 2)`. We will
 deem these to be the differentially expressed genes and will now turn
 our attention to using GO to gain a better understanding of the
 associated genes.  Before going further though, we note that these
-`r {sum(Fstats$adjp < pvCutOff)}` probes map to
-`r {sum(!duplicated(lls))}` distinct Entrez Gene identifiers and since
+`r sum(Fstats$adjp < pvCutOff)` probes map to
+`r sum(!duplicated(lls))` distinct Entrez Gene identifiers and since
 our GO mappings are based on Entrez Gene we further reduce our attention
 to these. We kept the first (in index order) of each of the duplicated
 probes for any analyses or computations that require gene expression
