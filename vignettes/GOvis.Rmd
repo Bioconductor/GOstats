@@ -10,6 +10,7 @@ vignette: >
   %\VignetteDepends{Biobase,genefilter,graph,GO.db,hgu95av2.db,xtable,multtest}
   %\VignetteSuggests{Rgraphviz}
   %\VignetteKeywords{EDA, graphs, ontology, visualization}
+  %\VignetteEncoding{UTF-8}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignettePackage{GOstats}
 output:
@@ -20,28 +21,19 @@ link-citations: yes
 
 # Introduction {#introduction .unnumbered}
 
-The basic characteristics of the GO [@GO]
-data are described in @GO and the
-interested reader is referred there for more details. In this
-paper we assume
+The basic characteristics of the GO [@GO] data are described in @GO and the
+interested reader is referred there for more details. In this paper we assume
 that readers are familiar with the basic DAG structure of GO
-and with the
-mappings of genes to GO terms that are provide by GOA [@GOA].
-We examine 
-some of the different visualization problems and data
+and with the mappings of genes to GO terms that are provide by GOA [@GOA].
+We examine  some of the different visualization problems and data
 analytic problems that can be addressed using these data. To
-make some of the
-concepts concrete and to provide extensive, but related
-examples we will make
-use of a microarray data set [@Chiaretti2004].
+make some of the concepts concrete and to provide extensive, but related
+examples we will make use of a microarray data set [@Chiaretti2004].
 
 We begin with brief descriptions and reminders of some of the
-important
-concepts, as well as of our example data. Once that has been done
-we will then
-consider several different bioinformatic tasks that are of interest
-and show how
-these tasks can be carried out using software from the Bioconductor
+important concepts, as well as of our example data. Once that has been done
+we will then consider several different bioinformatic tasks that are of interest
+and show how these tasks can be carried out using software from the Bioconductor
 Project.
 
 ```{r Setup, echo=FALSE, results='hide', message=FALSE}
@@ -61,8 +53,7 @@ The results reported in this document are based on
 `r packageDescription("hgu95av2.db")[["Version"]]` version of the
 `r Biocpkg("hgu95av2.db")` data package and on
 `r packageDescription("GO.db")[["Version"]]` of the `r Biocpkg("GO.db")` package.
-If you have
-different versions your results will probably be different.
+If you have different versions your results will probably be different.
 
 ## Graphs
 
@@ -114,26 +105,17 @@ they have a GO annotation for the ontology of interest.
 ## An Example 
 
 To demonstrate some of the tools that are included in the 
-`r Biocpkg("GOstats")`
-package we consider expression data from 79 samples from patients
-with acute
-lymphoblastic leukemia (ALL) that were investigated using HGU95AV2
-Affymetrix
-GeneChip arrays [@Chiaretti2004]. The data were normalized using
-quantile
-normalization and expression estimates were computed using 
-RMA [@Irizarry2003].
-We will consider the subset of these patients that have B-cell
-ALL and within
+`r Biocpkg("GOstats")` package we consider expression data from 79 samples 
+from patients with acute lymphoblastic leukemia (ALL) that were 
+investigated using HGU95AV2 Affymetrix GeneChip arrays [@Chiaretti2004].
+The data were normalized using quantile normalization and expression
+estimates were computed using RMA [@Irizarry2003]. We will consider 
+the subset of these patients that have B-cell ALL and within
 those we will further restrict our interest to comparing three
-groups. Those
-with BCR/ABL (this is a translocation between chromosomes 9 and 22),
-those with
-ALL1/AF4 (this is a translocation between chromosomes 4 and 11)
-and those with
-no detected cytogenetic abnormalities (labeled NEG).
-There are 37 patients with
-BCR/ABL, 10 with ALL1/AF4 and 42 from the NEG group.
+groups. Those with BCR/ABL (this is a translocation between chromosomes 9 and 22),
+those with ALL1/AF4 (this is a translocation between chromosomes 4 and 11)
+and those with no detected cytogenetic abnormalities (labeled NEG).
+There are 37 patients with BCR/ABL, 10 with ALL1/AF4 and 42 from the NEG group.
 
 We will examine genes that are differentially expressed between these
 different phenotypes and then make use of GO and other meta-data
@@ -447,11 +429,10 @@ for some suggestions. Code contributions that implement some of their
 methods would be most welcome.
 
 Two methods based on graph similarity have been implemented in
-`r Biocpkg("GOstats")`
-they are `simUI` and `simLP`. The first uses the number of nodes that
-the two graphs have in common divided by the number of nodes in the
-union of the two node sets. Hence these similarities are bounded between
-0 and 1 with genes that are more similar having values near one.
+`r Biocpkg("GOstats")` they are `simUI` and `simLP`. The first uses the
+number of nodes that the two graphs have in common divided by the number 
+of nodes in the union of the two node sets. Hence these similarities are
+bounded between 0 and 1 with genes that are more similar having values near one.
 
 For `simLP` the similarity measure is the depth of the longest shared
 path from the root node. Two genes that are both quite specific and
@@ -534,9 +515,8 @@ hope that the two measures are somewhat positively correlated.
 # Operations on GO Graphs
 
 You should refer to the documentation for the `r Biocpkg("graph")` and
-`r Biocpkg("RBGL")`
-packages for details on how to manipulate *graph* instances. Here we
-show how to identify the leaves of a GO graph.
+`r Biocpkg("RBGL")` packages for details on how to manipulate *graph* instances.
+Here we show how to identify the leaves of a GO graph.
 
 ```{r leavesEx}
 gCC.leaves = leaves(gCC, "in")
