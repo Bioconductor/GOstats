@@ -10,6 +10,7 @@ vignette: >
   %\VignetteDepends{Biobase,genefilter,graph,GO.db,hgu95av2.db,xtable,multtest}
   %\VignetteSuggests{Rgraphviz}
   %\VignetteKeywords{EDA, graphs, ontology, visualization}
+  %\VignetteEngine{knitr::rmarkdown}
   %\VignettePackage{GOstats}
 output:
   BiocStyle::html_document
