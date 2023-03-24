@@ -6,7 +6,7 @@ authors:
     affiliation: "Vignette translation from Sweave to Rmarkdown / HTML"
 date: "`r format(Sys.time(), '%B %d , %Y')`"
 vignette: >
-  %\VignetteIndexEntry{Visualizing Data Using GOstats}
+  %\VignetteIndexEntry{Visualizing and Distances Using GO}
   %\VignetteDepends{Biobase,genefilter,graph,GO.db,hgu95av2.db,xtable,multtest}
   %\VignetteSuggests{Rgraphviz}
   %\VignetteKeywords{EDA, graphs, ontology, visualization}
