@@ -188,7 +188,7 @@ data and note that others may want to use different conventions.
 
 Using the genes selected in Section [0.3](#sec:example) we can construct the
 induced GO graph for any one of the three different Ontologies. In Figures
-[1](#fig1), [2](#fig2) and [3](#fig3) we present these three different graphs.
+[1](#fig:mf), [2](#fig:bp) and [3](#fig:cc) we present these three different graphs.
 Of course one would like to add some of the experimental data and information to
 these plots.
 
@@ -237,20 +237,20 @@ highest means). Or, possibly of more interest would be to categorize the
 genes (again we could use which phenotype had the highest mean) and
 render the nodes using pie charts.
 
-<a id="fig1" ></a>
-```{r fig1, echo=FALSE, warning=FALSE, fig.cap = " The induced MF GO graph for the selected genes."}
+<a id="fig:mf" ></a>
+```{r GOMF, fig=TRUE, echo=FALSE, warning=FALSE, fig.cap = " The induced MF GO graph for the selected genes."}
   if (require("Rgraphviz"))
      plot(gMFlo, nodeAttrs=nMF, main="Molecular Function")
 ```
 
-<a id="fig2" ></a>
-```{r fig2, fig=TRUE, echo=FALSE, warning=FALSE, fig.cap = " The induced BP GO graph for the selected genes."}
+<a id="fig:bp" ></a>
+```{r GOBP, fig=TRUE, echo=FALSE, warning=FALSE, fig.cap = " The induced BP GO graph for the selected genes."}
   if (require("Rgraphviz"))
     plot(gBPlo, nodeAttrs=nBP, main="Biological Process")
 ```
 
-<a id="fig3" ></a>
-```{r fig3, echo=FALSE, fig.cap = "The induced CC GO graph for the selected genes.", warning=FALSE, fig=TRUE}
+<a id="fig:cc" ></a>
+```{r GOCC,  fig=TRUE, echo=FALSE, warning=FALSE, fig.cap = "The induced CC GO graph for the selected genes."}
   if (require("Rgraphviz"))
     plot(gCClo, nodeAttrs=nCC, main="Cellular Component")
 ```
