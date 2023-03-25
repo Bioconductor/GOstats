@@ -250,7 +250,7 @@ render the nodes using pie charts.
 ```
 
 <a id="fig:cc" ></a>
-```{r GOCC,  fig=TRUE, echo=FALSE, warning=FALSE, fig.cap = "The induced CC GO graph for the selected genes."}
+```{r GOCC, fig=TRUE, echo=FALSE, warning=FALSE, fig.cap = "The induced CC GO graph for the selected genes."}
   if (require("Rgraphviz"))
     plot(gCClo, nodeAttrs=nCC, main="Cellular Component")
 ```
