@@ -131,7 +131,6 @@ filtering.
 data(ALL)
 eset <- ALL[, intersect(grep("^B", as.character(ALL$BT)),
           which(as.character(ALL$mol) %in% c("BCR/ABL","NEG", "ALL1/AF4")))]
-
 MB = factor(eset$mol.bio)
 
 ## intensities above 100 in at least 7 of the samples
@@ -160,12 +159,9 @@ pvCutOff = 0.05
 
 Fstats = mt.maxT(exprs(esetSub), as.numeric(MB)-1,
                   B=1000, test="f")
-
 eSet = esetSub[Fstats$index[Fstats$adjp<pvCutOff],]
-
 gN = featureNames(eSet)
 lls = unlist(mget(gN, hgu95av2ENTREZID, ifnotfound=NA))
-
 eS = eSet[!duplicated(lls),]
 gN = featureNames(eS)
 lls = unlist(mget(gN, hgu95av2ENTREZID, ifnotfound=NA))
@@ -200,23 +196,18 @@ these plots.
  gMF = makeGOGraph(lls, "MF", chip="hgu95av2")
  gBP = makeGOGraph(lls, "BP", chip="hgu95av2")
  gCC = makeGOGraph(lls, "CC", chip="hgu95av2")
-
-
  nMF = list()
  lbs = rep("", length(nodes(gMF)))
  names(lbs) = nodes(gMF)
  nMF$label = lbs
-
  nBP = list()
  lbs = rep("", length(nodes(gBP)))
  names(lbs) = nodes(gBP)
  nBP$label = lbs
-
  nCC = list()
  lbs = rep("", length(nodes(gCC)))
  names(lbs) = nodes(gCC)
  nCC$label = lbs
-
 if( require("Rgraphviz") ) {
   gMFlo = agopen(gMF, "gMF")
   gBPlo = agopen(gBP, "gBP")
@@ -285,25 +276,20 @@ with the other two ontologies.
 ```{r genesToGO}
 CCnodes = nodes(gCC)
 nodes2affy = mget(CCnodes, hgu95av2GO2ALLPROBES, ifnotfound=NA)
-
 cts = sapply(nodes2affy, function(x) {
       wh = names(whismax) %in% x
       table(maxNames[wh])
   })
-
 all1cts = sapply(cts, function(x) x["ALL1/AF4"])
 all1cts = ifelse(is.na(all1cts), 0, all1cts)
 ##put nice names on
 names(all1cts) = names(cts)
-
 bcrcts = sapply(cts, function(x) x["BCR/ABL"])
 bcrcts = ifelse(is.na(bcrcts), 0, bcrcts)
 names(bcrcts) = names(cts)
-
 negcts = sapply(cts, function(x) x["NEG"])
 negcts = ifelse(is.na(negcts), 0, negcts)
 names(negcts) = names(cts)
-
 ctmat = cbind(all1cts, bcrcts, negcts)
 ```
 
@@ -354,28 +340,24 @@ We can make use of the `imageMap` function to provide tool tips for our
 graph.
 
 ```{r imageMap, message=FALSE, results='hide'}
- getNodeBB = function(ingraph) {
-     xypos = getNodeXY(ingraph)
-     hts = getNodeHeight(ingraph)
-     wdsR = getNodeRW(ingraph)
-     wdsL = getNodeLW(ingraph)
-     llx = xypos$x - wdsL
-     lly = xypos$y - (hts/2)
-     urx = xypos$x + wdsR
-     ury = xypos$y + (hts/2)
-     cbind(llx, lly, urx, ury)
- }
-
- CCbb = getNodeBB(gCClo)
-
- ##now we need to adjust the graphBB to the plot region
- bbG = boundBox(gCClo)
- llx = getX(botLeft(bbG))
- lly = getY(botLeft(bbG))
- urx = getX(upRight(bbG))
- ury = getY(upRight(bbG))
-
-
+getNodeBB = function(ingraph) {
+    xypos = getNodeXY(ingraph)
+    hts = getNodeHeight(ingraph)
+    wdsR = getNodeRW(ingraph)
+    wdsL = getNodeLW(ingraph)
+    llx = xypos$x - wdsL
+    lly = xypos$y - (hts/2)
+    urx = xypos$x + wdsR
+    ury = xypos$y + (hts/2)
+    cbind(llx, lly, urx, ury)
+}
+CCbb = getNodeBB(gCClo)
+##now we need to adjust the graphBB to the plot region
+bbG = boundBox(gCClo)
+llx = getX(botLeft(bbG))
+lly = getY(botLeft(bbG))
+urx = getX(upRight(bbG))
+ury = getY(upRight(bbG))
 ##FIXME: work in progress here - we need to do a bit of mapping
 ##to get the right user coords on the jpg file...
 if (interactive()) {
@@ -385,7 +367,6 @@ if (interactive()) {
   par(opar)
  dev.off()
 }
-
 ## FIXME (wh 20.1.2005): better to use imageMap function for Ragraph objects
 ## in the package Rgraphviz instead.
 if(require("geneplotter")) {
@@ -471,10 +452,8 @@ the BP ontology.
 ```{r multip}
 
 igenes = unlist(mget(gN[1:10], hgu95av2ENTREZID))
-
 igenes = igenes[!is.na(igenes)]
 igenes = as.character(igenes)
-
 psets = mget(igenes, revmap(hgu95av2ENTREZID))
 psets = sapply(psets, function(x) x[1])
 GOs = mget(psets, hgu95av2GO, ifnotfound=NA)
@@ -483,13 +462,10 @@ gBP = sapply(GOs, getOntology, "BP")
 
 sum(sapply(gBP, length))
 
-##drop those with no BP annotations
-hasBP = sapply(gBP, function(x) length(x) > 0 && !is.na(x[1]))
-
+ ##drop those with no BP annotations
+ hasBP = sapply(gBP, function(x) length(x) > 0 && !is.na(x[1]))
  gBP = gBP[hasBP]
-
-ggs = lapply(igenes[hasBP], makeGOGraph, "BP", chip="hgu95av2.db")
-
+ ggs = lapply(igenes[hasBP], makeGOGraph, "BP", chip="hgu95av2.db")
 ## you could also do ggx = lapply(gBP, GOGraph, GOBPPARENTS)
 ## and should get the same thing
 
@@ -498,9 +474,7 @@ for(i in 1:sum(hasBP))
    for( j in 1:sum(hasBP) )
        if( i== j ) next else
          simatM1[i,j] = simUI(ggs[[i]], ggs[[j]])
-
 library("RBGL")
-
 simatM2 = matrix(1, nr=sum(hasBP), nc=sum(hasBP))
 for(i in 1:sum(hasBP))
    for( j in 1:sum(hasBP) )
