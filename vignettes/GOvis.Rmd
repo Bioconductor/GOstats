@@ -450,7 +450,6 @@ a set of similarity measures between all pairs of genes with respect to
 the BP ontology.
 
 ```{r multip}
-
 igenes = unlist(mget(gN[1:10], hgu95av2ENTREZID))
 igenes = igenes[!is.na(igenes)]
 igenes = as.character(igenes)
