@@ -340,6 +340,7 @@ params <- new("GOHyperGParams",
               conditional=FALSE,
               testDirection="over")
 ```
+
 We would also like to perform a conditional test. Instead of having to
 define a new *GOHyperGParams* instance by hand, we can create a copy and
 update just the parameter of interest.
