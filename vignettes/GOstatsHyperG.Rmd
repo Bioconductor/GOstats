@@ -9,7 +9,7 @@ date: March 15, 2022
 package: GOstats
 bibliography: GOstats.bib
 vignette: >
-  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteIndexEntry{How To Use GOstats Testing Gene Lists for GO Term Association}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 output:
