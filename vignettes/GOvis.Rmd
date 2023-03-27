@@ -23,16 +23,16 @@ link-citations: yes
 
 The basic characteristics of the GO [@GO] data are described in @GO and the
 interested reader is referred there for more details. In this paper we assume
-that readers are familiar with the basic DAG structure of GO
-and with the mappings of genes to GO terms that are provide by GOA [@GOA].
+that readers are familiar with the basic DAG structure of GO and with the
+mappings of genes to GO terms that are provide by GOA [@GOA].
 We examine  some of the different visualization problems and data
 analytic problems that can be addressed using these data. To
 make some of the concepts concrete and to provide extensive, but related
 examples we will make use of a microarray data set [@Chiaretti2004].
 
-We begin with brief descriptions and reminders of some of the
-important concepts, as well as of our example data. Once that has been done
-we will then consider several different bioinformatic tasks that are of interest
+We begin with brief descriptions and reminders of some of the important
+concepts, as well as of our example data. Once that has been done we will
+then consider several different bioinformatic tasks that are of interest
 and show how these tasks can be carried out using software from the Bioconductor
 Project.
 
@@ -104,14 +104,13 @@ they have a GO annotation for the ontology of interest.
 
 ## An Example 
 
-To demonstrate some of the tools that are included in the 
-`r Biocpkg("GOstats")` package we consider expression data from 79 samples 
-from patients with acute lymphoblastic leukemia (ALL) that were 
-investigated using HGU95AV2 Affymetrix GeneChip arrays [@Chiaretti2004].
-The data were normalized using quantile normalization and expression
-estimates were computed using RMA [@Irizarry2003]. We will consider 
-the subset of these patients that have B-cell ALL and within
-those we will further restrict our interest to comparing three
+To demonstrate some of the tools that are included in the `r Biocpkg("GOstats")`
+package we consider expression data from 79 samples from patients with acute
+lymphoblastic leukemia (ALL) that were investigated using HGU95AV2
+Affymetrix GeneChip arrays [@Chiaretti2004]. The data were normalized
+using quantile normalization and expression estimates were computed using
+RMA [@Irizarry2003]. We will consider the subset of these patients that have
+B-cell ALL and within those we will further restrict our interest to comparing three
 groups. Those with BCR/ABL (this is a translocation between chromosomes 9 and 22),
 those with ALL1/AF4 (this is a translocation between chromosomes 4 and 11)
 and those with no detected cytogenetic abnormalities (labeled NEG).
@@ -132,7 +131,6 @@ data(ALL)
 eset <- ALL[, intersect(grep("^B", as.character(ALL$BT)),
           which(as.character(ALL$mol) %in% c("BCR/ABL","NEG", "ALL1/AF4")))]
 MB = factor(eset$mol.bio)
-
 ## intensities above 100 in at least 7 of the samples
 f1 <- kOverA(7, log2(100))
 f2 = function(x) {gps = split(2^x, MB); mns=sapply(gps, mean);
@@ -156,7 +154,6 @@ than 100 units. Applying both of these transformations yielded
 
 ```{r mtFstats, results='hide', echo=FALSE}
 pvCutOff = 0.05
-
 Fstats = mt.maxT(exprs(esetSub), as.numeric(MB)-1,
                   B=1000, test="f")
 eSet = esetSub[Fstats$index[Fstats$adjp<pvCutOff],]
@@ -177,12 +174,12 @@ have adjusted $p$-values less than `r round(pvCutOff, 2)`. We will
 deem these to be the differentially expressed genes and will now turn
 our attention to using GO to gain a better understanding of the
 associated genes.  Before going further though, we note that these
-`r sum(Fstats$adjp < pvCutOff)` probes map to
-`r sum(!duplicated(lls))` distinct Entrez Gene identifiers and since
-our GO mappings are based on Entrez Gene we further reduce our attention
-to these. We kept the first (in index order) of each of the duplicated
-probes for any analyses or computations that require gene expression
-data and note that others may want to use different conventions.
+`r sum(Fstats$adjp < pvCutOff)` probes map to `r sum(!duplicated(lls))`
+distinct Entrez Gene identifiers and since our GO mappings are based on
+Entrez Gene we further reduce our attention to these. We kept the first
+(in index order) of each of the duplicated probes for any analyses or
+computations that require gene expression data and note that others 
+may want to use different conventions.
 
 # Visualization
 
@@ -488,8 +485,8 @@ hope that the two measures are somewhat positively correlated.
 # Operations on GO Graphs
 
 You should refer to the documentation for the `r Biocpkg("graph")` and
-`r Biocpkg("RBGL")` packages for details on how to manipulate *graph* instances.
-Here we show how to identify the leaves of a GO graph.
+`r Biocpkg("RBGL")` packages for details on how to manipulate *graph*
+instances. Here we show how to identify the leaves of a GO graph.
 
 ```{r leavesEx}
 gCC.leaves = leaves(gCC, "in")
