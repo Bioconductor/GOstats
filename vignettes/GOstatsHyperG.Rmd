@@ -5,16 +5,25 @@ author:
   - name: R. Gentleman
   - name: Dennis Ndubi
     affiliation: "Vignette translation from Sweave to R Markdown / HTML"
-date: March 15, 2022
+date: "`r format(Sys.time(), '%B %d, %Y')`"
 package: GOstats
 bibliography: GOstats.bib
+link-citations: yes
 vignette: >
-  %\VignetteIndexEntry{How To Use GOstats Testing Gene Lists for GO Term Association}
+  %\VignetteIndexEntry{Hypergeometric Tests Using GOstats}
+  %\VignetteDepends{ALL, GO.db, annotate, hgu95av2.db, genefilter, RColorBrewer,
+  %xtable, Rgraphviz} 
+  %\VignetteKeywords{Hypergeometric, GO, ontology}
+  %\VignettePackage{GOstats}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 output:
-  BiocStyle::html_document
+  BiocStyle::html_document:
+    number_sections: no
+    toc: yes
+    toc_depth: 4
 ---
+
 # Introduction
 
 The `r Biocpkg("GOstats")` package has extensive facilities for testing
