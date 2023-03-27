@@ -20,7 +20,7 @@ vignette: >
 output:
   BiocStyle::html_document:
     number_sections: no
-    toc: yes
+    toc: no
     toc_depth: 4
 ---
 
