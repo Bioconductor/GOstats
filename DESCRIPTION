@@ -5,11 +5,11 @@ Authors@R: c(
     person("Robert", "Gentleman", role="aut"),
     person("Seth", "Falcon", role="ctb"),
     person("Robert", "Castelo", role="ctb"),
-    person("Dennis", "Ndubi", role ="ctb",
-        comment = "Converted GOstatsHyperG vignette from Sweave to RMarkdown / HTML."),
+    person("Dennis", "Ndubi", role="ctb",
+        comment="Converted GOstatsHyperG vignette from Sweave to RMarkdown / HTML."),
     person("Bioconductor Package Maintainer",
-        email = "maintainer@bioconductor.org", role = "cre"))
-Description: A set of t ools for interacting with GO and microarray
+        email="maintainer@bioconductor.org", role="cre"))
+Description: A set of tools for interacting with GO and microarray
         data. A variety of basic manipulation tools for graphs,
         hypothesis testing and other simple calculations.
 Depends: R (>= 2.10), Biobase (>= 1.15.29), Category (>= 2.43.2), graph
