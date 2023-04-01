@@ -96,9 +96,7 @@ paper we restrict attention to those genes which satisfy two conditions first
 they were included on the chip being used and second they have a GO annotation
 for the ontology of interest.
 
-<a id="sec:example"></a>
-
-## An Example 
+## An Example {#sec:example}
 
 To demonstrate some of the tools that are included in the `r Biocpkg("GOstats")`
 package we consider expression data from 79 samples from patients with acute
@@ -184,7 +182,7 @@ data and note that others may want to use different conventions.
 
 # Visualization
 
-Using the genes selected in Section [0.3](#sec:example) we can construct the
+Using the genes selected in Section \@ref(sec:example) we can construct the
 induced GO graph for any one of the three different Ontologies. In Figures
 [1](#fig:mf), [2](#fig:bp) and [3](#fig:cc) we present these three different
 graphs. Of course one would like to add some of the experimental data and
