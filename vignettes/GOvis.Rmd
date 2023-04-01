@@ -495,9 +495,9 @@ that the two measures are somewhat positively correlated.
 
 # Operations on GO Graphs
 
-You should refer to the documentation for the `r Biocpkg("graph")` and `r
-Biocpkg("RBGL")` packages for details on how to manipulate *graph* instances.
-Here we show how to identify the leaves of a GO graph.
+You should refer to the documentation for the `r Biocpkg("graph")` and 
+`r Biocpkg("RBGL")` packages for details on how to manipulate *graph* 
+instances. Here we show how to identify the leaves of a GO graph.
 
 ```{r leavesEx}
 gCC.leaves <- leaves(gCC, "in")
