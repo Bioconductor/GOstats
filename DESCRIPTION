@@ -6,9 +6,11 @@ Authors@R: c(
         person("Seth", "Falcon", role="ctb"),
         person("Robert", "Castelo", role="ctb"),
         person("Sonali", "Kumari", role="ctb",
-                comment = "Converted 'GOstats' vignettes from Sweave to RMarkdown / HTML."),
+                comment="Converted GOvis vignette from Sweave to R Markdown / HTML."),
+        person("Dennis", "Ndubi", role="ctb",
+                comment="Converted GOstatsHyperG vignette from Sweave to R Markdown / HTML."),
         person("Bioconductor Package Maintainer", role="cre",
-                email = "maintainer@bioconductor.org"))
+                email="maintainer@bioconductor.org"))
 Description: A set of tools for interacting with GO and microarray
         data. A variety of basic manipulation tools for graphs,
         hypothesis testing and other simple calculations.
