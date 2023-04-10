@@ -11,7 +11,7 @@ bibliography: GOstats.bib
 link-citations: yes
 vignette: >
   %\VignetteIndexEntry{Hypergeometric Tests Using GOstats}
-  %\VignetteDepends{ALL, GO.db, annotate, hgu95av2.db, genefilter, RColorBrewer, table, Rgraphviz}
+  %\VignetteDepends{ALL, GO.db, annotate, hgu95av2.db, genefilter, RColorBrewer, xtable, Rgraphviz}
   %\VignetteKeywords{Hypergeometric, GO, ontology}
   %\VignettePackage{GOstats}
   %\VignetteEngine{knitr::rmarkdown}

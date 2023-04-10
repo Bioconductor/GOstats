@@ -1,6 +1,6 @@
 Package: GOstats
 Title: Tools for manipulating GO and microarrays
-Version: 2.65.2
+Version: 2.65.3
 Authors@R: c(
         person("Robert", "Gentleman", role="aut"),
         person("Seth", "Falcon", role="ctb"),
