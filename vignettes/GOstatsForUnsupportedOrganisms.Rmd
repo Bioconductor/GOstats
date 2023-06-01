@@ -47,7 +47,7 @@ data.frame object. The starting object needs to be a data.frame with the GO Id's
 in the 1st col, the evidence codes in the 2nd column and the gene Id's in the
 3rd.
 
-```{r Acquire annotation data}
+```{r Acquire annotation data, message=FALSE}
 library("org.Hs.eg.db")
 frame = toTable(org.Hs.egGO)
 goframeData = data.frame(frame$go_id, frame$Evidence, frame$gene_id)
