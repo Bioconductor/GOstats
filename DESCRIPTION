@@ -6,7 +6,7 @@ Authors@R: c(
         person("Seth", "Falcon", role="ctb"),
         person("Robert", "Castelo", role="ctb"),
         person("Sonali", "Kumari", role="ctb",
-                comment="Converted GOvis vignette from Sweave to R Markdown / HTML."),
+                comment="Converted vignettes from Sweave to R Markdown / HTML."),
         person("Dennis", "Ndubi", role="ctb",
                 comment="Converted GOstatsHyperG vignette from Sweave to R Markdown / HTML."),
         person("Bioconductor Package Maintainer", role="cre",
